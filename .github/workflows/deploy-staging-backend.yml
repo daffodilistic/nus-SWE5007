@@ -36,10 +36,10 @@ jobs:
           name: staging-deploy
       - name: Check if artifact is present
         run: |
+          ls -R ./
           if [ -d demo/build ]; then
             echo "Artifact found"
           else
             echo "Artifact not found"
             exit 1
           fi
-          ls -R ./
