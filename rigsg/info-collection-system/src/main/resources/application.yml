@@ -1,0 +1,9 @@
+db:
+  projectId: sapient-symbol-388402
+  region: asia-southeast1
+  instanceId: dev-ric-database
+  name: ric-database
+  username: dev-ric-app-user
+  pwdFilePath: D:\swe5007-sql-password.txt
+
+
