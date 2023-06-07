@@ -5,7 +5,7 @@ on:
       - staging/backend
 
 jobs:
-  deploy:
+  build:
     permissions:
       contents: "read"
       id-token: "write"
@@ -20,3 +20,26 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '17'
       - run: "./build.sh"
+
+      - name: Share artifact inside workflow
+        uses: actions/upload-artifact@v3
+        with:
+          name: staging-deploy
+          path: demo/build
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: staging-deploy
+      - name: Check if artifact is present
+        run: |
+          if [ -d demo/build ]; then
+            echo "Artifact found"
+          else
+            echo "Artifact not found"
+            exit 1
+          fi
+          ls -R ./
