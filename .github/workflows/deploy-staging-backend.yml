@@ -34,10 +34,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: staging-deploy
+          path: artifact
       - name: Check if artifact is present
         run: |
           ls -R ./
-          if [ -d demo/build ]; then
+          if [ -d artifact ]; then
             echo "Artifact found"
           else
             echo "Artifact not found"
