@@ -2,11 +2,18 @@ package com.nus.project.capstone.rigsg.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
@@ -14,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 @Configuration
+@MapperScan(basePackages = "com.nus.project.capstone.rigsg.mapper", sqlSessionTemplateRef = "sqlSessionTemplate")
 public class MySqlConfig {
 
     private final Logger logger = LoggerFactory.getLogger(MySqlConfig.class);
@@ -45,6 +53,7 @@ public class MySqlConfig {
     }
 
     @Bean(name = "sqlDataSource")
+    @Primary
     public DataSource getConnectionPool() {
         String instanceName = getInstanceName();
         String dbPwd = extractPwd();
@@ -63,6 +72,22 @@ public class MySqlConfig {
         config.addDataSourceProperty("socketFactory", "com.google.cloud.sql.postgres.SocketFactory");
         config.addDataSourceProperty("cloudSqlInstance", instanceName);
         return new HikariDataSource(config);
+    }
+
+    @Bean(name = "sqlSessionFactory")
+    @Primary
+    public SqlSessionFactory mysqlSqlSessionFactory(
+            @Qualifier("sqlDataSource") DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean(name = "sqlSessionTemplate")
+    @Primary
+    public SqlSessionTemplate mysqlSqlSessionTemplate(
+            @Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
     }
 
 }
