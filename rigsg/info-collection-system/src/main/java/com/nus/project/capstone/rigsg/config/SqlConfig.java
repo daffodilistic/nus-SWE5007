@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
@@ -22,9 +21,9 @@ import java.io.IOException;
 
 @Configuration
 @MapperScan(basePackages = "com.nus.project.capstone.rigsg.mapper", sqlSessionTemplateRef = "sqlSessionTemplate")
-public class MySqlConfig {
+public class SqlConfig {
 
-    private final Logger logger = LoggerFactory.getLogger(MySqlConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(SqlConfig.class);
 
     @Value("${db.projectId}")
     private String projectId;
