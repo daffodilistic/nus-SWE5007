@@ -22,7 +22,8 @@ public interface UserInfoMapper {
             @Result(property = "phoneNumber", column = "phone_number"),
             @Result(property = "schoolName", column = "school_name"),
             @Result(property = "yearOfExp", column = "years_of_exp"),
-            @Result(property = "isQualified", column = "is_qualified")
+            @Result(property = "isQualified", column = "is_qualified"),
+            @Result(property = "teamId", column = "team_id")
     })
     List<User> getAllUser();
 }
