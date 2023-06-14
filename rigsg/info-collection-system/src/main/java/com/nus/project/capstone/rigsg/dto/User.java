@@ -22,5 +22,6 @@ public class User {
     private String schoolName;
     private String yearOfExp;
     private String isQualified;
+    private String teamId;
 
 }
