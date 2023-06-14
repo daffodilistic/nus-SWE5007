@@ -12,14 +12,17 @@ import java.util.List;
 public interface UserInfoMapper {
     @Select("SELECT * FROM users")
     @Results({
-            @Result(property = "firstName", column = "firstname"),
-            @Result(property = "lastName", column = "lastname"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "firstName", column = "first_name"),
+            @Result(property = "lastName", column = "last_name"),
             @Result(property = "email", column = "email"),
-            @Result(property = "address", column = "address"),
             @Result(property = "country", column = "country"),
-            @Result(property = "phoneNumber", column = "phonenumber"),
-            @Result(property = "isQualified", column = "isqualified"),
-            @Result(property = "userId", column = "userid"),
+            @Result(property = "state", column = "state"),
+            @Result(property = "dateOfBirth", column = "date_of_birth"),
+            @Result(property = "phoneNumber", column = "phone_number"),
+            @Result(property = "schoolName", column = "school_name"),
+            @Result(property = "yearOfExp", column = "years_of_exp"),
+            @Result(property = "isQualified", column = "is_qualified")
     })
     List<User> getAllUser();
 }
