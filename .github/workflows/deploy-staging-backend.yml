@@ -25,7 +25,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: staging-deploy
-          path: demo/build
+          path: |
+            rigsg/info-collection-system/target/
+            rigsg/user-profile-management/target/
   deploy:
     needs: build
     runs-on: ubuntu-latest
