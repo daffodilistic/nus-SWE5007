@@ -1,3 +1,3 @@
 #!/bin/bash
-cd demo
-./gradlew bootJar
+cd rigsg
+./mvnw clean package spring-boot:repackage
