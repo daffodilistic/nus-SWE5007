@@ -5,7 +5,7 @@ spring:
         database-name: ric-database
         instance-connection-name: sapient-symbol-388402:asia-southeast1:dev-ric-database
       credentials:
-        location: classpath:sapient-symbol-388402-63f104db32e1.json
+        location: file:/usr/local/credentials.json
       project-id: sapient-symbol-388402
   datasource:
     username: dev-ric-app-user
