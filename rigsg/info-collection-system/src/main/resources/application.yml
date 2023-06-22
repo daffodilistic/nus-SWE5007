@@ -8,8 +8,8 @@ spring:
         location: file:/usr/local/credentials.json
       project-id: sapient-symbol-388402
   datasource:
-    username: dev-ric-app-user
-    password: <password>
+    username: ${POSTGRES_USERNAME} 
+    password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
