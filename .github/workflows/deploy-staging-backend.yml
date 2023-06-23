@@ -55,7 +55,7 @@ jobs:
             sudo docker compose down \
           "
       - name: Upload JAR files
-        run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/build/
+        run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/info-collection-system/build/
       - name: Build and run Docker containers via Docker Compose
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
