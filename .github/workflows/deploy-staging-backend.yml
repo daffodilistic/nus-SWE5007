@@ -54,6 +54,8 @@ jobs:
             cd $DEPLOY_DIRECTORY/info-collection-system/ && \
             sudo docker compose down \
           "
+      - name: Upload JAR files
+        run: rsync -avzb --delete ./artifact ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_REVERSE_PROXY_HOST }}:$DEPLOY_DIRECTORY/build/
       - name: Build and run Docker containers via Docker Compose
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
