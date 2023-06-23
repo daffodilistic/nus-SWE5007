@@ -6,7 +6,7 @@ on:
 
 env:
   DEPLOY_DIRECTORY: /var/containers/
-        
+
 jobs:
   build:
     permissions:
@@ -16,12 +16,12 @@ jobs:
     steps:
       - name: Checkout
         uses: "actions/checkout@v3"
-            
+
       - name: Build Spring Boot application
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '17'
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "17"
       - run: "./build.sh"
 
       - name: Share artifact inside workflow
@@ -29,8 +29,8 @@ jobs:
         with:
           name: staging-deploy
           path: |
-            rigsg/info-collection-system/target/
-            rigsg/user-profile-management/target/
+            rigsg/info-collection-system/target/**/*.jar
+            rigsg/user-profile-management/target/**/*.jar
   deploy:
     needs: build
     runs-on: ubuntu-latest
