@@ -52,14 +52,14 @@ jobs:
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
             cd $DEPLOY_DIRECTORY/info-collection-system/ && \
-            sudo docker compose down && \
+            sudo docker compose down \
           "
       - name: Build and run Docker containers via Docker Compose
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
             cd $DEPLOY_DIRECTORY/info-collection-system/ && \
-            sudo docker compose up -d --build --remove-orphans && \
+            sudo docker compose up -d --build --remove-orphans \
           "
       - name: Timestamping deployment
         run: |
