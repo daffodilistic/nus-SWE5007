@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    gcp:
+      sql:
+        database-name: ric-database
+        instance-connection-name: sapient-symbol-388402:asia-southeast1:dev-ric-database
+      credentials:
+        location: file:/usr/local/credentials.json
+      project-id: sapient-symbol-388402
+  datasource:
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
