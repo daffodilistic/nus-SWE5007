@@ -20,7 +20,8 @@
 
     <modules>
         <module>info-collection-system</module>
-        <module>user-profile-management</module>
+        <module>idc-system</module>
+        <module>game-system</module>
     </modules>
 
     <properties>
