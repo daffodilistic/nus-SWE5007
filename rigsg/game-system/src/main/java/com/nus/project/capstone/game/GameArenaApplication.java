@@ -1,4 +1,4 @@
-package com.nus.project.capstone.rigsg;
+package com.nus.project.capstone.game;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
