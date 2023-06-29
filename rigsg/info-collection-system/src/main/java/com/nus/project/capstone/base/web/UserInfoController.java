@@ -8,7 +8,9 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -46,22 +48,27 @@ public class UserInfoController {
     }
 
     @PutMapping("/user")
-    public void updateUser(@RequestBody UserRequests u) {
+    public void updateUser(@RequestBody UserRequests updateUserRequests) {
 
-        if (u.getId() == null) {
+        if (updateUserRequests.getId() == null) {
             log.info("User id must be provided");
             return;
         }
 
-        if (userRepository.findById(u.getId()).isPresent()) {
-            userRepository.save(UserJpaEntities.toJpaEntity(u));
-        } else {
-            log.info(String.format("User %s is not found", u.getId()));
+        if (userRepository.findById(updateUserRequests.getId()).isEmpty()) {
+            log.info(String.format("User %s is not found", updateUserRequests.getId()));
+            return;
         }
+
+        var user = userRepository.findById(updateUserRequests.getId()).get();
+        user = user.updateJpaEntity(updateUserRequests);
+
+        userRepository.save(user);
     }
 
     @GetMapping("/users")
-    public List<UserJpaEntities> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserRequests> getAllUsers() {
+        val users = userRepository.findAll();
+        return users.stream().map(UserRequests::toUserRequests).collect(Collectors.toList());
     }
 }

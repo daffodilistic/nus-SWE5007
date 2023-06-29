@@ -12,6 +12,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserRequests {
 
+    // Request and Response
     private UUID id;
     private String firstName;
     private String lastName;
@@ -23,6 +24,10 @@ public class UserRequests {
     private String schoolName;
     private Integer yearsOfExp;
     private Boolean isQualified;
+    private Boolean isQualifiedProm;
+
+    // Response
+    private String team;
 
     public static UserRequests toUserRequests(UserJpaEntities u) {
         return UserRequests.builder()
@@ -37,6 +42,8 @@ public class UserRequests {
                 .schoolName(u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp())
                 .isQualified(u.getIsQualified())
+                .isQualifiedProm(u.getIsQualifiedProm())
+                .team(u.getTeam() == null ? null : u.getTeam().getId().toString())
                 .build();
     }
 }
