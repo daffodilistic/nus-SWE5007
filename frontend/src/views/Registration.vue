@@ -209,8 +209,11 @@ import Vue from 'vue';
 import { DropDownListPlugin } from "@syncfusion/ej2-vue-dropdowns";
 Vue.use(DropDownListPlugin);
 import { Query } from '@syncfusion/ej2-data';
-import VueSwal from 'vue-swal'
-Vue.use(VueSwal)
+
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+Vue.use(VueSweetalert2);
 
 export default {
   data () {
@@ -5210,17 +5213,7 @@ export default {
         { StateName: 'Mashonaland East Province', CountryId: '252', StateId: '4723' },
         { StateName: 'Masvingo Province', CountryId: '252', StateId: '4724' },
       ],
-      STEMYearData: [
-        { STEMYearName: '0', STEMYearId: '0'},
-        { STEMYearName: '1', STEMYearId: '1'},
-        { STEMYearName: '2', STEMYearId: '2'},
-        { STEMYearName: '3', STEMYearId: '3'},
-        { STEMYearName: '4', STEMYearId: '4'},
-        { STEMYearName: '5', STEMYearId: '5'},
-        { STEMYearName: '6', STEMYearId: '6'},
-        { STEMYearName: '7', STEMYearId: '7'},
-    ],
-     
+
       countryfields : { value: 'CountryId', text: 'CountryName' },
       statefields : { value: 'StateId', text: 'StateName' },
       STEMYearfields : { value: 'STEMYearId', text: 'STEMYearName' },
@@ -5241,7 +5234,9 @@ export default {
             this.stateenabled = true;
         }, 
         alert() {
-            this.$swal("Success!", "Registration Completed!", "success");
+           this.$swal.fire("Success!", "Registration Completed!", "success");
+
+           //at html put <!--@click="alert"-->
         }
     },
 }
