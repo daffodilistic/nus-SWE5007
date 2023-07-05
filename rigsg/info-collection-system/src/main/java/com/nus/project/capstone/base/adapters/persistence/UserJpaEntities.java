@@ -18,7 +18,7 @@ import java.util.UUID;
 public class UserJpaEntities {
 
     @Id
-    @Column(nullable = false)
+    @Column(nullable = false, name = "user_id")
     private UUID id;
     private String firstName;
     private String lastName;
@@ -33,7 +33,7 @@ public class UserJpaEntities {
     private Boolean isQualifiedProm;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "team_id", referencedColumnName = "id")
+    @JoinColumn(name = "team_id", referencedColumnName = "idc_team_id")
     private IdcTeamJpaEntities team;
 
     public static UserJpaEntities toJpaEntity(UserRequests u) {

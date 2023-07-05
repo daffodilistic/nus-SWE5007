@@ -18,7 +18,7 @@ import java.util.*;
 public class IdcTeamJpaEntities {
 
     @Id
-    @Column(nullable = false)
+    @Column(nullable = false, name = "idc_team_id")
     private UUID id;
     private String teamName;
     private String competitionChoice;
