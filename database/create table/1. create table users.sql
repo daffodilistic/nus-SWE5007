@@ -11,6 +11,6 @@ CREATE TABLE users
     phone_number        varchar(20) NULL,
     school_name         varchar(50) NULL,
     years_of_exp        BIGINT NULL,
-    is_qualified_prim   BOOL NULL,
-    is_qualified_promo  BOOL NULL
+    idc_team_id         uuid REFERENCES idc_team (idc_team_id),
+    game_team_id        uuid REFERENCES game_team (game_team_id)
 );

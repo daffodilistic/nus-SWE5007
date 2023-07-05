@@ -9,5 +9,5 @@ create table game_team
     qualification_round_score                   BIGINT NULL,
     qualification_round_point                   BIGINT NULL,
     qualification_round_num_matches_played      BIGINT NULL,
-    is_qualified_for_elimination                BOOL NULL
+    is_qualified_for_elimination                BOOL DEFAULT FALSE
 );
