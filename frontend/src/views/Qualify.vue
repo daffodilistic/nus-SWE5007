@@ -1,7 +1,5 @@
-<script setup lang="ts">
-  import { RouterView } from 'vue-router'
-  import SidebarMenu from "@/components/SidebarMenu.vue";
-
+<script>
+ 
 </script>
 
 <template>
@@ -31,6 +29,7 @@
      </tr>
    </tbody>
  </table>
+ <vs-pagination :total-pages="20" @change="changePage"></vs-pagination>
 </div>
 </template>
 
@@ -120,6 +119,7 @@ table td:first-child input[type="checkbox"]:hover {
 <script>
 
 export default {
+
    data() {
      return {
        users: [
