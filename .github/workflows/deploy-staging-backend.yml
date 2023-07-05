@@ -4,6 +4,9 @@ on:
     branches:
       - staging/backend
 
+env:
+  DEPLOY_DIRECTORY: /var/containers/
+
 jobs:
   build:
     permissions:
@@ -13,12 +16,12 @@ jobs:
     steps:
       - name: Checkout
         uses: "actions/checkout@v3"
-            
+
       - name: Build Spring Boot application
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '17'
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "17"
       - run: "./build.sh"
 
       - name: Share artifact inside workflow
@@ -26,8 +29,8 @@ jobs:
         with:
           name: staging-deploy
           path: |
-            rigsg/info-collection-system/target/
-            rigsg/user-profile-management/target/
+            rigsg/info-collection-system/target/**/*.jar
+            rigsg/user-profile-management/target/**/*.jar
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -37,12 +40,33 @@ jobs:
         with:
           name: staging-deploy
           path: artifact
-      - name: Check if artifact is present
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
+      - name: Stop running Docker containers
         run: |
-          ls -R ./
-          if [ -d artifact ]; then
-            echo "Artifact found"
-          else
-            echo "Artifact not found"
-            exit 1
-          fi
+          ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
+          " \
+            cd $DEPLOY_DIRECTORY/info-collection-system/ && \
+            sudo docker compose down \
+          "
+      - name: Upload JAR files
+        run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/info-collection-system/build/
+      - name: Build and run Docker containers via Docker Compose
+        run: |
+          ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
+          " \
+            cd $DEPLOY_DIRECTORY/info-collection-system/ && \
+            sudo docker compose up -d --build --remove-orphans \
+          "
+      - name: Timestamping deployment
+        run: |
+          ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
+          " \
+            cd $DEPLOY_DIRECTORY/info-collection-system/ && \
+            echo "Commit ${{ github.sha }} deployed at $(TZ=":Asia/Singapore" date)" > deployment_info.txt \
+          "
