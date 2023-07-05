@@ -1,27 +1,21 @@
-package com.nus.project.capstone.idc.adapters.persistence;
+package com.nus.project.capstone.base.adapters.entity;
 
-import com.nus.project.capstone.idc.adapters.entity.IdcTeamRequests;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nus.project.capstone.base.adapters.persistence.IdcTeamJpaEntities;
+import com.nus.project.capstone.base.adapters.persistence.UserJpaEntities;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "idc_team")
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-public class IdcTeamJpaEntities {
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class IdcTeamRequests {
 
-    @Id
-    @Column(nullable = false)
     private UUID id;
     private String teamName;
     private String competitionChoice;
@@ -30,10 +24,14 @@ public class IdcTeamJpaEntities {
     private Integer teamScoreFirstStage;
     private Integer teamScoreSecondStage;
     private Boolean isQualifiedSecondStage;
+    private Set<UUID> userIds;
 
-    public static IdcTeamJpaEntities toJpaEntity(IdcTeamRequests i) {
-        return IdcTeamJpaEntities.builder()
-                .id(i.getId() == null ? UUID.randomUUID() : i.getId())
+    // Response
+    private List<UserRequests> userRequests;
+
+    public static IdcTeamRequests toIdcTeamRequests(IdcTeamJpaEntities i) {
+        return IdcTeamRequests.builder()
+                .id(i.getId())
                 .teamName(i.getTeamName())
                 .competitionChoice(i.getCompetitionChoice())
                 .ageGroup(i.getAgeGroup())
