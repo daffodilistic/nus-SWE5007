@@ -25,14 +25,16 @@ jobs:
         with:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "17"
-      - run: "./build.sh"
+      - run: /
+          cd rigsg
+          ./mvnw --projects ${{ matrix.services }} clean package spring-boot:repackage -DskipTests=true
 
       - name: Share artifact inside workflow
         uses: actions/upload-artifact@v3
         with:
           name: staging-deploy
           path: |
-            rigsg/${{ matrix.version }}/target/**/*.jar
+            rigsg/${{ matrix.services }}/target/**/*.jar
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -53,22 +55,22 @@ jobs:
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
-            cd $DEPLOY_DIRECTORY/${{ matrix.version }}/ && \
+            cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
             sudo docker compose down \
           "
       - name: Upload JAR files
-        run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/${{ matrix.version }}/build/
+        run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/${{ matrix.services }}/build/
       - name: Build and run Docker containers via Docker Compose
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
-            cd $DEPLOY_DIRECTORY/${{ matrix.version }}/ && \
+            cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
             sudo docker compose up -d --build --remove-orphans \
           "
       - name: Timestamping deployment
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
-            cd $DEPLOY_DIRECTORY/${{ matrix.version }}/ && \
+            cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
             echo "Commit ${{ github.sha }} deployed at $(TZ=":Asia/Singapore" date)" > deployment_info.txt \
           "
