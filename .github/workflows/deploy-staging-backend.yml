@@ -12,6 +12,7 @@ jobs:
     strategy:
       matrix:
         services: [ game-system, idc-system, info-collection-system, user-profile-management ]
+    continue-on-error: true
     permissions:
       contents: "read"
       id-token: "write"
