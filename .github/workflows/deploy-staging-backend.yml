@@ -25,7 +25,7 @@ jobs:
         with:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "17"
-      - run: /
+      - run: |
           cd rigsg
           ./mvnw --projects ${{ matrix.services }} clean package spring-boot:repackage -DskipTests=true
 
