@@ -9,6 +9,9 @@ env:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        services: [ game-system, idc-system, info-collection-system, user-profile-management ]
     permissions:
       contents: "read"
       id-token: "write"
@@ -29,8 +32,7 @@ jobs:
         with:
           name: staging-deploy
           path: |
-            rigsg/info-collection-system/target/**/*.jar
-            rigsg/user-profile-management/target/**/*.jar
+            rigsg/${{ matrix.version }}/target/**/*.jar
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -51,22 +53,22 @@ jobs:
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
-            cd $DEPLOY_DIRECTORY/info-collection-system/ && \
+            cd $DEPLOY_DIRECTORY/${{ matrix.version }}/ && \
             sudo docker compose down \
           "
       - name: Upload JAR files
-        run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/info-collection-system/build/
+        run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/${{ matrix.version }}/build/
       - name: Build and run Docker containers via Docker Compose
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
-            cd $DEPLOY_DIRECTORY/info-collection-system/ && \
+            cd $DEPLOY_DIRECTORY/${{ matrix.version }}/ && \
             sudo docker compose up -d --build --remove-orphans \
           "
       - name: Timestamping deployment
         run: |
           ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
           " \
-            cd $DEPLOY_DIRECTORY/info-collection-system/ && \
+            cd $DEPLOY_DIRECTORY/${{ matrix.version }}/ && \
             echo "Commit ${{ github.sha }} deployed at $(TZ=":Asia/Singapore" date)" > deployment_info.txt \
           "
