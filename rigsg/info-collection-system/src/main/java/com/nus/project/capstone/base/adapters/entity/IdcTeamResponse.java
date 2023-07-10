@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IdcTeamRequests {
+public class IdcTeamResponse {
 
     private UUID id;
     private String teamName;
@@ -23,8 +23,10 @@ public class IdcTeamRequests {
     private Integer teamScoreSecondStage;
     private Boolean isQualifiedSecondStage;
     private Set<UUID> userIds;
-    public static IdcTeamRequests toIdcTeamRequests(IdcTeamJpaEntities i) {
-        return IdcTeamRequests.builder()
+    private List<UserRequests> userRequests;
+
+    public static IdcTeamResponse toIdcTeamResponse(IdcTeamJpaEntities i) {
+        return IdcTeamResponse.builder()
                 .id(i.getId())
                 .teamName(i.getTeamName())
                 .competitionChoice(i.getCompetitionChoice())

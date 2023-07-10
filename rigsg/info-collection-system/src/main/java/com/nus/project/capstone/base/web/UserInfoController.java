@@ -1,15 +1,16 @@
 package com.nus.project.capstone.base.web;
 
+import com.nus.project.capstone.base.adapters.entity.GeneralMessageEntity;
 import com.nus.project.capstone.base.adapters.entity.UserRequests;
+import com.nus.project.capstone.base.adapters.entity.UserResponse;
 import com.nus.project.capstone.base.adapters.persistence.UserJpaEntities;
 import com.nus.project.capstone.base.adapters.persistence.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,40 +36,43 @@ public class UserInfoController {
     }
 
     @PostMapping("/user")
-    public void createUser(@RequestBody UserRequests userRequests) {
+    public ResponseEntity<GeneralMessageEntity> createUser(@RequestBody UserRequests userRequests) {
 
-        userRepository.save(UserJpaEntities.toJpaEntity(userRequests));
+        val u = userRepository.save(UserJpaEntities.toJpaEntity(userRequests));
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
     }
 
     @GetMapping("/user")
-    public UserRequests readUser(@RequestBody UserRequests userRequests) {
+    public ResponseEntity<GeneralMessageEntity> readUser(@RequestBody UserRequests userRequests) {
 
         val o = userRepository.findById(userRequests.getId());
-        return o.map(UserRequests::toUserRequests).orElse(null);
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(o.map(UserResponse::toUserResponse).orElse(null)).build());
     }
 
     @PutMapping("/user")
-    public void updateUser(@RequestBody UserRequests updateUserRequests) {
+    public ResponseEntity<GeneralMessageEntity> updateUser(@RequestBody UserRequests updateUserRequests) {
 
         if (updateUserRequests.getId() == null) {
-            log.info("User id must be provided");
-            return;
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data("User id must be provided").build());
         }
 
         if (userRepository.findById(updateUserRequests.getId()).isEmpty()) {
-            log.info(String.format("User %s is not found", updateUserRequests.getId()));
-            return;
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data(String.format("User %s is not found", updateUserRequests.getId())).build());
         }
 
         var user = userRepository.findById(updateUserRequests.getId()).get();
         user = user.updateJpaEntity(updateUserRequests);
 
-        userRepository.save(user);
+        val u = userRepository.save(user);
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
     }
 
     @GetMapping("/users")
-    public List<UserRequests> getAllUsers() {
+    public ResponseEntity<GeneralMessageEntity> getAllUsers() {
         val users = userRepository.findAll();
-        return users.stream().map(UserRequests::toUserRequests).collect(Collectors.toList());
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(users.stream()
+                .map(UserRequests::toUserRequests).collect(Collectors.toList())).build());
     }
 }

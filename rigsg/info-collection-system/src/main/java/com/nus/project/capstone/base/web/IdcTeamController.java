@@ -1,6 +1,8 @@
 package com.nus.project.capstone.base.web;
 
+import com.nus.project.capstone.base.adapters.entity.GeneralMessageEntity;
 import com.nus.project.capstone.base.adapters.entity.IdcTeamRequests;
+import com.nus.project.capstone.base.adapters.entity.IdcTeamResponse;
 import com.nus.project.capstone.base.adapters.entity.UserRequests;
 import com.nus.project.capstone.base.adapters.persistence.IdcTeamJpaEntities;
 import com.nus.project.capstone.base.adapters.persistence.IdcTeamRepository;
@@ -9,10 +11,10 @@ import com.nus.project.capstone.base.adapters.persistence.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,33 +33,36 @@ public class IdcTeamController {
     }
 
     @PostMapping("/team")
-    public void createTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
+    public ResponseEntity<GeneralMessageEntity> createTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
 
-        idcTeamRepository.save(IdcTeamJpaEntities.toJpaEntity(idcTeamRequests));
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(idcTeamRepository.save(IdcTeamJpaEntities.toJpaEntity(idcTeamRequests)).getId()).build());
     }
 
     @GetMapping("/team")
-    public IdcTeamRequests readTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
+    public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
 
         val o = idcTeamRepository.findById(idcTeamRequests.getId());
-        return o.map(idcTeamJpa -> {
-            val idcTeamReq = IdcTeamRequests.toIdcTeamRequests(idcTeamJpa);
-            idcTeamReq.setUserRequests(idcTeamJpa.getUsers() == null ? null : idcTeamJpa.getUsers().stream().map(UserRequests::toUserRequests).collect(Collectors.toList()));
-            return idcTeamReq;
+        val i = o.map(idcTeamJpa -> {
+            val idcTeamResponse = IdcTeamResponse.toIdcTeamResponse(idcTeamJpa);
+            idcTeamResponse.setUserRequests(idcTeamJpa.getUsers() == null ? null :
+                    idcTeamJpa.getUsers().stream().map(UserRequests::toUserRequests).collect(Collectors.toList()));
+            return idcTeamResponse;
         }).orElse(null);
+
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(i).build());
     }
 
     @PutMapping("/team")
-    public void updateTeam(@RequestBody IdcTeamRequests updateIdcTeamRequests) {
+    public ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody IdcTeamRequests updateIdcTeamRequests) {
 
         if (updateIdcTeamRequests.getId() == null) {
-            log.info("Idc team id must be provided");
-            return;
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Idc team id must be provided").build());
         }
 
         if (idcTeamRepository.findById(updateIdcTeamRequests.getId()).isEmpty()) {
-            log.info(String.format("Team %s is not found", updateIdcTeamRequests.getId()));
-            return;
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data(String.format("Team %s is not found", updateIdcTeamRequests.getId())).build());
         }
 
         var team = idcTeamRepository.findById(updateIdcTeamRequests.getId()).get();
@@ -75,11 +80,14 @@ public class IdcTeamController {
             users.forEach(team::addToUsers);
         }
 
-        idcTeamRepository.save(team);
+        val t = idcTeamRepository.save(team);
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(t.getId()).build());
     }
 
     @GetMapping("/teams")
-    public List<IdcTeamRequests> getAllUsers() {
-        return idcTeamRepository.findAll().stream().map(IdcTeamRequests::toIdcTeamRequests).collect(Collectors.toList());
+    public ResponseEntity<GeneralMessageEntity> getAllUsers() {
+
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(idcTeamRepository.findAll().stream()
+                .map(IdcTeamResponse::toIdcTeamResponse).collect(Collectors.toList())).build());
     }
 }

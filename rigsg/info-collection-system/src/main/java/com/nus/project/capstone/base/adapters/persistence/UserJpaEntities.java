@@ -1,10 +1,7 @@
 package com.nus.project.capstone.base.adapters.persistence;
 
 import com.nus.project.capstone.base.adapters.entity.UserRequests;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -14,7 +11,9 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+//@Data
+@Getter
+@Setter
 public class UserJpaEntities {
 
     @Id
@@ -32,7 +31,9 @@ public class UserJpaEntities {
     private Boolean isQualified;
     private Boolean isQualifiedProm;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER
+//            , cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     @JoinColumn(name = "team_id", referencedColumnName = "idc_team_id")
     private IdcTeamJpaEntities team;
 
