@@ -1,10 +1,7 @@
 package com.nus.project.capstone.base.adapters.persistence;
 
 import com.nus.project.capstone.base.adapters.entity.IdcTeamRequests;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.*;
@@ -14,7 +11,9 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+//@Data
+@Getter
+@Setter
 public class IdcTeamJpaEntities {
 
     @Id
@@ -28,7 +27,9 @@ public class IdcTeamJpaEntities {
     private Integer teamScoreSecondStage;
     private Boolean isQualifiedSecondStage;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team"
+//            , cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     private List<UserJpaEntities> users;
 
     public void addToUsers(UserJpaEntities user) {
