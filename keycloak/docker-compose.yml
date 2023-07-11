@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - keycloak-auth
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:latest
+    restart: always
+    environment:
+        KC_DB: postgres
+        KC_DB_URL_HOST: postgres
+        KC_DB_URL_DATABASE: keycloak
+        KC_DB_USERNAME: keycloak
+        KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+        KC_HOSTNAME_STRICT: "false"
+        KC_HOSTNAME_STRICT_HTTPS: "false"
+        KC_PROXY: edge
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+        KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/server.crt.pem
+        KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/server.key.pem
+    ports:
+      - 8443:8443
+      - 8080:8080
+    volumes:
+      - /home/mytn1992/keycloak/server.crt.pem:/opt/keycloak/conf/server.crt.pem #replace with local directory
+      - /home/mytn1992/keycloak/server.key.pem:/opt/keycloak/conf/server.key.pem #replace with local directory
+    networks:
+      - keycloak-auth
+    depends_on:
+      - postgres
+    command: start
+volumes:
+  postgres_data:
+    driver: local
+networks:
+  keycloak-auth:
+    driver: bridge
