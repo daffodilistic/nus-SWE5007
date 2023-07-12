@@ -1,5 +1,5 @@
 FROM maven:3.9.3-eclipse-temurin-17-focal as builder
-ARG SERVICE_NAME=info-collection-system
+ARG SERVICE_NAME=insert_name_here
 RUN mkdir /build
 COPY . /build
 WORKDIR /build/rigsg/${SERVICE_NAME}/src/main/resources

@@ -1,14 +1,32 @@
 version: "3"
 services:
-  api_register:
+  info-collection:
     build:
       dockerfile: Dockerfile
       context: .
+      args:
+        - SERVICE_NAME=info-collection-system
     environment:
       - POSTGRES_USERNAME=root
       - POSTGRES_PASSWORD=password
     ports:
-      - "80:8080"
+      - "8880:8080"
+    extra_hosts:
+      - "staging.ric-robotics.xyz:127.0.0.1"
+    volumes:
+      - "./secrets/credentials.json:/usr/local/credentials.json"
+    restart: unless-stopped
+  idc:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        - SERVICE_NAME=idc-system
+    environment:
+      - POSTGRES_USERNAME=root
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "8881:8080"
     extra_hosts:
       - "staging.ric-robotics.xyz:127.0.0.1"
     volumes:
