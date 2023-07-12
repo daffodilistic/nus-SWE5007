@@ -18,3 +18,8 @@ The `docker-compose.yml` file is used to orchestrate the services.
 Note that the JAR file is built during the GitHub Actions workflow.
 A simple inject and extract method is used to copy the JAR file into the 
 custom Docker image. See `Dockerfile` for more details.
+
+To run the services locally for development use, use the following command:
+```shell
+docker compose up --remove-orphans
+```
