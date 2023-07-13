@@ -1,7 +1,6 @@
-package com.nus.project.capstone.idc.repository;
+package com.nus.project.capstone.base.repository;
 
 import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
-import lombok.*;
 
 import javax.persistence.Entity;
 

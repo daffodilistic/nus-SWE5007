@@ -1,10 +1,10 @@
 package com.nus.project.capstone.base.web;
 
+import com.nus.project.capstone.base.repository.UserJpaEntitiesLocal;
+import com.nus.project.capstone.base.repository.UserRepository;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserRequests;
 import com.nus.project.capstone.model.entity.base.UserResponse;
-import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
-import com.nus.project.capstone.model.persistence.base.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class UserInfoController {
     @PostMapping("/user")
     public ResponseEntity<GeneralMessageEntity> createUser(@RequestBody UserRequests userRequests) {
 
-        val u = userRepository.save(UserJpaEntities.toJpaEntity(userRequests));
+        val u = userRepository.save((UserJpaEntitiesLocal)  UserJpaEntitiesLocal.toJpaEntity(userRequests));
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
     }
 
@@ -63,7 +63,7 @@ public class UserInfoController {
         }
 
         var user = userRepository.findById(updateUserRequests.getId()).get();
-        user = user.updateJpaEntity(updateUserRequests);
+        user = (UserJpaEntitiesLocal) user.updateJpaEntity(updateUserRequests);
 
         val u = userRepository.save(user);
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
