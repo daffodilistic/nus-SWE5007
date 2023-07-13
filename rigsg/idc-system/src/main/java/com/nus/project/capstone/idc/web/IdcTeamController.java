@@ -1,13 +1,13 @@
-package com.nus.project.capstone.base.web;
+package com.nus.project.capstone.idc.web;
 
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
+import com.nus.project.capstone.model.entity.base.UserRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
-import com.nus.project.capstone.model.entity.base.UserRequests;
-import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
-import com.nus.project.capstone.model.persistence.idc.IdcTeamRepository;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
 import com.nus.project.capstone.model.persistence.base.UserRepository;
+import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
+import com.nus.project.capstone.model.persistence.idc.IdcTeamRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
