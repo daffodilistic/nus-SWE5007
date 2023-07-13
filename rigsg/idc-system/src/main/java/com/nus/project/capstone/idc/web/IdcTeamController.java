@@ -1,13 +1,7 @@
 package com.nus.project.capstone.idc.web;
 
+import com.nus.project.capstone.idc.repository.*;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
-import com.nus.project.capstone.model.entity.base.UserRequests;
-import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
-import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
-import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
-import com.nus.project.capstone.model.persistence.base.UserRepository;
-import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
-import com.nus.project.capstone.model.persistence.idc.IdcTeamRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,20 +27,20 @@ public class IdcTeamController {
     }
 
     @PostMapping("/team")
-    public ResponseEntity<GeneralMessageEntity> createTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
-
+    public ResponseEntity<GeneralMessageEntity> createTeam(@RequestBody IdcTeamRequestsLocal idcTeamRequests) {
+        var team = idcTeamRepository.save((IdcTeamJpaEntitiesLocal)  IdcTeamJpaEntitiesLocal.toJpaEntity(idcTeamRequests));
         return ResponseEntity.ok(GeneralMessageEntity.builder()
-                .data(idcTeamRepository.save(IdcTeamJpaEntities.toJpaEntity(idcTeamRequests)).getId()).build());
+                .data(team.getId()).build());
     }
 
     @GetMapping("/team")
-    public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
+    public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody IdcTeamRequestsLocal idcTeamRequests) {
 
         val o = idcTeamRepository.findById(idcTeamRequests.getId());
         val i = o.map(idcTeamJpa -> {
-            val idcTeamResponse = IdcTeamResponse.toIdcTeamResponse(idcTeamJpa);
+            val idcTeamResponse = IdcTeamResponseLocal.toIdcTeamResponse(idcTeamJpa);
             idcTeamResponse.setUserRequests(idcTeamJpa.getUsers() == null ? null :
-                    idcTeamJpa.getUsers().stream().map(UserRequests::toUserRequests).collect(Collectors.toList()));
+                    idcTeamJpa.getUsers().stream().map(UserRequestsLocal::toUserRequests).collect(Collectors.toList()));
             return idcTeamResponse;
         }).orElse(null);
 
@@ -54,7 +48,7 @@ public class IdcTeamController {
     }
 
     @PutMapping("/team")
-    public ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody IdcTeamRequests updateIdcTeamRequests) {
+    public ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody IdcTeamRequestsLocal updateIdcTeamRequests) {
 
         if (updateIdcTeamRequests.getId() == null) {
             return ResponseEntity.ok(GeneralMessageEntity.builder().data("Idc team id must be provided").build());
@@ -66,10 +60,10 @@ public class IdcTeamController {
         }
 
         var team = idcTeamRepository.findById(updateIdcTeamRequests.getId()).get();
-        team = team.updateJpaEntity(updateIdcTeamRequests);
+        team = (IdcTeamJpaEntitiesLocal) team.updateJpaEntity(updateIdcTeamRequests);
 
         if (updateIdcTeamRequests.getUserIds() != null) {
-            List<UserJpaEntities> originalUsersInTeam = userRepository.findAllByTeamId(team.getId());
+            List<UserJpaEntitiesLocal> originalUsersInTeam = userRepository.findAllByTeamId(team.getId());
             originalUsersInTeam.forEach(u -> {
                 u.setTeam(null);
                 userRepository.save(u);
@@ -88,6 +82,6 @@ public class IdcTeamController {
     public ResponseEntity<GeneralMessageEntity> getAllUsers() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(idcTeamRepository.findAll().stream()
-                .map(IdcTeamResponse::toIdcTeamResponse).collect(Collectors.toList())).build());
+                .map(IdcTeamResponseLocal::toIdcTeamResponse).collect(Collectors.toList())).build());
     }
 }
