@@ -9,7 +9,7 @@ spring:
       project-id: sapient-symbol-388402
   datasource:
     username: dev-ric-app-user
-    password: Sw35o07~
+    password: password
   jpa:
     hibernate:
       ddl-auto: update
