@@ -1,10 +1,10 @@
 package com.nus.project.capstone.base.web;
 
-import com.nus.project.capstone.base.adapters.entity.GeneralMessageEntity;
-import com.nus.project.capstone.base.adapters.entity.UserRequests;
-import com.nus.project.capstone.base.adapters.entity.UserResponse;
-import com.nus.project.capstone.base.adapters.persistence.UserJpaEntities;
-import com.nus.project.capstone.base.adapters.persistence.UserRepository;
+import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
+import com.nus.project.capstone.model.entity.base.UserRequests;
+import com.nus.project.capstone.model.entity.base.UserResponse;
+import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
+import com.nus.project.capstone.model.persistence.base.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;

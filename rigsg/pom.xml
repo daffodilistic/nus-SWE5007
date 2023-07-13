@@ -22,6 +22,7 @@
         <module>info-collection-system</module>
         <module>idc-system</module>
         <module>game-system</module>
+        <module>entity-model</module>
     </modules>
 
     <properties>

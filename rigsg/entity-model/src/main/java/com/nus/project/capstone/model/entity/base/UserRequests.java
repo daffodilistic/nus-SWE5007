@@ -1,7 +1,7 @@
-package com.nus.project.capstone.base.adapters.entity;
+package com.nus.project.capstone.model.entity.base;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nus.project.capstone.base.adapters.persistence.UserJpaEntities;
+import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,9 +10,9 @@ import java.util.UUID;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserResponse {
+public class UserRequests {
 
-    // Response
+    // Request and Response
     private UUID id;
     private String firstName;
     private String lastName;
@@ -25,10 +25,9 @@ public class UserResponse {
     private Integer yearsOfExp;
     private Boolean isQualified;
     private Boolean isQualifiedProm;
-    private String team;
 
-    public static UserResponse toUserResponse(UserJpaEntities u) {
-        return UserResponse.builder()
+    public static UserRequests toUserRequests(UserJpaEntities u) {
+        return UserRequests.builder()
                 .id(u.getId())
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
@@ -41,7 +40,6 @@ public class UserResponse {
                 .yearsOfExp(u.getYearsOfExp())
                 .isQualified(u.getIsQualified())
                 .isQualifiedProm(u.getIsQualifiedProm())
-                .team(u.getTeam() == null ? null : u.getTeam().getId().toString())
                 .build();
     }
 }
