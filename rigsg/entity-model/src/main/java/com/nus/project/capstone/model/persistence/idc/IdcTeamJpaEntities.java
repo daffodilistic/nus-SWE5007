@@ -12,7 +12,6 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@Data
 @Getter
 @Setter
 public class IdcTeamJpaEntities {
