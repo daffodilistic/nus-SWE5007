@@ -43,6 +43,7 @@ jobs:
     strategy:
       matrix:
         services: [ game-system, idc-system, info-collection-system, user-profile-management ]
+    continue-on-error: true
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +66,13 @@ jobs:
             cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
             sudo docker compose down \
           "
+      - name: Delete old JAR files
+        run: |
+            ssh ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }} \
+            " \
+              cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
+              rm -rf ./build \
+            "
       - name: Upload JAR files
         run: rsync -avzb --delete ./artifact ${{ secrets.STAGING_SSH_USERNAME }}@${{ secrets.STAGING_HOST }}:$DEPLOY_DIRECTORY/${{ matrix.services }}/build/
       - name: Build and run Docker containers via Docker Compose
