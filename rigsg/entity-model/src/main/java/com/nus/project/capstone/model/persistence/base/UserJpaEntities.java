@@ -1,6 +1,7 @@
-package com.nus.project.capstone.base.adapters.persistence;
+package com.nus.project.capstone.model.persistence.base;
 
-import com.nus.project.capstone.base.adapters.entity.UserRequests;
+import com.nus.project.capstone.model.entity.base.UserRequests;
+import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +12,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@Data
 @Getter
 @Setter
 public class UserJpaEntities {

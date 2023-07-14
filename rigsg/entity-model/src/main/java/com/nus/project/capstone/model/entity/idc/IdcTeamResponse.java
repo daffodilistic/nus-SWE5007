@@ -1,7 +1,8 @@
-package com.nus.project.capstone.base.adapters.entity;
+package com.nus.project.capstone.model.entity.idc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nus.project.capstone.base.adapters.persistence.IdcTeamJpaEntities;
+import com.nus.project.capstone.model.entity.base.UserRequests;
+import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IdcTeamRequests {
+public class IdcTeamResponse {
 
     private UUID id;
     private String teamName;
@@ -23,8 +24,10 @@ public class IdcTeamRequests {
     private Integer teamScoreSecondStage;
     private Boolean isQualifiedSecondStage;
     private Set<UUID> userIds;
-    public static IdcTeamRequests toIdcTeamRequests(IdcTeamJpaEntities i) {
-        return IdcTeamRequests.builder()
+    private List<UserRequests> userRequests;
+
+    public static IdcTeamResponse toIdcTeamResponse(IdcTeamJpaEntities i) {
+        return IdcTeamResponse.builder()
                 .id(i.getId())
                 .teamName(i.getTeamName())
                 .competitionChoice(i.getCompetitionChoice())

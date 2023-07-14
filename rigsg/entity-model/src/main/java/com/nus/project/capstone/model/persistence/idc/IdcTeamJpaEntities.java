@@ -1,6 +1,7 @@
-package com.nus.project.capstone.base.adapters.persistence;
+package com.nus.project.capstone.model.persistence.idc;
 
-import com.nus.project.capstone.base.adapters.entity.IdcTeamRequests;
+import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
+import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +12,6 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@Data
 @Getter
 @Setter
 public class IdcTeamJpaEntities {

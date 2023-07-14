@@ -1,4 +1,4 @@
-package com.nus.project.capstone.base.adapters.persistence;
+package com.nus.project.capstone.model.persistence.base;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

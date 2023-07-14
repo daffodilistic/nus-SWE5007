@@ -1,4 +1,4 @@
-package com.nus.project.capstone.base.adapters.entity;
+package com.nus.project.capstone.model.entity.base;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
