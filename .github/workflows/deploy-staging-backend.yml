@@ -37,6 +37,9 @@ jobs:
           path: |
             rigsg/${{ matrix.services }}/target/**/*.jar
   deploy:
+    strategy:
+      matrix:
+        services: [ game-system, idc-system, info-collection-system, user-profile-management ]
     needs: build
     runs-on: ubuntu-latest
     steps:
