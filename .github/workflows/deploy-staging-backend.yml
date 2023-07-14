@@ -27,7 +27,10 @@ jobs:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "17"
       - run: |
-          cd rigsg
+          cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/resources
+          rm application.yml
+          mv application_docker.yml application.yml
+          cd ${{ github.workspace }}/rigsg
           ./mvnw --projects ${{ matrix.services }} clean package spring-boot:repackage -DskipTests=true
 
       - name: Share artifact inside workflow
