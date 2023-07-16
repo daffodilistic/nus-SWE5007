@@ -2,6 +2,7 @@ package com.nus.project.capstone.idc.web;
 
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserRequests;
+import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
@@ -45,8 +46,8 @@ public class IdcTeamController {
         val o = idcTeamRepository.findById(idcTeamRequests.getId());
         val i = o.map(idcTeamJpa -> {
             val idcTeamResponse = IdcTeamResponse.toIdcTeamResponse(idcTeamJpa);
-            idcTeamResponse.setUserRequests(idcTeamJpa.getUsers() == null ? null :
-                    idcTeamJpa.getUsers().stream().map(UserRequests::toUserRequests).collect(Collectors.toList()));
+            idcTeamResponse.setUserResponses(idcTeamJpa.getUsers() == null ? null :
+                    idcTeamJpa.getUsers().stream().map(UserResponse::toUserResponse).collect(Collectors.toList()));
             return idcTeamResponse;
         }).orElse(null);
 

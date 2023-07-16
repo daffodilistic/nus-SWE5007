@@ -2,6 +2,7 @@ package com.nus.project.capstone.model.entity.idc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nus.project.capstone.model.entity.base.UserRequests;
+import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class IdcTeamResponse {
     private Integer teamScoreSecondStage;
     private Boolean isQualifiedSecondStage;
     private Set<UUID> userIds;
-    private List<UserRequests> userRequests;
+    private List<UserResponse> userResponses;
 
     public static IdcTeamResponse toIdcTeamResponse(IdcTeamJpaEntities i) {
         return IdcTeamResponse.builder()
