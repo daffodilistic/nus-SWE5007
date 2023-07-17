@@ -2,10 +2,8 @@ package com.nus.project.capstone.idc.web;
 
 import com.nus.project.capstone.model.entity.idc.IdcGroupRequests;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
-import com.nus.project.capstone.model.entity.base.UserRequests;
 import com.nus.project.capstone.model.entity.idc.IdcGroupResponse;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
-import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
 import com.nus.project.capstone.model.persistence.idc.IdcGroupJpaEntities;
 import com.nus.project.capstone.model.persistence.idc.IdcGroupRepository;
 import com.nus.project.capstone.model.persistence.idc.IdcTeamRepository;
@@ -86,7 +84,7 @@ public class IdcGroupController {
     }
 
     @GetMapping("/groups")
-    public ResponseEntity<GeneralMessageEntity> getAllUsers() {
+    public ResponseEntity<GeneralMessageEntity> getAllTeams() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(idcGroupRepository.findAll().stream()
                 .map(IdcGroupResponse::toIdcGroupResponse).collect(Collectors.toList())).build());

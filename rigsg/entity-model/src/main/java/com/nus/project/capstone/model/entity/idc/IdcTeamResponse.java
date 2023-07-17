@@ -1,7 +1,6 @@
 package com.nus.project.capstone.model.entity.idc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nus.project.capstone.model.entity.base.UserRequests;
 import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.Builder;

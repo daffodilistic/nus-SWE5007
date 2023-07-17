@@ -1,7 +1,6 @@
 package com.nus.project.capstone.idc.web;
 
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
-import com.nus.project.capstone.model.entity.base.UserRequests;
 import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
