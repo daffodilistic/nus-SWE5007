@@ -23,7 +23,7 @@ public class UserResponse {
     private String phoneNumber;
     private String schoolName;
     private Integer yearsOfExp;
-    private String team;
+    private String idcTeam;
 
     public static UserResponse toUserResponse(UserJpaEntities u) {
         return UserResponse.builder()
@@ -37,7 +37,7 @@ public class UserResponse {
                 .phoneNumber(u.getPhoneNumber())
                 .schoolName(u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp())
-                .team(u.getTeam() == null ? null : u.getTeam().getId().toString())
+                .idcTeam(u.getId() == null ? null : u.getIdcTeam().getId().toString())
                 .build();
     }
 }

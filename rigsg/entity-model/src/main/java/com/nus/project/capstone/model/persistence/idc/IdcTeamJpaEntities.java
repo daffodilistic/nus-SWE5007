@@ -27,7 +27,7 @@ public class IdcTeamJpaEntities {
     private Boolean qualifiedFinal2;
     private String teacherId;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "idc_team")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "idcTeam")
     private List<UserJpaEntities> users;
 
     //join column. name is fk, referenced column name is the pk column id on other table
@@ -36,7 +36,7 @@ public class IdcTeamJpaEntities {
     private IdcGroupJpaEntities idcGroup;
 
     public void addToUsers(UserJpaEntities user) {
-        user.setTeam(this);
+        user.setIdcTeam(this);
         users.add(user);
     }
 

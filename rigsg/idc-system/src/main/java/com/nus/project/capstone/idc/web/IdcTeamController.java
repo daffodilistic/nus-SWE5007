@@ -69,9 +69,9 @@ public class IdcTeamController {
         team = team.updateJpaEntity(updateIdcTeamRequests);
 
         if (updateIdcTeamRequests.getUserIds() != null) {
-            List<UserJpaEntities> originalUsersInTeam = userRepository.findAllByTeamId(team.getId());
+            List<UserJpaEntities> originalUsersInTeam = userRepository.findAllByIdcTeamId(team.getId());
             originalUsersInTeam.forEach(u -> {
-                u.setTeam(null);
+                u.setIdcTeam(null);
                 userRepository.save(u);
             });
 
