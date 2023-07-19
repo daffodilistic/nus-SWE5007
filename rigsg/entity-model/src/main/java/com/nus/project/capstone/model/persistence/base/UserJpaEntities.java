@@ -12,7 +12,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@Data
 @Getter
 @Setter
 public class UserJpaEntities {
@@ -29,8 +28,6 @@ public class UserJpaEntities {
     private String phoneNumber;
     private String schoolName;
     private Integer yearsOfExp;
-    private Boolean isQualified;
-    private Boolean isQualifiedProm;
 
     @ManyToOne(fetch = FetchType.EAGER
 //            , cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
@@ -50,8 +47,6 @@ public class UserJpaEntities {
                 .phoneNumber(u.getPhoneNumber())
                 .schoolName(u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp())
-                .isQualified(u.getIsQualified())
-                .isQualifiedProm(u.getIsQualifiedProm())
                 .build();
     }
 
@@ -67,8 +62,6 @@ public class UserJpaEntities {
                 .phoneNumber(u.getPhoneNumber() == null ? getPhoneNumber() : u.getPhoneNumber())
                 .schoolName(u.getSchoolName() == null ? getSchoolName() : u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp() == null ? getYearsOfExp() : u.getYearsOfExp())
-                .isQualified(u.getIsQualified() == null ? getIsQualified() : u.getIsQualified())
-                .isQualifiedProm(u.getIsQualifiedProm() == null ? getIsQualifiedProm() : u.getIsQualifiedProm())
                 .team(getTeam())
                 .build();
     }

@@ -23,8 +23,6 @@ public class UserRequests {
     private String phoneNumber;
     private String schoolName;
     private Integer yearsOfExp;
-    private Boolean isQualified;
-    private Boolean isQualifiedProm;
 
     public static UserRequests toUserRequests(UserJpaEntities u) {
         return UserRequests.builder()
@@ -38,8 +36,6 @@ public class UserRequests {
                 .phoneNumber(u.getPhoneNumber())
                 .schoolName(u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp())
-                .isQualified(u.getIsQualified())
-                .isQualifiedProm(u.getIsQualifiedProm())
                 .build();
     }
 }

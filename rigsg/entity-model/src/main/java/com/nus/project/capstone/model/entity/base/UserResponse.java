@@ -23,8 +23,6 @@ public class UserResponse {
     private String phoneNumber;
     private String schoolName;
     private Integer yearsOfExp;
-    private Boolean isQualified;
-    private Boolean isQualifiedProm;
     private String team;
 
     public static UserResponse toUserResponse(UserJpaEntities u) {
@@ -39,8 +37,6 @@ public class UserResponse {
                 .phoneNumber(u.getPhoneNumber())
                 .schoolName(u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp())
-                .isQualified(u.getIsQualified())
-                .isQualifiedProm(u.getIsQualifiedProm())
                 .team(u.getTeam() == null ? null : u.getTeam().getId().toString())
                 .build();
     }
