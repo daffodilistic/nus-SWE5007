@@ -32,7 +32,7 @@ public class UserJpaEntities {
     @ManyToOne(fetch = FetchType.EAGER
 //            , cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
     )
-    @JoinColumn(name = "team_id", referencedColumnName = "idc_team_id")
+    @JoinColumn(name = "idc_team_id", referencedColumnName = "idc_team_id")
     private IdcTeamJpaEntities team;
 
     public static UserJpaEntities toJpaEntity(UserRequests u) {
