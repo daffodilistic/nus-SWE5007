@@ -62,16 +62,16 @@ public class IdcTeamController {
 
         if (idcTeamRepository.findById(updateIdcTeamRequests.getId()).isEmpty()) {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
-                    .data(String.format("Team %s is not found", updateIdcTeamRequests.getId())).build());
+                    .data(String.format("IDC Team %s is not found", updateIdcTeamRequests.getId())).build());
         }
 
         var team = idcTeamRepository.findById(updateIdcTeamRequests.getId()).get();
         team = team.updateJpaEntity(updateIdcTeamRequests);
 
         if (updateIdcTeamRequests.getUserIds() != null) {
-            List<UserJpaEntities> originalUsersInTeam = userRepository.findAllByTeamId(team.getId());
+            List<UserJpaEntities> originalUsersInTeam = userRepository.findAllByIdcTeamId(team.getId());
             originalUsersInTeam.forEach(u -> {
-                u.setTeam(null);
+                u.setIdcTeam(null);
                 userRepository.save(u);
             });
 

@@ -61,7 +61,7 @@ public class IdcGroupController {
 
         if (idcGroupRepository.findById(updateIdcGroupRequests.getId()).isEmpty()) {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
-                    .data(String.format("Team %s is not found", updateIdcGroupRequests.getId())).build());
+                    .data(String.format("IDC Team %s is not found", updateIdcGroupRequests.getId())).build());
         }
 
         var group = idcGroupRepository.findById(updateIdcGroupRequests.getId()).get();

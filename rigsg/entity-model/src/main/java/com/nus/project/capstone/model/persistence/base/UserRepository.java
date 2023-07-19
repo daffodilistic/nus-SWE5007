@@ -9,5 +9,5 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<UserJpaEntities, UUID> {
 
-    List<UserJpaEntities> findAllByTeamId(UUID teamId);
+    List<UserJpaEntities> findAllByIdcTeamId(UUID teamId);
 }
