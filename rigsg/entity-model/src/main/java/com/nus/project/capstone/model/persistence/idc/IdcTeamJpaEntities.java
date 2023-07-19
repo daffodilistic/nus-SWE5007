@@ -22,10 +22,10 @@ public class IdcTeamJpaEntities {
     private String teamName;
     private String ageGroup;
     private Integer rankFirstStage;
-    private Boolean qualifiedPromo;
-    private Boolean qualifiedFinal;
-    private Boolean qualifiedFinal2;
-    private String teacherId;
+    private Boolean isQualifiedPromo;
+    private Boolean isQualifiedFinal;
+    private Boolean isQualifiedFinalSecondStage;
+    private UUID teacherId;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "idcTeam")
     private List<UserJpaEntities> users;
@@ -46,9 +46,9 @@ public class IdcTeamJpaEntities {
                 .teamName(i.getTeamName())
                 .ageGroup(i.getAgeGroup())
                 .rankFirstStage(i.getRankFirstStage())
-                .qualifiedPromo(i.getQualifiedPromo())
-                .qualifiedFinal(i.getQualifiedFinal())
-                .qualifiedFinal2(i.getQualifiedFinal2())
+                .isQualifiedPromo(i.getIsQualifiedPromo())
+                .isQualifiedFinal(i.getIsQualifiedFinal())
+                .isQualifiedFinalSecondStage(i.getIsQualifiedFinalSecondStage())
                 .teacherId(i.getTeacherId())
                 .build();
     }
@@ -60,12 +60,12 @@ public class IdcTeamJpaEntities {
                 .ageGroup(u.getAgeGroup() == null ? this.getAgeGroup() : u.getAgeGroup())
                 .rankFirstStage(u.getRankFirstStage() == null ? this.getRankFirstStage()
                         : u.getRankFirstStage())
-                .qualifiedPromo(u.getQualifiedPromo() == null ? this.getQualifiedPromo()
-                        : u.getQualifiedPromo())
-                .qualifiedFinal(u.getQualifiedFinal() == null ? this.getQualifiedFinal()
-                        : u.getQualifiedFinal())
-                .qualifiedFinal2(u.getQualifiedFinal2() == null ? this.getQualifiedFinal2()
-                        : u.getQualifiedFinal2())
+                .isQualifiedPromo(u.getIsQualifiedPromo() == null ? this.getIsQualifiedPromo()
+                        : u.getIsQualifiedPromo())
+                .isQualifiedFinal(u.getIsQualifiedFinal() == null ? this.getIsQualifiedFinal()
+                        : u.getIsQualifiedFinal())
+                .isQualifiedFinalSecondStage(u.getIsQualifiedFinalSecondStage() == null ? this.getIsQualifiedFinalSecondStage()
+                        : u.getIsQualifiedFinalSecondStage())
                 .teacherId(u.getTeacherId() == null ? this.getTeacherId()
                         : u.getTeacherId())
                 .build();

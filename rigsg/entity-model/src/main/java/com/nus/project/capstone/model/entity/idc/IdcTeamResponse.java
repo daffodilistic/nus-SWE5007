@@ -20,10 +20,10 @@ public class IdcTeamResponse {
     private String ageGroup;
     private UUID idcGroupId;
     private Integer rankFirstStage;
-    private Boolean qualifiedPromo;
-    private Boolean qualifiedFinal;
-    private Boolean qualifiedFinal2;
-    private String teacherId;
+    private Boolean isQualifiedPromo;
+    private Boolean isQualifiedFinal;
+    private Boolean isQualifiedFinalSecondStage;
+    private UUID teacherId;
     private Set<UUID> userIds;
     private List<UserResponse> userResponses;
 
@@ -33,9 +33,9 @@ public class IdcTeamResponse {
                 .teamName(i.getTeamName())
                 .ageGroup(i.getAgeGroup())
                 .rankFirstStage(i.getRankFirstStage())
-                .qualifiedPromo(i.getQualifiedPromo())
-                .qualifiedFinal(i.getQualifiedFinal())
-                .qualifiedFinal2(i.getQualifiedFinal2())
+                .isQualifiedPromo(i.getIsQualifiedPromo())
+                .isQualifiedFinal(i.getIsQualifiedFinal())
+                .isQualifiedFinalSecondStage(i.getIsQualifiedFinalSecondStage())
                 .teacherId(i.getTeacherId())
                 .build();
     }
