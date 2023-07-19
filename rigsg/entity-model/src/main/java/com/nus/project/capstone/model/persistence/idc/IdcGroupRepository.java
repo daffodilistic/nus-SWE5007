@@ -1,4 +1,4 @@
-package com.nus.project.capstone.idc.repository;
+package com.nus.project.capstone.model.persistence.idc;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface IdcTeamRepository extends JpaRepository<IdcTeamJpaEntitiesLocal, UUID> {
+public interface IdcGroupRepository extends JpaRepository<IdcGroupJpaEntities, UUID> {
+
 }

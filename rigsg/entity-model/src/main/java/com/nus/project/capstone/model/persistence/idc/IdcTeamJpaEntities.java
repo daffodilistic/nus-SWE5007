@@ -12,7 +12,6 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@Data
 @Getter
 @Setter
 public class IdcTeamJpaEntities {
@@ -23,15 +22,18 @@ public class IdcTeamJpaEntities {
     private String teamName;
     private String competitionChoice;
     private String ageGroup;
-    private UUID idcGroupId;
+//    private UUID idcGroupId;
     private Integer teamScoreFirstStage;
     private Integer teamScoreSecondStage;
     private Boolean isQualifiedSecondStage;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team"
-//            , cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
-    )
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team")
     private List<UserJpaEntities> users;
+
+    //join column. name is fk, referenced column name is the pk column id on other table
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idc_group_id", referencedColumnName = "idc_group_id")
+    private IdcGroupJpaEntities idcGroup;
 
     public void addToUsers(UserJpaEntities user) {
         user.setTeam(this);

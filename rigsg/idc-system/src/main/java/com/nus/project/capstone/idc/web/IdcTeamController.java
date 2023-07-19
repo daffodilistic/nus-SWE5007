@@ -1,10 +1,13 @@
 package com.nus.project.capstone.idc.web;
 
-import com.nus.project.capstone.idc.repository.*;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
-import com.nus.project.capstone.model.entity.base.UserRequests;
+import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
+import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
+import com.nus.project.capstone.model.persistence.base.UserRepository;
+import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
+import com.nus.project.capstone.model.persistence.idc.IdcTeamRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,7 @@ public class IdcTeamController {
 
     @PostMapping("/team")
     public ResponseEntity<GeneralMessageEntity> createTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
-        var team = idcTeamRepository.save((IdcTeamJpaEntitiesLocal)  IdcTeamJpaEntitiesLocal.toJpaEntity(idcTeamRequests));
+        var team = idcTeamRepository.save(IdcTeamJpaEntities.toJpaEntity(idcTeamRequests));
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(team.getId()).build());
     }
@@ -42,8 +45,8 @@ public class IdcTeamController {
         val o = idcTeamRepository.findById(idcTeamRequests.getId());
         val i = o.map(idcTeamJpa -> {
             val idcTeamResponse = IdcTeamResponse.toIdcTeamResponse(idcTeamJpa);
-            idcTeamResponse.setUserRequests(idcTeamJpa.getUsers() == null ? null :
-                    idcTeamJpa.getUsers().stream().map(UserRequests::toUserRequests).collect(Collectors.toList()));
+            idcTeamResponse.setUserResponses(idcTeamJpa.getUsers() == null ? null :
+                    idcTeamJpa.getUsers().stream().map(UserResponse::toUserResponse).collect(Collectors.toList()));
             return idcTeamResponse;
         }).orElse(null);
 
@@ -63,10 +66,10 @@ public class IdcTeamController {
         }
 
         var team = idcTeamRepository.findById(updateIdcTeamRequests.getId()).get();
-        team = (IdcTeamJpaEntitiesLocal) team.updateJpaEntity(updateIdcTeamRequests);
+        team = team.updateJpaEntity(updateIdcTeamRequests);
 
         if (updateIdcTeamRequests.getUserIds() != null) {
-            List<UserJpaEntitiesLocal> originalUsersInTeam = userRepository.findAllByTeamId(team.getId());
+            List<UserJpaEntities> originalUsersInTeam = userRepository.findAllByTeamId(team.getId());
             originalUsersInTeam.forEach(u -> {
                 u.setTeam(null);
                 userRepository.save(u);
