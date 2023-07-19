@@ -62,7 +62,7 @@ public class IdcTeamController {
 
         if (idcTeamRepository.findById(updateIdcTeamRequests.getId()).isEmpty()) {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
-                    .data(String.format("Team %s is not found", updateIdcTeamRequests.getId())).build());
+                    .data(String.format("IDC Team %s is not found", updateIdcTeamRequests.getId())).build());
         }
 
         var team = idcTeamRepository.findById(updateIdcTeamRequests.getId()).get();
