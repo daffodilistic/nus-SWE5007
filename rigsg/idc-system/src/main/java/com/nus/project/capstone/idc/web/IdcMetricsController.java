@@ -3,15 +3,15 @@ package com.nus.project.capstone.idc.web;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.idc.IdcMetricsRequests;
 import com.nus.project.capstone.model.entity.idc.IdcMetricsResponse;
+import com.nus.project.capstone.model.persistence.idc.IdcMetricsJpaEntities;
 import com.nus.project.capstone.model.persistence.idc.IdcMetricsRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -31,5 +31,39 @@ public class IdcMetricsController {
         val o = idcMetricsRepository.findById(idcMetricsRequests.getId());
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(o.map(IdcMetricsResponse::toIdcMetricsResponse).orElse(null)).build());
+    }
+
+    @PostMapping("/metric")
+    public ResponseEntity<GeneralMessageEntity> createMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
+
+        val u = idcMetricsRepository.save(IdcMetricsJpaEntities.toJpaEntity(idcMetricsRequests));
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
+    }
+
+
+    @PutMapping("/metric")
+    public ResponseEntity<GeneralMessageEntity> updateMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
+
+        if (idcMetricsRequests.getId() == null) {
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data("IDC metric id must be provided").build());
+        }
+
+        if (idcMetricsRepository.findById(idcMetricsRequests.getId()).isEmpty()) {
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data(String.format("IDC metric %s is not found", idcMetricsRequests.getId())).build());
+        }
+
+        var metric = idcMetricsRepository.findById(idcMetricsRequests.getId()).get();
+        metric = metric.updateJpaEntity(idcMetricsRequests);
+
+        val u = idcMetricsRepository.save(metric);
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
+    }
+
+    @GetMapping("/metrics")
+    public ResponseEntity<GeneralMessageEntity> getAllMetrics() {
+        val metrics = idcMetricsRepository.findAll();
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(metrics.stream()
+                .map(IdcMetricsResponse::toIdcMetricsResponse).collect(Collectors.toList())).build());
     }
 }
