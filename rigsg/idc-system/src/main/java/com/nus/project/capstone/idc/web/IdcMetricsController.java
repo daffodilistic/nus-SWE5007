@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -65,5 +67,23 @@ public class IdcMetricsController {
         val metrics = idcMetricsRepository.findAll();
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(metrics.stream()
                 .map(IdcMetricsResponse::toIdcMetricsResponse).collect(Collectors.toList())).build());
+    }
+
+    @GetMapping("/calculate")
+    public ResponseEntity<GeneralMessageEntity> calculateScores(@RequestBody IdcMetricsRequests idcMetricsRequests) {
+        float score = 0.0f;
+        List<UUID> ids = idcMetricsRequests.getMetricIds();
+        List<Float> scores = idcMetricsRequests.getMetricScores();
+        if(ids != null && scores != null){
+            for(int i = 0; i < ids.size(); i++){
+                var metric = idcMetricsRepository.findById(ids.get(0)).get();
+                score += metric.getMetricWeight() * scores.get(i);
+            }
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data(score).build());
+        } else {
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data("ids or scores are missing. Skip calculation").build());
+        }
     }
 }
