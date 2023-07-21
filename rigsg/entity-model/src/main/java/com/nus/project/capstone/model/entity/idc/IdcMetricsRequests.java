@@ -5,6 +5,7 @@ import com.nus.project.capstone.model.persistence.idc.IdcMetricsJpaEntities;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,6 +17,8 @@ public class IdcMetricsRequests {
     private String stageName;
     private String metricName;
     private Float metricWeight;
+    private List<UUID> metricIds;
+    private List<Float> metricScores;
 
     public static IdcMetricsRequests toIdcMetricsRequests(IdcMetricsJpaEntities i) {
         return IdcMetricsRequests.builder()
