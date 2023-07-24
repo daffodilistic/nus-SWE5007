@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface IdcTeamRepository extends JpaRepository<IdcTeamJpaEntities, UUID> {
+public interface IdcGroupRepository extends JpaRepository<IdcGroupJpaEntities, UUID> {
 
 }

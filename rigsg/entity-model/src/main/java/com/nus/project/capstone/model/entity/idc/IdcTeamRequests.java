@@ -15,22 +15,24 @@ public class IdcTeamRequests {
 
     private UUID id;
     private String teamName;
-    private String competitionChoice;
     private String ageGroup;
     private UUID idcGroupId;
-    private Integer teamScoreFirstStage;
-    private Integer teamScoreSecondStage;
-    private Boolean isQualifiedSecondStage;
+    private Integer rankFirstStage;
+    private Boolean isQualifiedPromo;
+    private Boolean isQualifiedFinal;
+    private Boolean isQualifiedFinalSecondStage;
+    private UUID teacherId;
     private Set<UUID> userIds;
     public static IdcTeamRequests toIdcTeamRequests(IdcTeamJpaEntities i) {
         return IdcTeamRequests.builder()
                 .id(i.getId())
                 .teamName(i.getTeamName())
-                .competitionChoice(i.getCompetitionChoice())
                 .ageGroup(i.getAgeGroup())
-                .teamScoreFirstStage(i.getTeamScoreFirstStage())
-                .teamScoreSecondStage(i.getTeamScoreSecondStage())
-                .isQualifiedSecondStage(i.getIsQualifiedSecondStage())
+                .rankFirstStage(i.getRankFirstStage())
+                .isQualifiedPromo(i.getIsQualifiedPromo())
+                .isQualifiedFinal(i.getIsQualifiedFinal())
+                .isQualifiedFinalSecondStage(i.getIsQualifiedFinalSecondStage())
+                .teacherId(i.getTeacherId())
                 .build();
     }
 }

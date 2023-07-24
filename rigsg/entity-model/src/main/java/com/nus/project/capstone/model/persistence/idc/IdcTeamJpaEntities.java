@@ -20,20 +20,23 @@ public class IdcTeamJpaEntities {
     @Column(nullable = false, name = "idc_team_id")
     private UUID id;
     private String teamName;
-    private String competitionChoice;
     private String ageGroup;
-    private UUID idcGroupId;
-    private Integer teamScoreFirstStage;
-    private Integer teamScoreSecondStage;
-    private Boolean isQualifiedSecondStage;
+    private Integer rankFirstStage;
+    private Boolean isQualifiedPromo;
+    private Boolean isQualifiedFinal;
+    private Boolean isQualifiedFinalSecondStage;
+    private UUID teacherId;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team"
-//            , cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
-    )
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "idcTeam")
     private List<UserJpaEntities> users;
 
+    //join column. name is fk, referenced column name is the pk column id on other table
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idc_group_id", referencedColumnName = "idc_group_id")
+    private IdcGroupJpaEntities idcGroup;
+
     public void addToUsers(UserJpaEntities user) {
-        user.setTeam(this);
+        user.setIdcTeam(this);
         users.add(user);
     }
 
@@ -41,11 +44,12 @@ public class IdcTeamJpaEntities {
         return IdcTeamJpaEntities.builder()
                 .id(i.getId() == null ? UUID.randomUUID() : i.getId())
                 .teamName(i.getTeamName())
-                .competitionChoice(i.getCompetitionChoice())
                 .ageGroup(i.getAgeGroup())
-                .teamScoreFirstStage(i.getTeamScoreFirstStage())
-                .teamScoreSecondStage(i.getTeamScoreSecondStage())
-                .isQualifiedSecondStage(i.getIsQualifiedSecondStage())
+                .rankFirstStage(i.getRankFirstStage())
+                .isQualifiedPromo(i.getIsQualifiedPromo())
+                .isQualifiedFinal(i.getIsQualifiedFinal())
+                .isQualifiedFinalSecondStage(i.getIsQualifiedFinalSecondStage())
+                .teacherId(i.getTeacherId())
                 .build();
     }
 
@@ -53,15 +57,17 @@ public class IdcTeamJpaEntities {
         return IdcTeamJpaEntities.builder()
                 .id(u.getId())
                 .teamName(u.getTeamName() == null ? this.getTeamName() : u.getTeamName())
-                .competitionChoice(u.getCompetitionChoice() == null ? this.getCompetitionChoice()
-                        : u.getCompetitionChoice())
                 .ageGroup(u.getAgeGroup() == null ? this.getAgeGroup() : u.getAgeGroup())
-                .teamScoreFirstStage(u.getTeamScoreFirstStage() == null ? this.getTeamScoreFirstStage()
-                        : u.getTeamScoreFirstStage())
-                .teamScoreSecondStage(u.getTeamScoreSecondStage() == null ? this.getTeamScoreSecondStage()
-                        : u.getTeamScoreSecondStage())
-                .isQualifiedSecondStage(u.getIsQualifiedSecondStage() == null ? this.getIsQualifiedSecondStage()
-                        : u.getIsQualifiedSecondStage())
+                .rankFirstStage(u.getRankFirstStage() == null ? this.getRankFirstStage()
+                        : u.getRankFirstStage())
+                .isQualifiedPromo(u.getIsQualifiedPromo() == null ? this.getIsQualifiedPromo()
+                        : u.getIsQualifiedPromo())
+                .isQualifiedFinal(u.getIsQualifiedFinal() == null ? this.getIsQualifiedFinal()
+                        : u.getIsQualifiedFinal())
+                .isQualifiedFinalSecondStage(u.getIsQualifiedFinalSecondStage() == null ? this.getIsQualifiedFinalSecondStage()
+                        : u.getIsQualifiedFinalSecondStage())
+                .teacherId(u.getTeacherId() == null ? this.getTeacherId()
+                        : u.getTeacherId())
                 .build();
     }
 }

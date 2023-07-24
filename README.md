@@ -10,7 +10,20 @@ It's the final semester
 - Maven 3.9
 - Docker 24.0
 ### Frontend
-- NodeJS 18 LTS
+1. Prerequisites
+- Ensure Vue.js cli installed. To install cli run this command `npm install -g @vue/cli`. To check if the cli is already installed run the following command `vue --version`.
+
+2. Project setup
+run this command `npm install`
+
+3. The command json-server will start a server using the data in our data.json file.
+run this command `json-server data.json`
+
+4. Compiles and hot-reloads for development
+run this command `npm run serve`
+
+5. Compiles and minifies for production
+run this command `npm run build'
 
 ## Docker Setup
 Backend services are built via `docker build` and run via `docker run`.
