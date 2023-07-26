@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"firstName\": \"Donald\",\n    \"lastName\": \"Trump\",\n    \"email\": \"donald.trump@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"isQualified\": false\n}",
+					"raw": "{\n    \"firstName\": \"Donald\",\n    \"lastName\": \"Trump\",\n    \"email\": \"donald.trump@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -42,7 +42,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\",\n    \"firstName\": \"Desmond\",\n    \"lastName\": \"Soh\",\n    \"email\": \"desmond.soh@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"isQualified\": false,\n    \"isQualifiedProm\": false\n}",
+					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\",\n    \"firstName\": \"Desmond\",\n    \"lastName\": \"Soh\",\n    \"email\": \"desmond.soh@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -135,7 +135,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"teamName\": \"Team NUS\",\n    \"competitionChoice\": \"Competition Choice\",\n    \"ageGroup\": \"21\",\n    \"teamScoreFirstStage\": 1,\n    \"teamScoreSecondStage\": 2,\n    \"isQualifiedSecondStage\": false\n}",
+					"raw": "{\n    \"teamName\": \"Team NUS shot\",\n    \"ageGroup\": \"21\",\n    \"isQualifiedPromo\": false,\n    \"isQualifiedFinal\": false,\n    \"isQualifiedFinalSecondStage\": false\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -164,7 +164,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"0336ea25-c95e-4f70-8ffe-45618ae8d6e3\",\n    \"teamName\": \"Team NUS ISS Shit\",\n    \"competitionChoice\": \"Competition Choice\",\n    \"ageGroup\": \"21\",\n    \"teamScoreFirstStage\": 1,\n    \"teamScoreSecondStage\": 2,\n    \"isQualifiedSecondStage\": false,\n    \"userIds\": [\"36a5b817-2226-4f7e-b268-df6903ab2b1a\", \"426666ec-5d58-46fb-9c13-e02bc3a18d6c\"]\n}",
+					"raw": "{\n    \"id\": \"f80a2b98-008c-4aca-83af-34de7fdd62a4\",\n    \"teamName\": \"Team NUS shot\",\n    \"userIds\": [\"47cf2588-8d22-40b7-8404-3f946e4364dc\"]\n}\n\n// id is idc_team_id you just created.\n// userIds is the user Id you want to add",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -193,7 +193,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"0336ea25-c95e-4f70-8ffe-45618ae8d6e3\",\n    \"teamScoreFirstStage\": 888,\n    \"teamScoreSecondStage\": 999,\n    \"isQualifiedSecondStage\": true\n}",
+					"raw": "{\n    \"id\": \"037f0670-266e-4414-9f5f-476b61cc343b\",\n    \"isQualifiedPromo\": true\n}\n\n// id is the idc_team_Id you want to qualify",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -281,9 +281,33 @@
 		},
 		{
 			"name": "Get a IDC metric with metric id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"4b1f24f2-278f-11ee-944f-42010a400030\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/idcmetrics/metric",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"idcmetrics",
+						"metric"
+					]
+				}
 			},
 			"response": []
 		},
@@ -291,7 +315,19 @@
 			"name": "Get alll IDCmetrics",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/idcmetrics/metrics",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"idcmetrics",
+						"metrics"
+					]
+				}
 			},
 			"response": []
 		},
@@ -302,7 +338,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"firstName\": \"Donald\",\n    \"lastName\": \"Trump\",\n    \"email\": \"donald.trump@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"isQualified\": false\n}",
+					"raw": "{\n    \"stageName\": \"test_stage\",\n    \"metricName\": \"test_metric\",\n    \"metricWeight\": 0.25\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -310,15 +346,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/userinfo/user",
+					"raw": "http://localhost:8080/idcmetrics/metric",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"userinfo",
-						"user"
+						"idcmetrics",
+						"metric"
 					]
 				}
 			},
@@ -326,9 +362,33 @@
 		},
 		{
 			"name": "7. Calculate total scores given 3 metrics",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"metricIds\": [\"4b1f24f2-278f-11ee-944f-42010a400030\",\"4b2178d8-278f-11ee-944f-42010a400030\",\"4b2348e8-278f-11ee-944f-42010a400030\"],\r\n    \"metricScores\": [50, 50, 50]\r\n}\r\n\r\n//metricIds are 3 metrics within that stage (see database)\r\n// metricScores are each score assigned to them",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/idcmetrics/calculate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"idcmetrics",
+						"calculate"
+					]
+				}
 			},
 			"response": []
 		}
