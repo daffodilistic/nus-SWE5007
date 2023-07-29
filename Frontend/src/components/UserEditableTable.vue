@@ -1,5 +1,22 @@
 <template>
   <article>
+    <b-modal v-if="selectedUser" v-model="openModal" title="Edit User">
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <b-form-input id="firstName" v-model="selectedUser.firstName" />
+      </div>
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <b-form-input id="lastName" v-model="selectedUser.lastName" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <b-form-input id="email" v-model="selectedUser.email" type="email" />
+      </div>
+      <!-- Add other fields for editing here -->
+      <b-button variant="primary" @click="saveChanges">Save</b-button>
+    </b-modal>
+    <!--
     <b-modal
       id="modal-1"
       title="Confirm"
@@ -9,42 +26,50 @@
     >
       <p class="my-4">Are you sure you want to remove the selected rows?</p>
     </b-modal>
-    <div class="action-container">
-      <table align="right">
+    -->
+    <div class="search-container">
+      <table>
         <tr>
-          <td>
-            <b-button @click="addRowHandler" variant="outline-primary"><b-icon icon="person-plus"></b-icon></b-button>
-          </td>
+          <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
+          <td><input type="text" v-model="filter" placeholder="Search.." class="search-box"></td>
         </tr>
+        <tr>&nbsp;</tr>
+        <tr>&nbsp;</tr>
       </table>
     </div>
+    <div class="add-button">
+      <b-button variant="outline-primary" size="lg" @click="addRowHandler"><b-icon icon="person-plus" ></b-icon>
+      </b-button><br>
 
-    <br><br>
+    </div>
+          <!--
+          <td>
+            <b-button variant="danger" @click="openDialog = true">Remove Rows</b-button>
+          </td>
+          -->
+          <p class="mt-3">{{positionText}}</p><br>
     <b-table class="b-table"
       id="table-1"
       :items="tableItems"
       :fields="fields" fixed
+      :per-page="perPage"
+      :current-page="currentPage"
       :filter="filter"
       >
+      <template #[`cell(${field.key})`]="data">
+        <div @click="openEditModal(data.item)">
+          {{ data.value }}
+        </div>
+      </template>
 
       <template v-for="(field, index) in fields" #[`cell(${field.key})`]="data">
         <b-form-datepicker
           v-if="field.type === 'date' && tableItems[data.index].isEdit"
-          placeholder=""
           :key="index"
           :type="field.type"
           :value="tableItems[data.index][field.key]"
-          :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-          :max="new Date()"
           @input="(value) => inputHandler(value, data.index, field.key)"
         ></b-form-datepicker>
-
-        <b-checkbox
-          v-else-if="field.key === 'selectRow'"
-          :checked="tableItems[data.index].isSelected"
-          :key="index"
-          @change="selectRowHandler(data)"
-        ></b-checkbox>
 
         <b-form-select
         v-else-if="field.type === 'select' && field.key === 'country' && tableItems[data.index].isEdit"
@@ -92,6 +117,21 @@
     :min="0"
   ></b-form-input>
 
+        <b-form-select
+          v-else-if="field.type === 'select' && tableItems[data.index].isEdit"
+          :key="index"
+          :value="tableItems[data.index][field.key]"
+          @input="(value) => inputHandler(value, data.index, field.key)"
+          :options="field.options"
+        ></b-form-select>
+        <!--
+        <b-checkbox
+          v-else-if="field.key === 'selectRow'"
+          :checked="tableItems[data.index].isSelected"
+          :key="index"
+          @change="selectRowHandler(data)"
+        ></b-checkbox>
+        -->
         <div :key="index" v-else-if="field.type === 'edit'">
           <b-button @click="editRowHandler(data)" variant="outline-primary">
             <span v-if="!tableItems[data.index].isEdit"><b-icon icon="pencil"></b-icon></span>
@@ -114,8 +154,19 @@
         <span :key="index" v-else>{{ data.value }}</span>
       </template>
     </b-table>
+    <b-pagination
+      v-model="currentPage"
+      pills :total-rows="rows"
+      :per-page="perPage"
+      aria-controls="table-1"
+      align="center"
+    ></b-pagination>
+
+
   </article>
 </template>
+
+
 <script>
 import { countriesOptions,statesOptions } from '../dropdownOptions';
 export default {
@@ -128,8 +179,12 @@ export default {
   data() {
     return {
       filter: '',
+      perPage: 10,
+      currentPage: 1,
       tableItems: this.mapItems(this.value),
       openDialog: false,
+      openModal: false,
+      selectedUser: null,
       selectedCountry: null,
       countriesOptions: countriesOptions,
       selectedCountryStates: [],
@@ -144,6 +199,12 @@ export default {
       rows() {
         return this.tableItems.length
       },
+      positionText() {
+      var endIndex = this.currentPage * this.perPage,
+        startIndex = ((this.currentPage - 1) * this.perPage) + 1;
+
+      return "Showing "+startIndex+ " to "+ (endIndex>this.tableItems.length? this.tableItems.length :endIndex)  + " of " + this.tableItems.length + " records";
+    }
     },
   methods: {
     editRowHandler(data) {
@@ -177,9 +238,33 @@ export default {
       this.$emit("input", this.tableItems);
       this.$emit("remove", selectedItems);
     },
+    /*
     selectRowHandler(data) {
       this.tableItems[data.index].isSelected =
         !this.tableItems[data.index].isSelected;
+    },
+    */
+    openEditModal(user) {
+      this.selectedUser = { ...user }; // Create a copy of the user object to avoid modifying the original data directly
+      this.openModal = true;
+    },
+    saveChanges() {
+      // Implement the logic to save the changes to the backend or update the user data in the table
+      // For demonstration purposes, let's just update the tableItems directly (without API call)
+      const index = this.tableItems.findIndex(user => user.id === this.selectedUser.id);
+      if (index !== -1) {
+        this.tableItems[index] = { ...this.selectedUser }; // Update the user in tableItems
+      }
+      this.openModal = false; // Close the modal after saving changes
+    },
+    mapItems(data) {
+      return data.map((item, index) => ({
+        ...item,
+        isEdit: this.tableItems[index] ? this.tableItems[index].isEdit : false,
+        isSelected: this.tableItems[index]
+          ? this.tableItems[index].isSelected
+          : false,
+      }));
     },
     handleCountrySelect(index) {
       const selectedCountryName = this.tableItems[index].country;
@@ -212,28 +297,43 @@ export default {
         this.selectedCountryStates = [];
       }
     },
-
-    mapItems(data) {
-      return data.map((item, index) => ({
-        ...item,
-        isEdit: this.tableItems[index] ? this.tableItems[index].isEdit : false,
-        isSelected: this.tableItems[index]
-          ? this.tableItems[index].isSelected
-          : false,
-      }));
-    },
   },
 };
 </script>
-<style>
-.action-container {
-  margin-bottom: 10px;
-}
-.action-container button {
-  margin-right: 25px;
-}
+<style scoped>
+
 .delete-button {
   margin-left: 5px;
+}
+
+.search-container {
+  display: flex;
+  justify-content: flex-end; /* Aligns the search box to the right */
+  margin-bottom: 20px;
+  margin-right:30px;
+}
+
+
+/* Search Box Styles */
+.search-box {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 200px; /* Adjust the width as needed */
+}
+
+.add-button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-right: 27px;
+}
+
+/* Style the button icon */
+.add-button b-icon {
+  font-size: 20px;
+  margin-right: 5px; /* Add some space between the icon and the button */
 }
 
 .country-dropdown {
@@ -275,5 +375,4 @@ export default {
     cursor: not-allowed;
     pointer-events: none;
   }
-
 </style>

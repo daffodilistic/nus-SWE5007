@@ -9,7 +9,12 @@ module.exports = defineConfig({
       'Access-Control-Allow-Headers':
         'Origin, X-Requested-With, Content-Type, Accept, Authorization',
     },
-    //proxy: 'http://localhost:8080/', //proxy of postman
-    proxy: 'http://localhost:3000/', //proxy of postman
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8081', // Replace this with your backend server's URL
+        changeOrigin: true,
+        pathRewrite: { '^/api': '' },
+      },
+    },
   }
 })

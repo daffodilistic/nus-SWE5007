@@ -6,6 +6,7 @@
       @submit="handleUpdateUser($event)"
       @remove="handleRemoveUser($event)"
     ></EditableTable>
+    {{ users }}
 
   </div>
 
@@ -14,6 +15,7 @@
 import EditableTable from "@/components/EditableTable.vue";
 import { addUser, deleteUser, getUsers, updateUser } from "@/services/user";
 import axios from "axios";
+
 export default {
   name: "account",
   components: {
@@ -26,31 +28,20 @@ export default {
         { key: "firstName", label: "First Name", type: "text", required: true },
         { key: "edit", label: "", type: "edit" },
       ],
-      users:[],
+      users: [],
     };
   },
   async mounted() {
-    this.users = await axios.get(`http://localhost:8081/userinfo/users/`);
-  },
-  methods: {
-    async handleUpdateUser(user) {
-      if (user.id) {
-        await updateUser(user);
-      } else {
-        await addUser(user);
-      }
-    },
-    async handleRemoveUser(user) {
-      if (user.length > 0) {
-        await user.map(async (item) => {
-          await deleteUser(item.id);
-        })
-      } else {
-        await deleteUser(user.id);
-      }
+    try {
+      this.users = await axios.get(`http://localhost:8080/idcteam/team`);
+    } catch (error) {
+      // Handle any errors that might occur during the request
+      console.error("Error fetching users:", error);
     }
   },
-
+  methods: {
+    // Your other methods here...
+  },
 };
 </script>
 <style>

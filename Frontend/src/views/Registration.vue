@@ -1,44 +1,61 @@
 <template>
   <div id="app">
     <div class="form-container">
-      <div class="form-group select">
-        <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
-        <label class="red-asterisk">*</label>
-        <label class="label-color">Competition Choice:</label>
-        <select v-model="competitionChoice" id="category" class="custom-select">
-          <option value="" disabled selected>Select Competition Choice</option>
-          <option v-for="option in competitionChoiceOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
-        </select>
-      </div>
+      <table>
+        <tr>
+          <td>
+            <div class="form-group select">
+              <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
+              <label class="red-asterisk">*</label>
+              <label class="label-color">Competition Choice:&nbsp;&nbsp;</label>
+              <select v-model="competitionChoice" id="category" class="custom-select">
+                <option value="" disabled selected>Select Competition Choice</option>
+                <option v-for="option in competitionChoiceOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+              </select>
+            </div>
+          </td>
+          <td>
+            <div class="form-group select">
+            <label><i class="fas fa-user-tag" style='color: rgb(65, 127, 202)'></i></label>
+            <label class="red-asterisk">*</label>
+            <label class="label-color">Age Group:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <select v-model="ageGroup" id="category" class="custom-select">
+              <option value="" disabled selected>Select Age Group</option>
+              <option v-for="option in ageGroupOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+            </select>
+            </div>
+          </td>
+        </tr>
+        <tr>&nbsp;</tr>
+        <tr>
+          <td>
+            <div class="form-group">
 
-      <div class="form-group select">
-      <label><i class="fas fa-user-tag" style='color: rgb(65, 127, 202)'></i></label>
-      <label class="red-asterisk">*</label>
-      <label class="label-color">Age Group:</label>
-      <select v-model="ageGroup" id="category" class="custom-select">
-        <option value="" disabled selected>Select Age Group</option>
-        <option v-for="option in ageGroupOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
-      </select>
-      </div>
-
-      <div class="form-group">
-
-        <label><i class="far fa-id-card fa-lg" style='color: rgb(65, 127, 202)'></i></label> <label class="red-asterisk">*</label>
-        <label class="label-color">Team Name:</label>
-        <input v-model="teamName" type="text" placeholder="Enter Team Name" />
-      </div>
-
-
+              <label><i class="far fa-id-card fa-lg" style='color: rgb(65, 127, 202)'></i></label> <label class="red-asterisk">*</label>
+              <label class="label-color">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+              <input v-model="teamName" type="text" placeholder="Enter Team Name" />
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <label><i class="far fa-id-card fa-lg" style='color: rgb(65, 127, 202)'></i></label> <label class="red-asterisk">*</label>
+              <label class="label-color">Teacher Name:&nbsp;&nbsp;</label>
+              <input v-model="teacherName" type="text" placeholder="Enter Teacher Name" />
+            </div>
+          </td>
+        </tr>
+      </table>
     </div>
 
-    <br />
+    <br>
     <EditableTable
       v-model="users"
       :fields="fields"
-      :categories="categories"
       @submit="handleUpdateUser($event)"
       @remove="handleRemoveUser($event)"
     ></EditableTable>
+    {{ this.users.length }}
+    {{ this.users }}
     <br><br>
     <button class="submit-button" v-on:click="register()">Register</button>
     <pre class="json-display">{{ JSON.stringify(newTeam, null, 2) }}</pre>
@@ -54,6 +71,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 import { v4 as uuidv4 } from 'uuid'; // Import the uuidv4 function from the uuid library
 Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
+import axios from "axios";
 
 export default {
 
@@ -65,6 +83,7 @@ export default {
       teamName: "",
       ageGroup: "",
       competitionChoice: "",
+      teacherName: "",
       data:[],
       country: null,
       fields: [
@@ -120,25 +139,92 @@ export default {
         return rest;
       });
     },
-    register() {
-      // Create a new team object with form data
-      this.removeExtraProperty();
+    async registerIDCTeam() {
+      try {
+        // Prepare the data for the POST request
+        const teamData = {
+          teamName: this.teamName,
+          ageGroup: this.ageGroup,
+          //teacherName: this.teacherName,
+          isQualifiedPromo: false,
+          isQualifiedFinal: false,
+          isQualifiedFinalSecondStage: false,
 
-      const newTeamData = {
-        teamName: this.teamName,
-        ageGroup: this.ageGroup,
-        competitionChoice: this.competitionChoice,
-        userResponses: this.users.map(user => ({ ...user, id: uuidv4() })),
-      };
+        };
+        //userResponses: this.users.map(user => ({ ...user, id: uuidv4() })),
+        const numberOfUsers = this.users.length;
 
-      // Push the new team object to the newTeam array
-      this.newTeam.push(newTeamData);
+        //Create IDC Team
+        //const response = await axios.post('http://localhost:8080/idcteam/team', teamData);
+        //console.log('Team registration successful:', response.data);
 
-      // Reset the form data to clear the input fields after registration
-      //this.teamName = null;
-      //this.ageGroup = null;
-      //this.competitionChoice = null;
+        // Create new user for each user in the users array
+      for (const user of this.users) {
+        const userData = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          country: user.country,
+          state: user.state,
+          dateOfBirth: user.dateOfBirth,
+          schoolName: user.schoolName,
+          yearsOfExp: user.yearsOfExp,
+        };
+
+         // Call the create new user API
+        const response = await axios.post('http://localhost:8080/userinfo/user', userData);
+        //console.log('Member Registration successful:', response.data);
+        }
+
+
+
+
+
+        // Show a success message to the user using VueSweetalert2
+        this.$swal({
+          title: 'Success!',
+          text: 'Team registration successful!',
+          icon: 'success',
+          timer: 2000, // Display the success message for 2 seconds
+        });
+
+        return response.data;
+
+      } catch (error) {
+        // Handle any errors that occurred during the registration process
+        console.error('Error registering team:', error);
+
+        // Show an error message to the user using VueSweetalert2
+        this.$swal({
+          title: 'Error!',
+          text: 'Failed to register the team. Please try again later.',
+          icon: 'error',
+          timer: 2000, // Display the error message for 2 seconds
+        });
+      }
     },
+    register() {
+    // Create a new team object with form data
+    this.removeExtraProperty();
+
+    // Check if the competitionChoice is 'IDC' or 'Innovation Design Challenge'
+    if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
+      // Call the registerIDCTeam() function if the competition choice is IDC or Innovation Design Challenge
+      this.registerIDCTeam();
+    } else {
+      // Handle other competition choices here, if needed
+      // For example, you could call a different function for other competitions or show an error message.
+      // For simplicity, we're not adding the specific implementation here.
+    }
+
+    // Reset the form data to clear the input fields after registration
+    //this.teamName = null;
+    //this.ageGroup = null;
+    //this.competitionChoice = null;
+    //this.teacherName = null;
+    //this.users = []; // Reset the users array as well
+  },
 
   },
   mounted() {

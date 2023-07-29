@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 export const getUsers = async () => {
-    const response = await axios.get('https://jsonplaceholder.typicode.com/users')
+    const response = await axios.get('http://localhost:8080/userinfo/users')
     return response.data;
 }
 

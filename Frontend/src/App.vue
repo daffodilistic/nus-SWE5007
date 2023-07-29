@@ -2,11 +2,11 @@
   <div id="app">
     <div id="nav" class="top-menu">
       <router-link to="/" class="menu-item">Home</router-link>
-      <!--<router-link v-if="authenticated" to="/upload" class="menu-item">Upload Module</router-link>-->
       <router-link to="/registration" class="menu-item">Register</router-link>
-      <!--<router-link v-if="authenticated" to="/account" class="menu-item">Manage Account</router-link>-->
-      <router-link v-if="authenticated" to="/secure" class="menu-item">Manage Team</router-link>
-      <!--<router-link v-if="authenticated" to="/qualify" class="menu-item">Manage Registration</router-link>-->
+      <router-link v-if="authenticated" to="/upload" class="menu-item">Upload</router-link>
+      <router-link to="/account" class="menu-item">Manage User</router-link>
+      <router-link to="/secure" class="menu-item">Manage Team</router-link>
+      <router-link to="/qualify" class="menu-item">TEST API</router-link>
       <router-link v-if="authenticated" to="/login" v-on:click.native="logout()" replace class="menu-item">Logout</router-link>
       <router-link v-else to="/login" class="menu-item">Login</router-link>
     </div>

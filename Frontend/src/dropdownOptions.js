@@ -1,42 +1,42 @@
 export const ageGroupOptions = [
-    { value: "Open Category: 8-15 years old", text: "Open Category: 8-15 years old" },
-    { value: "Junior Category: 8-12 years old" , text: "Junior Category: 8-12 years old" },
+    { value: "OC", text: "Open Category: 8-15 years old" },
+    { value: "JC" , text: "Junior Category: 8-12 years old" },
   ];
 
   export const competitionChoiceOptions = [
-    { value: 'Innovation Design Challenge', text: 'Innovation Design Challenge'},
-    { value: 'Grand Arena', text: 'Grand Arena' },
-    { value: 'Technical Competitions', text: 'Technical Competitions' },
+    { value: 'IDC', text: 'Innovation Design Challenge', id:'1'},
+    { value: 'GA', text: 'Grand Arena', id:'2' },
+    { value: 'TA', text: 'Technical Competitions',id:'3' },
   ];
 
-  export const idcQualificationOptions = [
-    { value: 'Registration: Qualified', text: 'Registration: Qualified'},
-    { value: 'Registration : Disqualified', text: 'Registration : Disqualified' },
-    { value: 'Preliminary : Proposal Pending', text: 'Preliminary : Proposal Pending'},
-    { value: 'Preliminary : Proposal In-Review', text: 'Preliminary : Proposal In-Review'},
-    { value: 'Preliminary : Proposal Accepted', text: 'Preliminary : Proposal Accepted'},
-    { value: 'Preliminary : Proposal Rejected', text: 'Preliminary : Proposal Rejected'},
-    { value: 'Promotion : Proposal Pending', text: 'Promotion : Proposal Pending'},
-    { value: 'Promotion : Proposal In-Review', text: 'Promotion : Proposal In-Review'},
-    { value: 'Promotion : Proposal Accepted', text: 'Promotion : Proposal Accepted'},
-    { value: 'Promotion : Proposal Rejected', text: 'Promotion : Proposal Rejected'},
-    { value: 'Qualification : Disqualified', text: 'Qualification : Disqualified' },//game arena
-    { value: 'Qualification : Qualified', text: 'Qualification : Qualified' },//game arena
-    { value: 'Elimination : Qualified', text: 'Elimination : Qualified' },//game arena
-    { value: 'Elimination : Disqualified', text: 'Elimination : Disqualified' },//game arena
-    { value: 'Final : 1st Round Disqualified', text: 'Final : 1st Round Disqualified'},
-    { value: 'Final : 1st Round Qualified', text: 'Final : 1st Round Qualified'},
-    { value: 'Final : 2nd Round Disqualified', text: 'Final : 2nd Round Disqualified'},
-    { value: 'Final : 2nd Round Qualified', text: 'Final : 2nd Round Qualified'},
+  export const adminUploadTypeOptions = [
+    { value: 'Game Manual', text: 'Game Manual', id:'1'},
+    { value: 'Time Table', text: 'Time Table', id:'2' },
   ];
 
-  export const gameArenaQualificationOptions = [
-    { value: 'Registration: Qualified', text: 'Registration: Qualified'},
-    { value: 'Registration : Disqualified', text: 'Registration : Disqualified' },
-    { value: 'Qualification : Disqualified', text: 'Qualification : Disqualified' },
-    { value: 'Qualification : Qualified', text: 'Qualification : Qualified' },
-    { value: 'Elimination : Qualified', text: 'Elimination : Qualified' },
-    { value: 'Elimination : Disqualified', text: 'Elimination : Disqualified' },
+  export const QualificationOptions = [
+    //IDC
+    { value: 'Registration: Qualified', text: 'Registration: Qualified', CompetitionId:'1'},
+    { value: 'Registration : Disqualified', text: 'Registration : Disqualified' , CompetitionId:'1'},
+    { value: 'Preliminary : Proposal Pending', text: 'Preliminary : Proposal Pending', CompetitionId:'1'},
+    { value: 'Preliminary : Proposal In-Review', text: 'Preliminary : Proposal In-Review', CompetitionId:'1'},
+    { value: 'Preliminary : Proposal Accepted', text: 'Preliminary : Proposal Accepted', CompetitionId:'1'},
+    { value: 'Preliminary : Proposal Rejected', text: 'Preliminary : Proposal Rejected', CompetitionId:'1'},
+    { value: 'Promotion : Proposal Pending', text: 'Promotion : Proposal Pending', CompetitionId:'1'},
+    { value: 'Promotion : Proposal In-Review', text: 'Promotion : Proposal In-Review', CompetitionId:'1'},
+    { value: 'Promotion : Proposal Accepted', text: 'Promotion : Proposal Accepted', CompetitionId:'1'},
+    { value: 'Promotion : Proposal Rejected', text: 'Promotion : Proposal Rejected', CompetitionId:'1'},
+    { value: 'Final : 1st Round Disqualified', text: 'Final : 1st Round Disqualified', CompetitionId:'1'},
+    { value: 'Final : 1st Round Qualified', text: 'Final : 1st Round Qualified', CompetitionId:'1'},
+    { value: 'Final : 2nd Round Disqualified', text: 'Final : 2nd Round Disqualified', CompetitionId:'1'},
+    { value: 'Final : 2nd Round Qualified', text: 'Final : 2nd Round Qualified', CompetitionId:'1'},
+    //game arena
+    { value: 'Registration: Qualified', text: 'Registration: Qualified', CompetitionId:'2'},
+    { value: 'Registration : Disqualified', text: 'Registration : Disqualified' , CompetitionId:'2'},
+    { value: 'Qualification : Disqualified', text: 'Qualification : Disqualified' , CompetitionId:'2'},
+    { value: 'Qualification : Qualified', text: 'Qualification : Qualified', CompetitionId:'2' },
+    { value: 'Elimination : Qualified', text: 'Elimination : Qualified', CompetitionId:'2' },
+    { value: 'Elimination : Disqualified', text: 'Elimination : Disqualified', CompetitionId:'2' },
   ];
 
   export const countriesOptions = [

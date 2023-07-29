@@ -19,7 +19,7 @@
           <th>Team Name</th>
           <th>Age Group</th>
           <th>Competition Choice</th>
-          <th>Team Size</th>
+          <th>Teacher Name</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -57,10 +57,17 @@
               </template>
             </b-form-select>
           </td>
-          <td>{{ team.userResponses.length }}</td>
 
           <td v-if="!team.editing">
-            {{ team.status }} <!-- Display text instead of value -->
+            {{ team.teacherName }}
+          </td>
+          <td v-else>
+            <input type="text" v-model="team.editingteacherName" class="form-control editing-textbox" />
+          </td>
+          <!--<td>{{ team.userResponses.length }}</td>-->
+
+          <td v-if="!team.editing">
+            {{ team.status }}
           </td>
           <td v-else>
             <b-form-select v-model="team.editingStatus" :options="filteredStatusChoices" class="editing-dropdown">
@@ -85,8 +92,8 @@
             @click="deleteTeam(index)"
             ><b-icon icon="trash"></b-icon></b-button>
           </td>
-
         </tr>
+        <!-- Child rows -->
         <tr v-if="activeRow === index" class="child-row">
           <td :colspan="10"> <!-- Use colspan to span all columns in the row -->
             <table class="user-table">
@@ -109,15 +116,36 @@
                 <tr v-for="(user, userIndex) in team.userResponses" :key="userIndex" class="child-row">
                   <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                   <td>{{ userIndex + 1 }}</td>
-                  <td>{{ user.firstName }}</td>
-                  <td>{{ user.lastName }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.phone }}</td>
-                  <td>{{ user.country }}</td>
-                  <td>{{ user.state }}</td>
-                  <td>{{ formatDate(user.dateOfBirth) }}</td>
-                  <td>{{ user.schoolName }}</td>
-                  <td>{{ user.yearsOfExp }}</td>
+                  <td>
+                    {{ user.firstName }}
+                  </td>
+                  <td>
+                    {{ user.lastName }}
+                  </td>
+                  <td>
+                    {{ user.email }}
+                  </td>
+                  <td>
+                    {{ user.phone }}
+                  </td>
+                  <td>
+                    {{ user.country }}
+                  </td>
+                  <td>
+                    {{ user.state }}
+                  </td>
+                  <td>
+                    <input v-if="editingChildRow === userIndex" v-model="user.dateOfBirth" type= "date" class="form-control editing-textbox" />
+                    <span v-else>{{ user.dateOfBirth }}</span>
+                  </td>
+                  <td>
+                    <input v-if="editingChildRow === userIndex" v-model="user.schoolName" class="form-control editing-textbox" />
+                    <span v-else>{{ user.schoolName }}</span>
+                  </td>
+                  <td>
+                    <input v-if="editingChildRow === userIndex" v-model="user.yearsOfExp" min = 0 type= "number" class="form-control editing-textbox" />
+                    <span v-else>{{ user.yearsOfExp }}</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -133,6 +161,7 @@
     <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
       <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
     </button>
+    <pre class="json-display">{{ JSON.stringify(teams, null, 2) }}</pre>
   </div>
   </div>
 </template>
@@ -140,7 +169,7 @@
 
 <script>
 import axios from "axios";
-import { ageGroupOptions, competitionChoiceOptions, countriesOptions, idcQualificationOptions,gameArenaQualificationOptions } from "../dropdownOptions";
+import { ageGroupOptions, competitionChoiceOptions, QualificationOptions,countriesOptions,statesOptions } from "../dropdownOptions";
 
 export default {
   created() {
@@ -154,6 +183,17 @@ export default {
       itemsPerPage: 10, // Number of teams per page
       currentPage: 1, // Current page
       editingStatus: null,
+      newChildRow: {
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        country: "",
+        state: "",
+        birthday: "",
+        schoolName: "",
+        experience: "",
+      },
     };
   },
   computed: {
@@ -174,7 +214,7 @@ export default {
       return ageGroupOptions;
     },
     filteredStatusChoices() {
-      return idcQualificationOptions;
+      return QualificationOptions;
     },
     totalPages() {
       return Math.ceil(this.filteredTeams.length / this.itemsPerPage);
@@ -194,13 +234,20 @@ export default {
     totalRecords() {
       return this.filteredTeams.length;
     },
-  },async mounted() {
-    this.fetchData();
+  },
+  async mounted() {
+    try {
+      this.teamsData = await axios.get(`http://localhost:8082/idcteam/teams`);
+      this.teams = this.teamsData.data.data;
+    } catch (error) {
+      // Handle any errors that might occur during the request
+      console.error("Error fetching users:", error);
+    }
   },
   methods: {
     async fetchData() {
       try {
-        const response = await axios.get("http://localhost:3000/teams");
+        const response = await axios.get("");
         this.teams = response.data; // Assuming the data is an array of teams
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -234,11 +281,13 @@ export default {
         team.teamName = team.editingTeamName;
         team.ageGroup = team.editingAgeGroup;
         team.competitionChoice = team.editingCompetitionChoice;
+        team.teacherName = team.editingteacherName;
         team.status = team.editingStatus;
         team.editing = false;
       } else {
         // Enter editing mode
         team.editingTeamName = team.teamName;
+        team.editingteacherName = team.teacherName;
         team.editingAgeGroup = team.ageGroup;
         team.editingCompetitionChoice = team.competitionChoice;
         team.editingStatus = team.status;
@@ -252,6 +301,17 @@ export default {
         this.filteredTeams.splice(index, 1);
       }
     },
+  // Method to add a new child row
+  addChildRow(teamIndex) {
+      const team = this.filteredTeams[teamIndex];
+      team.userResponses.push({ ...this.newChildRow });
+      // Set the initial country and state values for the new child row
+      const newUserIndex = team.userResponses.length - 1;
+      const newUser = team.userResponses[newUserIndex];
+      newUser.country = null;
+      newUser.statesOptions = [];
+    },
+
   },
 };
 </script>
@@ -397,15 +457,7 @@ input.form-control.editing-textbox {
   min-width: 100px;
 }
 
-/* Styles for the dropdown in editing mode */
-.editing-dropdown {
-  min-width: 150px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 14px;
-}
+
 
 
 </style>
