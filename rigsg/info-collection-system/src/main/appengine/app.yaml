@@ -1,0 +1,9 @@
+runtime: java
+env: flex
+entrypoint: java -Xmx64m -jar target/info-collection-system-1.0.0-SNAPSHOT.jar
+runtime_config:
+    operating_system: "ubuntu22"
+    runtime_version: "17"
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 1
