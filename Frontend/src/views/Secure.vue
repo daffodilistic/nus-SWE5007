@@ -1,5 +1,81 @@
 <template>
   <div>
+     <!-- Add Member Modal -->
+     <b-modal
+      v-model="showAddMemberModal"
+      title="Add Member"
+      modal-class="custom-modal"
+    >
+     <!-- Search bar for filtering users -->
+     <div class="search-container-modal">
+        <b-icon icon="search" style="color: rgb(65, 127, 202)"></b-icon>
+        <input
+          type="text"
+          v-model="searchQueryModal"
+          placeholder="Search User Name"
+          class="search-box"
+        >
+      </div>
+        <!-- List of users to be displayed inside the modal -->
+        <table class="modal-table">
+              <thead>
+                {{ selectedUsers  }}
+                <tr>
+                  <th></th>
+                  <th>Select</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Country</th>
+                  <th>State</th>
+                  <th>Birthday</th>
+                  <th>School Name</th>
+                  <th>Experience <br>(Year)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(user, userIndex) in filteredModalUserList" :key="user.id" @click="addMember(user)">
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                  <td>
+                  <input
+                    type="checkbox"
+                    :checked="selectedUsers.includes(user)"
+                    @change="toggleUserSelection(user)"
+                  />
+                </td>
+                  <!--<td>{{ userIndex + 1 }}</td>-->
+                  <td>
+                    {{ user.firstName }}
+                  </td>
+                  <td>
+                    {{ user.lastName }}
+                  </td>
+                  <td>
+                    {{ user.email }}
+                  </td>
+                  <td>
+                    {{ user.phone }}
+                  </td>
+                  <td>
+                    {{ user.country }}
+                  </td>
+                  <td>
+                    {{ user.state }}
+                  </td>
+                  <td>
+                    {{ user.dateOfBirth }}
+                  </td>
+                  <td>
+                    {{ user.schoolName }}
+                  </td>
+                  <td>
+                    {{ user.yearsOfExp }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+    </b-modal>
     <br><br>
     <div class="search-container">
       <table>
@@ -28,6 +104,7 @@
         <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
           <td>
             <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
+
           </td>
           <td v-if="!team.editing">
             {{ team.teamName }}
@@ -110,6 +187,7 @@
                   <th>Birthday</th>
                   <th>School Name</th>
                   <th>Experience (Year)</th>
+                  <th><button @click="fetchUsers(team.id)" class="add-member-button">Add Member</button></th>
                 </tr>
               </thead>
               <tbody>
@@ -117,6 +195,7 @@
                   <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                   <td>{{ userIndex + 1 }}</td>
                   <td>
+                    test
                     {{ user.firstName }}
                   </td>
                   <td>
@@ -172,17 +251,19 @@ import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions, QualificationOptions,countriesOptions,statesOptions } from "../dropdownOptions";
 
 export default {
-  created() {
-    this.fetchData();
-  },
+
   data() {
     return {
+      selectedUsers: [],
       searchQuery: '',
+      searchQueryModal: '',
       teams:[],
       activeRow: null,
       itemsPerPage: 10, // Number of teams per page
       currentPage: 1, // Current page
-      editingStatus: null,
+      editingStatus: null, // Control the visibility of the modal
+      showAddMemberModal: false,
+      userList: [],
       newChildRow: {
         firstName: "",
         lastName: "",
@@ -234,28 +315,69 @@ export default {
     totalRecords() {
       return this.filteredTeams.length;
     },
+    filteredModalUserList() {
+    if (this.searchQueryModal.trim() === '') {
+      return this.userList;
+    }
+
+    const query = this.searchQueryModal.trim().toLowerCase();
+    return this.userList.filter(
+      (user) =>
+        user.firstName.toLowerCase().includes(query) ||
+        user.lastName.toLowerCase().includes(query)
+    );
+  },
   },
   async mounted() {
     try {
-      this.teamsData = await axios.get(`http://localhost:8082/idcteam/teams`);
-      this.teams = this.teamsData.data.data;
+      this.teamsData = await axios.get('http://localhost:3000/teams');
+      this.teams = this.teamsData.data;
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching users:", error);
     }
   },
   methods: {
-    async fetchData() {
+
+    async fetchUsers(teamId) {
       try {
-        const response = await axios.get("");
-        this.teams = response.data; // Assuming the data is an array of teams
+        const response = await axios.get("api/userinfo/users");
+        this.userList = response.data.data;
+        this.showAddMemberModal = true; // Show the modal after fetching the users
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching users:", error);
       }
     },
-    toggleRow(index) {
-      this.activeRow = this.activeRow === index ? null : index;
-    },
+
+   /* async fetchTeamMembers(team) {
+      const requestBody = {
+        id: team.id // Assuming the server expects a "teamId" property in the request body
+      };
+      try {
+    const response = await axios.get("/api/idcteam/team", {
+      headers: {
+        "Content-Type": "application/json" // Set the Content-Type header to indicate JSON data
+      },
+      data: JSON.stringify(requestBody) // Convert the requestBody to JSON string
+       });
+
+        team.userResponses = response.data; // Assuming the response contains an array of team members
+        console.log(`success GET URL for fetching team members: /api/idcteam/team, Request Body: ${JSON.stringify(requestBody)}`);
+      } catch (error) {
+        console.error('Error fetching team members:', error);
+        console.log(`fail GET URL for fetching team members: /api/idcteam/team, Request Body: ${JSON.stringify(requestBody)}`);
+      }
+    },*/
+
+  async toggleRow(index) {
+    if (this.activeRow === index) {
+      this.activeRow = null; // Collapse the row if it's already expanded
+    } else {
+      this.activeRow = index;
+      const team = this.filteredTeams[index];
+     // await this.fetchTeamMembers(team);
+    }
+  },
     gotoPage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
@@ -302,7 +424,7 @@ export default {
       }
     },
   // Method to add a new child row
-  addChildRow(teamIndex) {
+    addChildRow(teamIndex) {
       const team = this.filteredTeams[teamIndex];
       team.userResponses.push({ ...this.newChildRow });
       // Set the initial country and state values for the new child row
@@ -311,6 +433,14 @@ export default {
       newUser.country = null;
       newUser.statesOptions = [];
     },
+    toggleUserSelection(user) {
+    if (this.selectedUsers.includes(user)) {
+      this.selectedUsers = this.selectedUsers.filter((selectedUser) => selectedUser !== user);
+    } else {
+      this.selectedUsers.push(user);
+    }
+  },
+
 
   },
 };
@@ -457,7 +587,20 @@ input.form-control.editing-textbox {
   min-width: 100px;
 }
 
+.custom-modal {
+  max-width: 100%; /* Optionally set a max-width for the modal */
+  width: 100% !important; /* Set the modal width to take full width of the viewport */
+}
 
+.modal-dialog {
+  max-width: none !important; /* Ensure there are no constraints on modal's width */
+  margin: 0 auto; /* Center the modal horizontally */
+}
 
+.modal-table {
+  width: 100%; /* Set the table width to take full width of the modal */
+  /* Optionally, you can set a max-width for the table if needed */
+  /* max-width: 800px; */
+}
 
 </style>
