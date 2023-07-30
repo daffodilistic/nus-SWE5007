@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<UserJpaEntities, UUID> {
 
     List<UserJpaEntities> findAllByIdcTeamId(UUID teamId);
+
+    List<UserJpaEntities> findAllByGameTeamId(UUID gameId);
 }
