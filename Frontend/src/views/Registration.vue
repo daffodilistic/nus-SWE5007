@@ -72,6 +72,7 @@ import { v4 as uuidv4 } from 'uuid'; // Import the uuidv4 function from the uuid
 Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
 import axios from "axios";
+import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
 
 export default {
 
@@ -139,27 +140,25 @@ export default {
         return rest;
       });
     },
+    registerTeamMembers() {
+      this.users = this.users.map(user => {
+        // Create a new object without the isEdit property
+        const { isEdit,edit, ...rest } = user;
+        return rest;
+      });
+    },
     async registerIDCTeam() {
       try {
         // Prepare the data for the POST request
-        const teamData = {
-          teamName: this.teamName,
-          ageGroup: this.ageGroup,
-          //teacherName: this.teacherName,
-          isQualifiedPromo: false,
-          isQualifiedFinal: false,
-          isQualifiedFinalSecondStage: false,
 
-        };
         //userResponses: this.users.map(user => ({ ...user, id: uuidv4() })),
         const numberOfUsers = this.users.length;
 
-        //Create IDC Team
-        //const response = await axios.post('http://localhost:8080/idcteam/team', teamData);
-        //console.log('Team registration successful:', response.data);
+        // Create an array to store the user IDs
+        const userIDs = [];
 
         // Create new user for each user in the users array
-      for (const user of this.users) {
+        for (const user of this.users) {
         const userData = {
           firstName: user.firstName,
           lastName: user.lastName,
@@ -172,14 +171,43 @@ export default {
           yearsOfExp: user.yearsOfExp,
         };
 
-         // Call the create new user API
-        const response = await axios.post('http://localhost:8080/userinfo/user', userData);
-        //console.log('Member Registration successful:', response.data);
+          // Call the create new user API
+          const createUserResponse = await axios.post(`${USER_INFO_BASE_URL}userinfo/user`, userData);
+          console.log('Member Registration successful:', createUserResponse.data);
+
+          // Push the user ID into the userIDs array
+          userIDs.push(createUserResponse.data.data.id);
         }
 
+        //Create IDC Team
+        const teamData = {
+          teamName: this.teamName,
+          ageGroup: this.ageGroup,
+          //teacherName: this.teacherName,
+          isQualifiedPromo: false,
+          isQualifiedFinal: false,
+          isQualifiedFinalSecondStage: false,
+        };
 
+        const createTeamResponse = await axios.post(`${IDC_TEAM_BASE_URL}idcteam/team`, teamData, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"
+        },
+      });
+        console.log('Team registration successful:', createTeamResponse.data);
 
+        const RegisterTeamData = {
+          id: createTeamResponse.data.data,
+          teamName: this.teamName,
+          userIds: userIDs
+        };
 
+        //register created user to team
+        const registerTeamResponse = await axios.put(`${IDC_TEAM_BASE_URL}idcteam/team`, RegisterTeamData);
+        console.log('Team Allocation successful:', registerTeamResponse.data);
 
         // Show a success message to the user using VueSweetalert2
         this.$swal({
@@ -188,8 +216,6 @@ export default {
           icon: 'success',
           timer: 2000, // Display the success message for 2 seconds
         });
-
-        return response.data;
 
       } catch (error) {
         // Handle any errors that occurred during the registration process

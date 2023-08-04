@@ -17,7 +17,7 @@ spring:
       ddl-auto: update
 
 keycloak:
-  auth-server-url: http://35.247.139.32
+  auth-server-url: http://35.247.139.32:8080
   principal-attribute: idc-system
   realm: ricsg
   resource: ricsg

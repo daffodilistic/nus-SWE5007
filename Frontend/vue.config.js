@@ -1,5 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
-/* module.exports = defineConfig({
+module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
     headers: {
@@ -13,24 +13,13 @@ const { defineConfig } = require('@vue/cli-service')
       '/api': {
         target: 'http://localhost:8081', // Replace this with your backend server's URL
         changeOrigin: true,
-        pathRewrite: { '^/api': '' },
+        //pathRewrite: { '^/api': '' },
       },
       '/api2': {
         target: 'http://localhost:8082', // Replace this with your backend server's URL
         changeOrigin: true,
-        pathRewrite: { '^/api2': '' },
+        //pathRewrite: { '^/api2': '' },
       },
     },
   }
-})*/
-
-module.exports = {
-  devServer: {
-    proxy: 'http://localhost:8083', // Disable the dev server proxy
-    '/api': {
-      target: 'http://localhost:8081', // Replace this with your backend server's URL
-      changeOrigin: true,
-      pathRewrite: { '^/api': '' },
-    },
-  },
-};
+})

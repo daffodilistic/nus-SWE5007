@@ -13,6 +13,7 @@
 <script>
 import EditableTable from "@/components/UserEditableTable.vue";
 import axios from "axios";
+import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
 
 export default {
   name: "account",
@@ -38,7 +39,7 @@ export default {
   },
   async mounted() {
     try {
-      this.usersData = await axios.get('/api/userinfo/users');
+      this.usersData = await axios.get(`${USER_INFO_BASE_URL}userinfo/users`);
       this.users = this.usersData.data.data;
     } catch (error) {
       // Handle any errors that might occur during the request
@@ -53,7 +54,7 @@ export default {
       if (user.id) {
         // User has an ID, so it already exists in the backend, update the user
         try {
-          await axios.put('/api/userinfo/user', user);
+          await axios.put(`${USER_INFO_BASE_URL}userinfo/user`, user);
           // Update the user in the users array after successful API update
           const index = this.users.findIndex(u => u.id === user.id);
           if (index !== -1) {
@@ -65,7 +66,7 @@ export default {
       } else {
         // User doesn't have an ID, so it is a new user, add the user
         try {
-          const response = await axios.post('/api/userinfo/user', user);
+          const response = await axios.post(`${USER_INFO_BASE_URL}userinfo/user`, user);
           // Add the new user to the users array after successful API add
           this.users.push(response.data.data);
         } catch (error) {

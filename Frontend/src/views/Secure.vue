@@ -1,14 +1,16 @@
 <template>
   <div>
      <!-- Add Member Modal -->
+
      <b-modal
       v-model="showAddMemberModal"
       :title="'Add Member to ' + currentTeamName"
       modal-class="custom-modal"
+      hide-footer
     >
      <!-- Search bar for filtering users -->
-     <div class="search-container-modal">
-        <b-icon icon="search" style="color: rgb(65, 127, 202)"></b-icon>
+     <div class="search-container">
+        <p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p>&nbsp;&nbsp;
         <input
           type="text"
           v-model="searchQueryModal"
@@ -72,9 +74,11 @@
                     {{ user.yearsOfExp }}
                   </td>
                 </tr>
-                <button @click="addMembersToTeam" class="add-member-button">Add Member</button>
               </tbody>
             </table>
+            <div class="text-center">
+              <button @click="addMembersToTeam" class="add-member-button">Save</button>
+            </div>
     </b-modal>
     <br><br>
     <div class="search-container">
@@ -94,9 +98,8 @@
           <th></th>
           <th>Team Name</th>
           <th>Age Group</th>
-          <th>Competition Choice</th>
           <th>Teacher Name</th>
-          <th>Status</th>
+          <th>Promotion <br>Qualification</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -114,7 +117,7 @@
           </td>
 
           <td v-if="!team.editing">
-            {{ team.ageGroup }} <!-- Display text instead of value -->
+            {{ ageGroupTextMap[team.ageGroup] }}
           </td>
           <td v-else>
             <b-form-select v-model="team.editingAgeGroup" :options="filteredAgeGroupChoices" class="editing-dropdown">
@@ -122,10 +125,6 @@
                 <option :value="null" disabled>Select Age Group</option>
               </template>
             </b-form-select>
-          </td>
-
-          <td v-if="!team.editing">
-            {{ team.competitionChoice }}
           </td>
           <td v-else>
             <b-form-select v-model="team.editingCompetitionChoice" :options="filteredCompetitionChoices" class="editing-dropdown">
@@ -144,7 +143,7 @@
           <!--<td>{{ team.userResponses.length }}</td>-->
 
           <td v-if="!team.editing">
-            {{ team.status }}
+            {{ team.isQualifiedPromo ? 'Yes' : 'No' }}
           </td>
           <td v-else>
             <b-form-select v-model="team.editingStatus" :options="filteredStatusChoices" class="editing-dropdown">
@@ -155,17 +154,22 @@
           </td>
 
           <td>
+            <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" >
+              <b-icon icon="person-plus" ></b-icon>
+            </b-button>
             <!-- Edit Icon -->
-            <b-button @click="editTeam(index)" variant="outline-primary">
-            <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
-            <span v-else><b-icon icon="save"></b-icon></span>
-          </b-button>
+            <b-button @click="editTeam(index)" variant="outline-primary" class="delete-button">
+              <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
+              <span v-else><b-icon icon="save"></b-icon></span>
+            </b-button>
             <!-- Delete Icon -->
             <b-button
             class="delete-button"
             variant="outline-primary"
             @click="deleteTeam(index)"
-            ><b-icon icon="trash"></b-icon></b-button>
+            >
+              <b-icon icon="trash"></b-icon>
+            </b-button>
           </td>
         </tr>
         <!-- Child rows -->
@@ -185,7 +189,6 @@
                   <th>Birthday</th>
                   <th>School Name</th>
                   <th>Experience (Year)</th>
-                  <th><button @click="fetchUsers(team.id,team.teamName)" class="add-member-button">Add Member</button></th>
                 </tr>
               </thead>
               <tbody>
@@ -220,7 +223,9 @@
   </div>
   <div v-else>
       <!-- Show a loading message or spinner while the data is being fetched -->
-      <p>Loading...</p>
+      <div class="loader-container">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -229,8 +234,22 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions, QualificationOptions,countriesOptions,statesOptions } from "../dropdownOptions";
+import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
 
 export default {
+  head() {
+    return {
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
+          integrity: 'sha512-...',
+          crossorigin: 'anonymous',
+          referrerpolicy: 'no-referrer',
+        },
+      ],
+    }
+  },
 
   data() {
     return {
@@ -314,10 +333,19 @@ export default {
         user.lastName.toLowerCase().includes(query)
     );
   },
+  ageGroupTextMap() {
+    // Define a mapping of age group values to their corresponding text
+    const ageGroupMap = {
+      'OC': 'Open Category: 8-15 years old',
+      'JC': 'Junior Category: 8-12 years old',
+      // Add more entries as needed for other age groups
+    };
+    return ageGroupMap;
+  },
   },
   async mounted() {
     try {
-      this.teamsData = await axios.get('http://localhost:8083/api2/idcteam/teams');
+      this.teamsData = await axios.get(`${IDC_TEAM_BASE_URL}idcteam/teams`);
       this.teams = this.teamsData.data.data;
     } catch (error) {
       // Handle any errors that might occur during the request
@@ -325,10 +353,9 @@ export default {
     }
   },
   methods: {
-
     async fetchUsers(teamId,teamName) {
       try {
-        const response = await axios.get("api/userinfo/users");
+        const response = await axios.get(`${USER_INFO_BASE_URL}userinfo/users`);
         this.currentTeamId = teamId;
         this.userList = response.data.data;
         this.currentTeamName = teamName;
@@ -339,34 +366,41 @@ export default {
       }
     },
 
-    /* async fetchTeamMembers(team) {
+    async toggleRow(index) {
+    if (this.activeRow === index) {
+      this.activeRow = null; // Collapse the row if it's already expanded
+    } else {
+      this.activeRow = index;
+      const team = this.filteredTeams[index];
+      try {
+        // Make the API call here using the team ID as the request body
         const requestBody = {
-          id: team.id // Assuming the server expects a "teamId" property in the request body
+          id: team.id,
         };
-        try {
-      const response = await axios.get("/api/idcteam/team", {
-        headers: {
-          "Content-Type": "application/json" // Set the Content-Type header to indicate JSON data
-        },
-        data: JSON.stringify(requestBody) // Convert the requestBody to JSON string
-        });
 
-          team.userResponses = response.data; // Assuming the response contains an array of team members
-          console.log(`success GET URL for fetching team members: /api/idcteam/team, Request Body: ${JSON.stringify(requestBody)}`);
-        } catch (error) {
-          console.error('Error fetching team members:', error);
-          console.log(`fail GET URL for fetching team members: /api/idcteam/team, Request Body: ${JSON.stringify(requestBody)}`);
-        }
-      },*/
-      async toggleRow(index) {
-        if (this.activeRow === index) {
-          this.activeRow = null; // Collapse the row if it's already expanded
-        } else {
-          this.activeRow = index;
-          const team = this.filteredTeams[index];
-        // await this.fetchTeamMembers(team);
-        }
-      },
+        // Make the HTTP PUT request to the API endpoint
+        const requestBodyJson = JSON.stringify(requestBody);
+        console.log('Request Body:', requestBodyJson);
+        const response = await axios.get(`${IDC_TEAM_BASE_URL}idcteam/team`, requestBody,{
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length,X-Requested-With"
+        },
+      });
+
+        // Handle the response, if needed
+        console.log('Response from server:', response.data);
+
+        // Optional: Perform any additional actions, such as updating the UI.
+      } catch (error) {
+        // Handle errors, if any
+        console.error('Error calling API:', error);
+        console.log('ETEST:', response.data);
+      }
+    }
+  },
       gotoPage(page) {
         if (page >= 1 && page <= this.totalPages) {
           this.currentPage = page;
@@ -385,7 +419,7 @@ export default {
         return `${day}/${month}/${year}`;
       },
       // Method to toggle editing mode for a team
-      editTeam(index) {
+      async editTeam(index) {
         const team = this.filteredTeams[index];
         if (team.editing) {
           // Save the changes
@@ -395,6 +429,35 @@ export default {
           team.teacherName = team.editingteacherName;
           team.status = team.editingStatus;
           team.editing = false;
+          //let isQualifiedPromoValue = false;
+          team.isQualifiedPromo = team.editingStatus
+          //if (team.editingStatus === "Promotion : Qualified") {
+            //isQualifiedPromoValue = true;
+          //} else {
+            //isQualifiedPromoValue = false;
+          //}
+          const requestBody = {
+            id: team.id,
+            isQualifiedPromo: team.isQualifiedPromo
+          };
+
+          console.log('Request Payload 222:', requestBody);
+
+          try {
+            // Make the HTTP POST request to the API endpoint
+            const response = await axios.put(`${IDC_TEAM_BASE_URL}idcteam/team`, requestBody);
+
+            // Handle the response, if needed
+            console.log('Response from server:', response.data);
+
+            // Close the modal after the request is successful
+            this.showAddMemberModal = false;
+
+            // Optional: Perform any additional actions, such as updating the UI.
+          } catch (error) {
+            // Handle errors, if any
+            console.error('Error adding members to team:', error);
+          }
         } else {
           // Enter editing mode
           team.editingTeamName = team.teamName;
@@ -432,6 +495,7 @@ export default {
       };
       console.log(jsonPayload)
     },
+
     async addMembersToTeam() {
     // Make sure currentTeamId and selectedUsers are defined
     if (!this.currentTeamId || this.selectedUsers.length === 0) {
@@ -446,14 +510,16 @@ export default {
       userIds: this.selectedUsers,
     };
 
+    console.log('Request Payload:', requestBody);
+
     try {
       // Make the HTTP POST request to the API endpoint
-      const response = await axios.post('http://localhost:8082/idcteam/team', requestBody, {
+      const response = await axios.put(`${IDC_TEAM_BASE_URL}idcteam/team`, requestBody, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"
+          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length,X-Requested-With"
         },
       });
 
@@ -614,14 +680,15 @@ input.form-control.editing-textbox {
   min-width: 100px;
 }
 
-.custom-modal {
-  max-width: 100%; /* Optionally set a max-width for the modal */
-  width: 100% !important; /* Set the modal width to take full width of the viewport */
-}
+/* Modal Styles */
+.custom-modal .modal-dialog  {
+    max-width: 1300px; /* Set the max width of the modal */
+    text-align: center;
+  }
 
-.modal-dialog {
-  max-width: none !important; /* Ensure there are no constraints on modal's width */
-  margin: 0 auto; /* Center the modal horizontally */
+/* Center the modal title */
+.custom-modal .modal-header {
+  text-align: center;
 }
 
 .modal-table {
@@ -629,5 +696,36 @@ input.form-control.editing-textbox {
   /* Optionally, you can set a max-width for the table if needed */
   /* max-width: 800px; */
 }
+
+.add-member-button {
+  padding: 10px 20px;
+  background-color: #5DADE2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+
+}
+
+.text-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* Adjust the height as needed */
+}
+
+.fa-spinner {
+  font-size: 32px; /* Adjust the size as needed */
+}
+
 
 </style>

@@ -16,27 +16,8 @@ export const ageGroupOptions = [
 
   export const QualificationOptions = [
     //IDC
-    { value: 'Registration: Qualified', text: 'Registration: Qualified', CompetitionId:'1'},
-    { value: 'Registration : Disqualified', text: 'Registration : Disqualified' , CompetitionId:'1'},
-    { value: 'Preliminary : Proposal Pending', text: 'Preliminary : Proposal Pending', CompetitionId:'1'},
-    { value: 'Preliminary : Proposal In-Review', text: 'Preliminary : Proposal In-Review', CompetitionId:'1'},
-    { value: 'Preliminary : Proposal Accepted', text: 'Preliminary : Proposal Accepted', CompetitionId:'1'},
-    { value: 'Preliminary : Proposal Rejected', text: 'Preliminary : Proposal Rejected', CompetitionId:'1'},
-    { value: 'Promotion : Proposal Pending', text: 'Promotion : Proposal Pending', CompetitionId:'1'},
-    { value: 'Promotion : Proposal In-Review', text: 'Promotion : Proposal In-Review', CompetitionId:'1'},
-    { value: 'Promotion : Proposal Accepted', text: 'Promotion : Proposal Accepted', CompetitionId:'1'},
-    { value: 'Promotion : Proposal Rejected', text: 'Promotion : Proposal Rejected', CompetitionId:'1'},
-    { value: 'Final : 1st Round Disqualified', text: 'Final : 1st Round Disqualified', CompetitionId:'1'},
-    { value: 'Final : 1st Round Qualified', text: 'Final : 1st Round Qualified', CompetitionId:'1'},
-    { value: 'Final : 2nd Round Disqualified', text: 'Final : 2nd Round Disqualified', CompetitionId:'1'},
-    { value: 'Final : 2nd Round Qualified', text: 'Final : 2nd Round Qualified', CompetitionId:'1'},
-    //game arena
-    { value: 'Registration: Qualified', text: 'Registration: Qualified', CompetitionId:'2'},
-    { value: 'Registration : Disqualified', text: 'Registration : Disqualified' , CompetitionId:'2'},
-    { value: 'Qualification : Disqualified', text: 'Qualification : Disqualified' , CompetitionId:'2'},
-    { value: 'Qualification : Qualified', text: 'Qualification : Qualified', CompetitionId:'2' },
-    { value: 'Elimination : Qualified', text: 'Elimination : Qualified', CompetitionId:'2' },
-    { value: 'Elimination : Disqualified', text: 'Elimination : Disqualified', CompetitionId:'2' },
+    { value: false, text: 'No', CompetitionId:'1'},
+    { value: true, text: 'Yes', CompetitionId:'1'},
   ];
 
   export const countriesOptions = [
