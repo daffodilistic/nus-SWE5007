@@ -1,6 +1,7 @@
 package com.nus.project.capstone.model.persistence.base;
 
 import com.nus.project.capstone.model.entity.base.UserRequests;
+import com.nus.project.capstone.model.persistence.game.GameTeamJpaEntities;
 import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.*;
 
@@ -34,6 +35,10 @@ public class UserJpaEntities {
     )
     @JoinColumn(name = "idc_team_id", referencedColumnName = "idc_team_id")
     private IdcTeamJpaEntities idcTeam;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "game_team_id", referencedColumnName = "game_team_id")
+    private GameTeamJpaEntities gameTeam;
 
     public static UserJpaEntities toJpaEntity(UserRequests u) {
         return UserJpaEntities.builder()

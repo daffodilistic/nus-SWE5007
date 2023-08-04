@@ -1,5 +1,81 @@
 <template>
   <div>
+     <!-- Add Member Modal -->
+     <b-modal
+      v-model="showAddMemberModal"
+      :title="'Add Member to ' + currentTeamName"
+      modal-class="custom-modal"
+    >
+     <!-- Search bar for filtering users -->
+     <div class="search-container-modal">
+        <b-icon icon="search" style="color: rgb(65, 127, 202)"></b-icon>
+        <input
+          type="text"
+          v-model="searchQueryModal"
+          placeholder="Search User Name"
+          class="search-box"
+        >
+      </div>
+        <!-- List of users to be displayed inside the modal -->
+        <table class="modal-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Select</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Country</th>
+                  <th>State</th>
+                  <th>Birthday</th>
+                  <th>School Name</th>
+                  <th>Experience <br>(Year)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(user, userIndex) in filteredModalUserList" :key="user.id">
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                  <td>
+                  <input
+                    type="checkbox"
+                    :checked="selectedUsers.includes(user.id)"
+                    @change="toggleUserSelection(user.id)"
+                  />
+                </td>
+                  <!--<td>{{ userIndex + 1 }}</td>-->
+                  <td>
+                    {{ user.firstName }}
+                  </td>
+                  <td>
+                    {{ user.lastName }}
+                  </td>
+                  <td>
+                    {{ user.email }}
+                  </td>
+                  <td>
+                    {{ user.phone }}
+                  </td>
+                  <td>
+                    {{ user.country }}
+                  </td>
+                  <td>
+                    {{ user.state }}
+                  </td>
+                  <td>
+                    {{ user.dateOfBirth }}
+                  </td>
+                  <td>
+                    {{ user.schoolName }}
+                  </td>
+                  <td>
+                    {{ user.yearsOfExp }}
+                  </td>
+                </tr>
+                <button @click="addMembersToTeam" class="add-member-button">Add Member</button>
+              </tbody>
+            </table>
+    </b-modal>
     <br><br>
     <div class="search-container">
       <table>
@@ -9,7 +85,7 @@
         </tr>
       </table>
     </div>
-
+    <div v-if="teams && teams.length > 0">
     <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
     <br>
     <table class="main-table">
@@ -28,6 +104,7 @@
         <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
           <td>
             <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
+
           </td>
           <td v-if="!team.editing">
             {{ team.teamName }}
@@ -79,12 +156,10 @@
 
           <td>
             <!-- Edit Icon -->
-
             <b-button @click="editTeam(index)" variant="outline-primary">
             <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
             <span v-else><b-icon icon="save"></b-icon></span>
           </b-button>
-
             <!-- Delete Icon -->
             <b-button
             class="delete-button"
@@ -110,42 +185,22 @@
                   <th>Birthday</th>
                   <th>School Name</th>
                   <th>Experience (Year)</th>
+                  <th><button @click="fetchUsers(team.id,team.teamName)" class="add-member-button">Add Member</button></th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(user, userIndex) in team.userResponses" :key="userIndex" class="child-row">
                   <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                  <td>{{ userIndex + 1 }}</td>
-                  <td>
-                    {{ user.firstName }}
-                  </td>
-                  <td>
-                    {{ user.lastName }}
-                  </td>
-                  <td>
-                    {{ user.email }}
-                  </td>
-                  <td>
-                    {{ user.phone }}
-                  </td>
-                  <td>
-                    {{ user.country }}
-                  </td>
-                  <td>
-                    {{ user.state }}
-                  </td>
-                  <td>
-                    <input v-if="editingChildRow === userIndex" v-model="user.dateOfBirth" type= "date" class="form-control editing-textbox" />
-                    <span v-else>{{ user.dateOfBirth }}</span>
-                  </td>
-                  <td>
-                    <input v-if="editingChildRow === userIndex" v-model="user.schoolName" class="form-control editing-textbox" />
-                    <span v-else>{{ user.schoolName }}</span>
-                  </td>
-                  <td>
-                    <input v-if="editingChildRow === userIndex" v-model="user.yearsOfExp" min = 0 type= "number" class="form-control editing-textbox" />
-                    <span v-else>{{ user.yearsOfExp }}</span>
-                  </td>
+                  <td> {{ userIndex + 1 }} </td>
+                  <td> {{ user.firstName }} </td>
+                  <td> {{ user.lastName }} </td>
+                  <td> {{ user.email }} </td>
+                  <td> {{ user.phone }} </td>
+                  <td> {{ user.country }} </td>
+                  <td> {{ user.state }} </td>
+                  <td> {{ user.dateOfBirth }} </td>
+                  <td> {{ user.schoolName }} </td>
+                  <td> {{ user.yearsOfExp }} </td>
                 </tr>
               </tbody>
             </table>
@@ -161,8 +216,12 @@
     <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
       <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
     </button>
-    <pre class="json-display">{{ JSON.stringify(teams, null, 2) }}</pre>
   </div>
+  </div>
+  <div v-else>
+      <!-- Show a loading message or spinner while the data is being fetched -->
+      <p>Loading...</p>
+    </div>
   </div>
 </template>
 
@@ -172,17 +231,21 @@ import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions, QualificationOptions,countriesOptions,statesOptions } from "../dropdownOptions";
 
 export default {
-  created() {
-    this.fetchData();
-  },
+
   data() {
     return {
+      currentTeamId: "",
+      currentTeamName: "",
+      selectedUsers: [],
       searchQuery: '',
+      searchQueryModal: '',
       teams:[],
       activeRow: null,
       itemsPerPage: 10, // Number of teams per page
       currentPage: 1, // Current page
-      editingStatus: null,
+      editingStatus: null, // Control the visibility of the modal
+      showAddMemberModal: false,
+      userList: [],
       newChildRow: {
         firstName: "",
         lastName: "",
@@ -198,15 +261,20 @@ export default {
   },
   computed: {
     filteredTeams() {
-      // If the search query is empty, show all teams
-      if (this.searchQuery.trim() === '') {
-        return this.teams;
-      }
+    // If the teams data is not available yet, return an empty array
+    if (!this.teams || this.teams.length === 0) {
+      return [];
+    }
 
-      // Otherwise, filter teams based on the search query
-      const query = this.searchQuery.trim().toLowerCase();
-      return this.teams.filter((team) => team.teamName.toLowerCase().includes(query));
-    },
+    // If the search query is empty, show all teams
+    if (this.searchQuery.trim() === '') {
+      return this.teams;
+    }
+
+    // Otherwise, filter teams based on the search query
+    const query = this.searchQuery.trim().toLowerCase();
+    return this.teams.filter((team) => team.teamName.toLowerCase().includes(query));
+  },
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
     },
@@ -234,10 +302,22 @@ export default {
     totalRecords() {
       return this.filteredTeams.length;
     },
+    filteredModalUserList() {
+    if (this.searchQueryModal.trim() === '') {
+      return this.userList;
+    }
+
+    const query = this.searchQueryModal.trim().toLowerCase();
+    return this.userList.filter(
+      (user) =>
+        user.firstName.toLowerCase().includes(query) ||
+        user.lastName.toLowerCase().includes(query)
+    );
+  },
   },
   async mounted() {
     try {
-      this.teamsData = await axios.get(`http://localhost:8082/idcteam/teams`);
+      this.teamsData = await axios.get('http://localhost:8083/api2/idcteam/teams');
       this.teams = this.teamsData.data.data;
     } catch (error) {
       // Handle any errors that might occur during the request
@@ -245,73 +325,150 @@ export default {
     }
   },
   methods: {
-    async fetchData() {
+
+    async fetchUsers(teamId,teamName) {
       try {
-        const response = await axios.get("");
-        this.teams = response.data; // Assuming the data is an array of teams
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        const response = await axios.get("api/userinfo/users");
+        this.currentTeamId = teamId;
+        this.userList = response.data.data;
+        this.currentTeamName = teamName;
+        this.showAddMemberModal = true; // Show the modal after fetching the users
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
       }
     },
-    toggleRow(index) {
-      this.activeRow = this.activeRow === index ? null : index;
-    },
-    gotoPage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.currentPage = page;
-      }
-    },
-    formatDate(dateString) {
-      // Create a Date object from the given dateString
-      const date = new Date(dateString);
 
-      // Extract day, month, and year from the Date object
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-      const year = date.getFullYear();
+    /* async fetchTeamMembers(team) {
+        const requestBody = {
+          id: team.id // Assuming the server expects a "teamId" property in the request body
+        };
+        try {
+      const response = await axios.get("/api/idcteam/team", {
+        headers: {
+          "Content-Type": "application/json" // Set the Content-Type header to indicate JSON data
+        },
+        data: JSON.stringify(requestBody) // Convert the requestBody to JSON string
+        });
 
-      // Return the formatted date as "dd/mm/yyyy"
-      return `${day}/${month}/${year}`;
-    },
-    // Method to toggle editing mode for a team
-    editTeam(index) {
-      const team = this.filteredTeams[index];
-      if (team.editing) {
-        // Save the changes
-        team.teamName = team.editingTeamName;
-        team.ageGroup = team.editingAgeGroup;
-        team.competitionChoice = team.editingCompetitionChoice;
-        team.teacherName = team.editingteacherName;
-        team.status = team.editingStatus;
-        team.editing = false;
+          team.userResponses = response.data; // Assuming the response contains an array of team members
+          console.log(`success GET URL for fetching team members: /api/idcteam/team, Request Body: ${JSON.stringify(requestBody)}`);
+        } catch (error) {
+          console.error('Error fetching team members:', error);
+          console.log(`fail GET URL for fetching team members: /api/idcteam/team, Request Body: ${JSON.stringify(requestBody)}`);
+        }
+      },*/
+      async toggleRow(index) {
+        if (this.activeRow === index) {
+          this.activeRow = null; // Collapse the row if it's already expanded
+        } else {
+          this.activeRow = index;
+          const team = this.filteredTeams[index];
+        // await this.fetchTeamMembers(team);
+        }
+      },
+      gotoPage(page) {
+        if (page >= 1 && page <= this.totalPages) {
+          this.currentPage = page;
+        }
+      },
+      formatDate(dateString) {
+        // Create a Date object from the given dateString
+        const date = new Date(dateString);
+
+        // Extract day, month, and year from the Date object
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        const year = date.getFullYear();
+
+        // Return the formatted date as "dd/mm/yyyy"
+        return `${day}/${month}/${year}`;
+      },
+      // Method to toggle editing mode for a team
+      editTeam(index) {
+        const team = this.filteredTeams[index];
+        if (team.editing) {
+          // Save the changes
+          team.teamName = team.editingTeamName;
+          team.ageGroup = team.editingAgeGroup;
+          team.competitionChoice = team.editingCompetitionChoice;
+          team.teacherName = team.editingteacherName;
+          team.status = team.editingStatus;
+          team.editing = false;
+        } else {
+          // Enter editing mode
+          team.editingTeamName = team.teamName;
+          team.editingteacherName = team.teacherName;
+          team.editingAgeGroup = team.ageGroup;
+          team.editingCompetitionChoice = team.competitionChoice;
+          team.editingStatus = team.status;
+          team.editing = true;
+        }
+      },
+      // Method to delete a team
+      deleteTeam(index) {
+        if (confirm("Are you sure you want to delete this team?")) {
+          this.filteredTeams.splice(index, 1);
+        }
+      },
+      // Method to add a new child row
+      addChildRow(teamIndex) {
+        const team = this.filteredTeams[teamIndex];
+        team.userResponses.push({ ...this.newChildRow });
+        // Set the initial country and state values for the new child row
+        const newUserIndex = team.userResponses.length - 1;
+        const newUser = team.userResponses[newUserIndex];
+        newUser.country = null;
+        newUser.statesOptions = [];
+      },
+      toggleUserSelection(userId) {
+      if (this.selectedUsers.includes(userId)) {
+        this.selectedUsers = this.selectedUsers.filter((selectedUserId) => selectedUserId !== userId);
       } else {
-        // Enter editing mode
-        team.editingTeamName = team.teamName;
-        team.editingteacherName = team.teacherName;
-        team.editingAgeGroup = team.ageGroup;
-        team.editingCompetitionChoice = team.competitionChoice;
-        team.editingStatus = team.status;
-        team.editing = true;
+        this.selectedUsers.push(userId);
       }
+      const jsonPayload = {
+        userIds: this.selectedUsers,
+      };
+      console.log(jsonPayload)
     },
+    async addMembersToTeam() {
+    // Make sure currentTeamId and selectedUsers are defined
+    if (!this.currentTeamId || this.selectedUsers.length === 0) {
+      console.error('Team ID or selected users not available.');
+      return;
+    }
 
-    // Method to delete a team
-    deleteTeam(index) {
-      if (confirm("Are you sure you want to delete this team?")) {
-        this.filteredTeams.splice(index, 1);
-      }
-    },
-  // Method to add a new child row
-  addChildRow(teamIndex) {
-      const team = this.filteredTeams[teamIndex];
-      team.userResponses.push({ ...this.newChildRow });
-      // Set the initial country and state values for the new child row
-      const newUserIndex = team.userResponses.length - 1;
-      const newUser = team.userResponses[newUserIndex];
-      newUser.country = null;
-      newUser.statesOptions = [];
-    },
+    // Prepare the payload to be sent in the request body
+    const requestBody = {
+      id: this.currentTeamId,
+      teamName : this.currentTeamName,
+      userIds: this.selectedUsers,
+    };
 
+    try {
+      // Make the HTTP POST request to the API endpoint
+      const response = await axios.post('http://localhost:8082/idcteam/team', requestBody, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"
+        },
+      });
+
+      // Handle the response, if needed
+      console.log('Response from server:', response.data);
+
+      // Close the modal after the request is successful
+      this.showAddMemberModal = false;
+
+      // Optional: Perform any additional actions, such as updating the UI.
+    } catch (error) {
+      // Handle errors, if any
+      console.error('Error adding members to team:', error);
+    }
+  },
   },
 };
 </script>
@@ -457,7 +614,20 @@ input.form-control.editing-textbox {
   min-width: 100px;
 }
 
+.custom-modal {
+  max-width: 100%; /* Optionally set a max-width for the modal */
+  width: 100% !important; /* Set the modal width to take full width of the viewport */
+}
 
+.modal-dialog {
+  max-width: none !important; /* Ensure there are no constraints on modal's width */
+  margin: 0 auto; /* Center the modal horizontally */
+}
 
+.modal-table {
+  width: 100%; /* Set the table width to take full width of the modal */
+  /* Optionally, you can set a max-width for the table if needed */
+  /* max-width: 800px; */
+}
 
 </style>

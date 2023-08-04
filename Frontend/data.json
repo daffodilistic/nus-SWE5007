@@ -1,6 +1,7 @@
 {
 	"teams": [
 		{
+			"id" : "f80a2b98-008c-4aca-83af-34de7fdd62a4",
 			"teamName": "C",
 			"ageGroup": "Open Category: 8-15 years old",
 			"competitionChoice": "Innovation Design Challenge",
@@ -44,6 +45,7 @@
 			]
 		},
 		{
+			"id" : "ABC124",
 			"teamName": "B",
 			"ageGroup": "Open Category: 8-15 years old",
 			"competitionChoice": "Grand Arena",
@@ -87,6 +89,7 @@
 			]
 		},
 		{
+			"id" : "ABC125",
 			"teamName": "A",
 			"ageGroup": "Open Category: 8-15 years old",
 			"competitionChoice": "Grand Arena",

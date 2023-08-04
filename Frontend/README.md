@@ -9,13 +9,20 @@ A simple user login app built using Vue.js. This app allows access to secure por
 ### Project setup
 npm install
 
+### port setup
+Frontend - 8080
+InfoCollectionSystemApplication - 8081
+InnovationDesignChallengeApplication - 8082
+Proxy Server - 8083
+
+### run proxy to prevent cors issue when running API
+node server.js
 
 ### The command json-server will start a server using the data in our data.json file.
 json-server data.json
 
 ### Compiles and hot-reloads for development
 npm run serve
-
 
 ### Compiles and minifies for production
 npm run build
