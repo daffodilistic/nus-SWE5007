@@ -41,4 +41,8 @@
 	<dependencyManagement>
 	</dependencyManagement>
 
+	<build>
+		<finalName>demo</finalName>
+	</build>
+
 </project>
