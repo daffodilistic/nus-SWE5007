@@ -41,7 +41,9 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/idcteam/**")
                 .permitAll()
-                .antMatchers("/idcmetrics/**")
-                .denyAll();
+                .antMatchers("/idcmetrics/calculate", "/idcmetrics/view**").hasRole("judge")
+                .antMatchers("/idcmetrics/view**").hasRole("participant")
+                .antMatchers("/idcmetrics/create**", "/idcmetrics/update**").hasRole("admin")
+                .anyRequest().permitAll();
     }
 }

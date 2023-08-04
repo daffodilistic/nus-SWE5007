@@ -27,7 +27,7 @@ public class IdcMetricsController {
         this.idcMetricsRepository = idcMetricsRepository;
     }
 
-    @GetMapping("/metric")
+    @GetMapping("/view-metric")
     public ResponseEntity<GeneralMessageEntity> readMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
 
         val o = idcMetricsRepository.findById(idcMetricsRequests.getId());
@@ -35,7 +35,7 @@ public class IdcMetricsController {
                 .data(o.map(IdcMetricsResponse::toIdcMetricsResponse).orElse(null)).build());
     }
 
-    @PostMapping("/metric")
+    @PostMapping("/create-metric")
     public ResponseEntity<GeneralMessageEntity> createMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
 
         val u = idcMetricsRepository.save(IdcMetricsJpaEntities.toJpaEntity(idcMetricsRequests));
@@ -43,7 +43,7 @@ public class IdcMetricsController {
     }
 
 
-    @PutMapping("/metric")
+    @PutMapping("/update-metric")
     public ResponseEntity<GeneralMessageEntity> updateMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
 
         if (idcMetricsRequests.getId() == null) {
@@ -62,7 +62,7 @@ public class IdcMetricsController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
     }
 
-    @GetMapping("/metrics")
+    @GetMapping("/view-all-metrics")
     public ResponseEntity<GeneralMessageEntity> getAllMetrics() {
         val metrics = idcMetricsRepository.findAll();
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(metrics.stream()
