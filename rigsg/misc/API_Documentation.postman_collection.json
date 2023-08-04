@@ -265,12 +265,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcteam/teams",
+					"raw": "http://localhost:8082/idcteam/teams",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcteam",
 						"teams"
@@ -285,6 +285,46 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -297,35 +337,75 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcmetrics/metric",
+					"raw": "http://localhost:8082/idcmetrics/view-metric",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcmetrics",
-						"metric"
+						"view-metric"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get alll IDCmetrics",
+			"name": "Get all IDCmetrics",
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/idcmetrics/metrics",
+					"raw": "http://localhost:8082/idcmetrics/view-all-metrics",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcmetrics",
-						"metrics"
+						"view-all-metrics"
 					]
 				}
 			},
@@ -334,6 +414,46 @@
 		{
 			"name": "6. Create/modify a IDC metric",
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -346,15 +466,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcmetrics/metric",
+					"raw": "http://localhost:8082/idcmetrics/create-metric",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcmetrics",
-						"metric"
+						"create-metric"
 					]
 				}
 			},
@@ -366,6 +486,46 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "siyuan",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -378,12 +538,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcmetrics/calculate",
+					"raw": "http://localhost:8082/idcmetrics/calculate",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcmetrics",
 						"calculate"
