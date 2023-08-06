@@ -8,9 +8,15 @@
 </template>
 
 <script>
+import Vue from 'vue'
 
 export default {
   data() {
+    if (Vue.$keycloak.token.length>0){
+      console.log(Vue.$keycloak.token)
+      this.$emit("authenticated", true);
+      // this.$router.replace({ name: "Secure" });
+    }
     return {};
   },
   name: 'Home',
