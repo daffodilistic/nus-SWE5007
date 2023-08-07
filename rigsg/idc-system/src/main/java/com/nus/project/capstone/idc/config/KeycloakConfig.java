@@ -49,10 +49,11 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                     .and()
                     .csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/idcteam/**")
-                    .permitAll()
-                    .antMatchers("/idcmetrics/calculate", "/idcmetrics/view**").hasRole("judge")
+                    .antMatchers("/idcteam/view**").hasRole("participant")
+                    .antMatchers("/idcteam/qualify**", "/idcteam/view**").hasRole("judge")
+                    .antMatchers("/idcteam/assign-user", "/idcteam/create**").hasRole("admin")
                     .antMatchers("/idcmetrics/view**").hasRole("participant")
+                    .antMatchers("/idcmetrics/calculate", "/idcmetrics/view**").hasRole("judge")
                     .antMatchers("/idcmetrics/create**", "/idcmetrics/update**").hasRole("admin")
                     .anyRequest().permitAll();
         } else {
