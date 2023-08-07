@@ -32,14 +32,14 @@ public class IdcTeamController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/team")
+    @PostMapping("/create-team")
     public ResponseEntity<GeneralMessageEntity> createTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
         var team = idcTeamRepository.save(IdcTeamJpaEntities.toJpaEntity(idcTeamRequests));
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(team.getId()).build());
     }
 
-    @GetMapping("/team")
+    @GetMapping("/view-team")
     public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
 
         val o = idcTeamRepository.findById(idcTeamRequests.getId());
@@ -53,8 +53,36 @@ public class IdcTeamController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(i).build());
     }
 
-    @PutMapping("/team")
-    public ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody IdcTeamRequests updateIdcTeamRequests) {
+    @PutMapping("/qualify-team")
+    public ResponseEntity<GeneralMessageEntity> qualifyTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
+        if(idcTeamRequests.getTeamName() == null &&
+           idcTeamRequests.getIdcGroupId() == null &&
+           idcTeamRequests.getAgeGroup() == null &&
+           idcTeamRequests.getRankFirstStage() == null &&
+           idcTeamRequests.getTeacherId() == null &&
+           idcTeamRequests.getUserIds() == null){
+            return updateTeam(idcTeamRequests);
+        } else{
+            return genericFailureMessage();
+        }
+    }
+
+    @PutMapping("/assign-user")
+    public ResponseEntity<GeneralMessageEntity> assignUser(@RequestBody IdcTeamRequests idcTeamRequests) {
+        if(idcTeamRequests.getIsQualifiedPromo() == null &&
+                idcTeamRequests.getIsQualifiedFinal() == null &&
+                idcTeamRequests.getIsQualifiedFinalSecondStage() == null &&
+                idcTeamRequests.getIdcGroupId() == null &&
+                idcTeamRequests.getAgeGroup() == null &&
+                idcTeamRequests.getRankFirstStage() == null &&
+                idcTeamRequests.getTeacherId() == null ){
+            return updateTeam(idcTeamRequests);
+        } else{
+            return genericFailureMessage();
+        }
+    }
+
+    private ResponseEntity<GeneralMessageEntity> updateTeam(IdcTeamRequests updateIdcTeamRequests) {
 
         if (updateIdcTeamRequests.getId() == null) {
             return ResponseEntity.ok(GeneralMessageEntity.builder().data("Idc team id must be provided").build());
@@ -84,10 +112,15 @@ public class IdcTeamController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(t.getId()).build());
     }
 
-    @GetMapping("/teams")
+    @GetMapping("/view-all-teams")
     public ResponseEntity<GeneralMessageEntity> getAllUsers() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(idcTeamRepository.findAll().stream()
                 .map(IdcTeamResponse::toIdcTeamResponse).collect(Collectors.toList())).build());
+    }
+
+    private ResponseEntity<GeneralMessageEntity> genericFailureMessage(){
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data("Update failed. Request contains other illegal params. Pls check.").build());
     }
 }
