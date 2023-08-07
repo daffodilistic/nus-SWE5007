@@ -131,11 +131,51 @@
 		{
 			"name": "3. Create a new IDC team",
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"teamName\": \"Team NUS shot\",\n    \"ageGroup\": \"21\",\n    \"isQualifiedPromo\": false,\n    \"isQualifiedFinal\": false,\n    \"isQualifiedFinalSecondStage\": false\n}",
+					"raw": "{\n    \"teamName\": \"Team NUS alibaba\",\n    \"ageGroup\": \"21\",\n    \"isQualifiedPromo\": false,\n    \"isQualifiedFinal\": false,\n    \"isQualifiedFinalSecondStage\": false\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -143,15 +183,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcteam/team",
+					"raw": "http://localhost:8082/idcteam/create-team",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcteam",
-						"team"
+						"create-team"
 					]
 				}
 			},
@@ -160,11 +200,51 @@
 		{
 			"name": "4. Assign a user to a IDC team",
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"f80a2b98-008c-4aca-83af-34de7fdd62a4\",\n    \"teamName\": \"Team NUS shot\",\n    \"userIds\": [\"47cf2588-8d22-40b7-8404-3f946e4364dc\"]\n}\n\n// id is idc_team_id you just created.\n// userIds is the user Id you want to add",
+					"raw": "{\n    \"id\": \"9e12703e-70fb-4f79-8a62-2bff18bdea6f\",\n    \"teamName\": \"Team NUS shot\",\n    \"userIds\": [\"47cf2588-8d22-40b7-8404-3f946e4364dc\"]\n}\n\n// id is idc_team_id you just created.\n// userIds is the user Id you want to add",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -172,15 +252,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcteam/team",
+					"raw": "http://localhost:8082/idcteam/assign-user",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcteam",
-						"team"
+						"assign-user"
 					]
 				}
 			},
@@ -189,11 +269,51 @@
 		{
 			"name": "5. IDC team qualify for stages",
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "siyuan",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"037f0670-266e-4414-9f5f-476b61cc343b\",\n    \"isQualifiedPromo\": true\n}\n\n// id is the idc_team_Id you want to qualify",
+					"raw": "{\n    \"id\": \"f3d67c4a-a42f-4e15-998e-3665533ca43d\",\n    \"isQualifiedPromo\": true\n}\n\n// id is the idc_team_Id you want to qualify",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -201,15 +321,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcteam/team",
+					"raw": "http://localhost:8082/idcteam/qualify-team",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcteam",
-						"team"
+						"qualify-team"
 					]
 				}
 			},
@@ -221,11 +341,51 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"0336ea25-c95e-4f70-8ffe-45618ae8d6e3\"\n}",
+					"raw": "{\n    \"id\": \"f3d67c4a-a42f-4e15-998e-3665533ca43d\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -233,15 +393,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/idcteam/team",
+					"raw": "http://localhost:8082/idcteam/view-team",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
 						"idcteam",
-						"team"
+						"view-team"
 					]
 				}
 			},
@@ -253,11 +413,51 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\"\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -265,7 +465,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/idcteam/teams",
+					"raw": "http://localhost:8082/idcteam/view-all-teams",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -273,7 +473,7 @@
 					"port": "8082",
 					"path": [
 						"idcteam",
-						"teams"
+						"view-all-teams"
 					]
 				}
 			},
@@ -290,7 +490,7 @@
 					"oauth2": [
 						{
 							"key": "username",
-							"value": "marcus",
+							"value": "siyuan",
 							"type": "string"
 						},
 						{
