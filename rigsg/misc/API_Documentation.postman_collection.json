@@ -13,6 +13,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "matthew",
 							"type": "string"
@@ -30,11 +35,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -82,6 +82,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "matthew",
 							"type": "string"
@@ -99,11 +104,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -151,6 +151,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -168,11 +173,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -223,6 +223,16 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -233,18 +243,8 @@
 							"type": "string"
 						},
 						{
-							"key": "clientSecret",
-							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
-							"type": "string"
-						},
-						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -292,6 +292,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "matthew",
 							"type": "string"
@@ -309,11 +314,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -361,6 +361,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "matthew",
 							"type": "string"
@@ -378,11 +383,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -430,6 +430,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "siyuan",
 							"type": "string"
@@ -447,11 +452,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -499,6 +499,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -516,11 +521,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -571,6 +571,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -588,11 +593,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -640,6 +640,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "siyuan",
 							"type": "string"
@@ -657,11 +662,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -709,6 +709,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -726,11 +731,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -769,6 +769,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "matthew",
 							"type": "string"
@@ -786,11 +791,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -838,6 +838,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "siyuan",
 							"type": "string"
@@ -855,11 +860,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -907,6 +907,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "matthew",
 							"type": "string"
@@ -924,11 +929,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -976,6 +976,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "matthew",
 							"type": "string"
@@ -993,11 +998,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -1045,6 +1045,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -1062,11 +1067,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -1117,6 +1117,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -1134,11 +1139,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
