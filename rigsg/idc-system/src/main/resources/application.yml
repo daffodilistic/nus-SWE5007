@@ -12,6 +12,8 @@ spring:
   datasource:
     username: dev-ric-app-user
     password: password
+    hikari:
+      minimum-idle: 5
   jpa:
     hibernate:
       ddl-auto: update
