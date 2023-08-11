@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nus.project.capstone.idc.web.Tools.genericFailureMessage;
+
 @Slf4j
 @RestController
 @RequestMapping("/idcteam")
@@ -39,7 +41,7 @@ public class IdcTeamController {
                 .data(team.getId()).build());
     }
 
-    @GetMapping("/view-team")
+    @PostMapping("/view-team")
     public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
 
         val o = idcTeamRepository.findById(idcTeamRequests.getId());
@@ -119,8 +121,4 @@ public class IdcTeamController {
                 .map(IdcTeamResponse::toIdcTeamResponse).collect(Collectors.toList())).build());
     }
 
-    private ResponseEntity<GeneralMessageEntity> genericFailureMessage(){
-        return ResponseEntity.ok(GeneralMessageEntity.builder()
-                .data("Update failed. Request contains other illegal params. Pls check.").build());
-    }
 }

@@ -27,7 +27,7 @@ public class IdcMetricsController {
         this.idcMetricsRepository = idcMetricsRepository;
     }
 
-    @GetMapping("/view-metric")
+    @PostMapping("/view-metric")
     public ResponseEntity<GeneralMessageEntity> readMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
 
         val o = idcMetricsRepository.findById(idcMetricsRequests.getId());
@@ -69,7 +69,7 @@ public class IdcMetricsController {
                 .map(IdcMetricsResponse::toIdcMetricsResponse).collect(Collectors.toList())).build());
     }
 
-    @GetMapping("/calculate")
+    @PostMapping("/calculate")
     public ResponseEntity<GeneralMessageEntity> calculateScores(@RequestBody IdcMetricsRequests idcMetricsRequests) {
         float score = 0.0f;
         List<UUID> ids = idcMetricsRequests.getMetricIds();
