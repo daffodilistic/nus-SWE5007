@@ -20,7 +20,7 @@ spring:
   secured: true
 
 keycloak:
-  auth-server-url: http://35.247.139.32:8080
+  auth-server-url: https://keycloak.ric-robotics.xyz
   principal-attribute: idc-system
   realm: ricsg
   resource: ricsg
