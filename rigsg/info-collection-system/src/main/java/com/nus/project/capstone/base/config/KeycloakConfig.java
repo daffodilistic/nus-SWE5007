@@ -1,4 +1,4 @@
-package com.nus.project.capstone.idc.config;
+package com.nus.project.capstone.base.config;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,10 +50,7 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                     .csrf().disable()
                     .authorizeRequests()
                     .antMatchers("/**/view**").hasAnyRole("participant", "judge")
-                    .antMatchers("/idcteam/qualify**").hasRole("judge")
-                    .antMatchers("/idcteam/assign-user", "/idcteam/create**").hasRole("admin")
-                    .antMatchers("/idcmetrics/calculate").hasRole("judge")
-                    .antMatchers("/idcmetrics/create**", "/idcmetrics/update**").hasRole("admin")
+                    .antMatchers("/userinfo/create-user", "/userinfo/update-user").hasRole("admin")
                     .anyRequest().denyAll();
         } else {
             logger.info("Keycloak Auth is NOT turned on !!");

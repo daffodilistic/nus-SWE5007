@@ -31,19 +31,14 @@ public class UserInfoController {
         return "Hello World @ UserInfoDao";
     }
 
-    @PostMapping("/qualifyParticipant")
-    public void qualifyParticipant() {
-
-    }
-
-    @PostMapping("/user")
+    @PostMapping("/create-user")
     public ResponseEntity<GeneralMessageEntity> createUser(@RequestBody UserRequests userRequests) {
 
         val u = userRepository.save(UserJpaEntities.toJpaEntity(userRequests));
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
     }
 
-    @GetMapping("/user")
+    @PostMapping("/view-user")
     public ResponseEntity<GeneralMessageEntity> readUser(@RequestBody UserRequests userRequests) {
 
         val o = userRepository.findById(userRequests.getId());
@@ -51,7 +46,7 @@ public class UserInfoController {
                 .data(o.map(UserResponse::toUserResponse).orElse(null)).build());
     }
 
-    @PutMapping("/user")
+    @PutMapping("/update-user")
     public ResponseEntity<GeneralMessageEntity> updateUser(@RequestBody UserRequests updateUserRequests) {
 
         if (updateUserRequests.getId() == null) {
@@ -70,7 +65,7 @@ public class UserInfoController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
     }
 
-    @GetMapping("/users")
+    @GetMapping("/view-all-users")
     public ResponseEntity<GeneralMessageEntity> getAllUsers() {
         val users = userRepository.findAll();
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(users.stream()

@@ -39,7 +39,7 @@ public class IdcTeamController {
                 .data(team.getId()).build());
     }
 
-    @GetMapping("/view-team")
+    @PostMapping("/view-team")
     public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
 
         val o = idcTeamRepository.findById(idcTeamRequests.getId());

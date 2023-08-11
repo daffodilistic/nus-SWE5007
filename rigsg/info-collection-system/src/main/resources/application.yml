@@ -15,3 +15,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  secured: true
+
+keycloak:
+  auth-server-url: http://35.247.139.32:8080
+  principal-attribute: idc-system
+  realm: ricsg
+  resource: ricsg
+  public-client: true
+  use-resource-role-mappings: false
+  bearer-only: true
+  cors: true
