@@ -10,6 +10,8 @@ spring:
   datasource:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
+    hikari:
+      minimum-idle: 5
   jpa:
     hibernate:
       ddl-auto: update
