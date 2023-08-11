@@ -9,6 +9,46 @@
 		{
 			"name": "1. Create a new user",
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -21,15 +61,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/userinfo/user",
+					"raw": "http://localhost:8081/userinfo/create-user",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8081",
 					"path": [
 						"userinfo",
-						"user"
+						"create-user"
 					]
 				}
 			},
@@ -38,11 +78,51 @@
 		{
 			"name": "2. Update user info",
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\",\n    \"firstName\": \"Desmond\",\n    \"lastName\": \"Soh\",\n    \"email\": \"desmond.soh@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5\n}",
+					"raw": "{\n    \"id\": \"ff6ec410-0ae6-46d0-9293-3f7594080dba\",\n    \"firstName\": \"Desmond\",\n    \"lastName\": \"Soh\",\n    \"email\": \"desmond.soh@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -50,15 +130,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/userinfo/user",
+					"raw": "http://localhost:8081/userinfo/update-user",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8081",
 					"path": [
 						"userinfo",
-						"user"
+						"update-user"
 					]
 				}
 			},
@@ -66,15 +146,52 @@
 		},
 		{
 			"name": "Get a user with his userId",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
-				"method": "GET",
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\"\n}",
+					"raw": "{\n    \"id\": \"ff6ec410-0ae6-46d0-9293-3f7594080dba\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -82,15 +199,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/userinfo/user",
+					"raw": "http://localhost:8081/userinfo/view-user",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8081",
 					"path": [
 						"userinfo",
-						"user"
+						"view-user"
 					]
 				}
 			},
@@ -102,6 +219,46 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
@@ -114,15 +271,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/userinfo/users",
+					"raw": "http://localhost:8081/userinfo/view-all-users",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8081",
 					"path": [
 						"userinfo",
-						"users"
+						"view-all-users"
 					]
 				}
 			},
@@ -337,9 +494,6 @@
 		},
 		{
 			"name": "Get a IDC team with his team id",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "oauth2",
@@ -381,7 +535,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -481,9 +635,6 @@
 		},
 		{
 			"name": "Get a IDC metric with metric id",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "oauth2",
@@ -525,7 +676,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -682,9 +833,6 @@
 		},
 		{
 			"name": "7. Calculate total scores given 3 metrics",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "oauth2",
@@ -726,11 +874,11 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"metricIds\": [\"4b1f24f2-278f-11ee-944f-42010a400030\",\"4b2178d8-278f-11ee-944f-42010a400030\",\"4b2348e8-278f-11ee-944f-42010a400030\"],\r\n    \"metricScores\": [50, 50, 50]\r\n}\r\n\r\n//metricIds are 3 metrics within that stage (see database)\r\n// metricScores are each score assigned to them",
+					"raw": "{\r\n    \"metricIds\": [\"4b2a611e-278f-11ee-944f-42010a400030\",\"4b2c26f2-278f-11ee-944f-42010a400030\",\"4b95bd4c-278f-11ee-944f-42010a400030\"],\r\n    \"metricScores\": [50, 50, 50]\r\n}\r\n\r\n//metricIds are 3 metrics within that stage (see database)\r\n// metricScores are each score assigned to them",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -747,6 +895,285 @@
 					"path": [
 						"idcmetrics",
 						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"groupName\": \"IDC Group X\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/create-group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"create-group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assign team to a new group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"d961b8c1-e4fd-4465-a6f0-c674188a1705\",\n    \"teamIds\": [\"a52e5593-ba2e-410b-ae66-725f8f0f48ee\"]\n}\n\n// id here is the group id",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/assign-team",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"assign-team"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a IDC group with group id",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"d82d66c8-1750-11ee-8166-42010a400015\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/view-group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"view-group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all IDC Groups",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/view-all-groups",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"view-all-groups"
 					]
 				}
 			},
