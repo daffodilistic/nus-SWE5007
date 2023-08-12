@@ -5,8 +5,7 @@ export const ageGroupOptions = [
 
   export const competitionChoiceOptions = [
     { value: 'IDC', text: 'Innovation Design Challenge', id:'1'},
-    { value: 'GA', text: 'Grand Arena', id:'2' },
-    { value: 'TA', text: 'Technical Competitions',id:'3' },
+    { value: 'GA', text: 'Game Arena', id:'2' },
   ];
 
   export const adminUploadTypeOptions = [
@@ -14,10 +13,15 @@ export const ageGroupOptions = [
     { value: 'Time Table', text: 'Time Table', id:'2' },
   ];
 
-  export const QualificationOptions = [
+  export const qualificationOptions = [
     //IDC
-    { value: false, text: 'No', CompetitionId:'1'},
-    { value: true, text: 'Yes', CompetitionId:'1'},
+    { value: 'FTS', text: 'Final 2nd Stage', competitionId:'1'},
+    { value: 'FFS', text: 'Final 1st Stage', competitionId:'1'},
+    { value: 'PRE', text: 'Preliminary Round', competitionId:'1'},
+    { value: 'PRO', text: 'Promotional Round', competitionId:'1'},
+    { value: 'DIQ', text: 'Not Qualified', competitionId:'1'},
+    { value: 'ELR', text: 'Elimination Round', competitionId:'2'},
+    { value: 'DIQ', text: 'Not Qualified', competitionId:'2'},
   ];
 
   export const countriesOptions = [
