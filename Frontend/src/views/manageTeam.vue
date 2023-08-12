@@ -1,259 +1,231 @@
 <template>
-  <div>
-     <!-- Add Member Modal -->
-
-     <b-modal
-      v-model="showAddMemberModal"
-      modal-class="custom-modal"
-      hide-footer
-    >
-     <!-- Search bar for filtering users -->
-     <div class="search-container">
-        <p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p>&nbsp;&nbsp;
-        <input
-          type="text"
-          v-model="searchQueryModal"
-          placeholder="Search User Name"
-          class="search-box"
+  <b-tabs >
+    <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadTeam()">
+      <div>
+        <!-- Add Member Modal -->
+        <b-modal
+          v-model="showAddMemberModal"
+          modal-class="custom-modal"
+          hide-footer
         >
-      </div>
-
-      <p>
-        Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }}
-        to {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
-        of {{ totalRecordsModal }} records
-      </p>
-
-      <div class="pagination">
-        <button @click="gotoPageModal(currentPageModal - 1)" :disabled="currentPageModal === 1" class="page-button">
-          <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i>
-        </button>
-        <span>Page {{ currentPageModal }} of {{ totalPagesModal }}</span>
-        <button @click="gotoPageModal(currentPageModal + 1)" :disabled="currentPageModal === totalPagesModal" class="page-button">
-          <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i>
-        </button>
-      </div><br>
-
-        <!-- List of users to be displayed inside the modal -->
-        <table class="modal-table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Select</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Country</th>
-                  <th>State</th>
-                  <th>Birthday</th>
-                  <th>School Name</th>
-                  <th>Experience <br>(Year)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(user, userIndex) in paginatedModalUserList" :key="user.id">
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                  <td>
-                  <input
-                    type="checkbox"
-                    :checked="selectedUsers.includes(user.id)"
-                    @change="toggleUserSelection(user.id)"
-                  />
-                </td>
-                  <!--<td>{{ userIndex + 1 }}</td>-->
-                  <td>{{ user.firstName }}</td>
-                  <td>{{ user.lastName }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.phone }}</td>
-                  <td>{{ user.country }}</td>
-                  <td>{{ user.state }}</td>
-                  <td>{{ user.dateOfBirth }}</td>
-                  <td>{{ user.schoolName }}</td>
-                  <td>{{ user.yearsOfExp }}</td>
-                </tr>
-                <tr></tr>
-              </tbody>
-
-            </table>
-            <div class="text-center">
-              <button @click="addMembersToTeam" class="add-member-button">Save</button>
-            </div>
-    </b-modal>
-    <br><br>
-    <div class="search-container">
-      <table>
-        <tr>
-          <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
-          <td><input type="text" v-model="searchQuery" placeholder="Search Team Name" class="search-box"></td>
-        </tr>
-      </table>
-    </div>
-    <div v-if="teams && teams.length > 0">
-    <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
-    <div class="pagination">
-      <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-        <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-        <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-      </button>
-    </div>
-    <table class="main-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Team Name</th>
-          <th>Age Group</th>
-          <th>Teacher Name</th>
-          <th>Qualification Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody v-for="(team, index) in paginatedTeams" :key="index">
-        <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
-          <td>
-            <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
-
-          </td>
-          <td v-if="!team.editing">
-            {{ team.teamName }}
-          </td>
-          <td v-else>
-            <input type="text" v-model="team.editingTeamName" class="form-control editing-textbox" />
-          </td>
-
-          <td v-if="!team.editing">
-            {{ ageGroupTextMap[team.ageGroup] }}
-          </td>
-          <td v-else>
-            <b-form-select v-model="team.editingAgeGroup" :options="filteredAgeGroupChoices" class="editing-dropdown">
-              <template v-slot:first>
-                <option :value="null" disabled>Select Age Group</option>
-              </template>
-            </b-form-select>
-          </td>
-          <td v-else>
-            <b-form-select v-model="team.editingCompetitionChoice" :options="filteredCompetitionChoices" class="editing-dropdown">
-              <template v-slot:first>
-                <option :value="null" disabled>Select Competition Choice</option>
-              </template>
-            </b-form-select>
-          </td>
-
-          <td v-if="!team.editing">
-            {{ team.teacherName }}
-          </td>
-          <td v-else>
-            <input type="text" v-model="team.editingteacherName" class="form-control editing-textbox" />
-          </td>
-          <!--<td>{{ team.userResponses.length }}</td>-->
-
-          <td v-if="!team.editing">
-            <p v-if="team.isQualifiedFinalSecondStage">
-              Qualified Final Second Stage
-            </p>
-            <p v-else-if="team.isQualifiedFinal">
-              Qualified Final First Stage
-            </p>
-            <p v-else-if="team.isQualifiedPromo">
-              Qualified Promotional Round
-            </p>
-            <p v-else>
-              Not qualified
-            </p>
-          </td>
-          <td v-else>
-            <b-form-select v-model="team.editingStatus" :options="filteredStatusChoices" class="editing-dropdown">
-              <template v-slot:first>
-                <option :value="null" disabled>Select Status</option>
-              </template>
-            </b-form-select>
-          </td>
-
-          <td>
-            <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" >
-              <b-icon icon="person-plus" ></b-icon>
-            </b-button>
-            <!-- Edit Icon -->
-            <b-button @click="editTeam(index)" variant="outline-primary" class="delete-button">
-              <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
-              <span v-else><b-icon icon="save"></b-icon></span>
-            </b-button>
-            <!-- Delete Icon -->
-            <b-button
-            class="delete-button"
-            variant="outline-primary"
-            @click="deleteTeam(index)"
+        <!-- Search bar for filtering users -->
+        <div class="search-container">
+            <p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p>&nbsp;&nbsp;
+            <input
+              type="text"
+              v-model="searchQueryModal"
+              placeholder="Search User Name"
+              class="search-box"
             >
-              <b-icon icon="trash"></b-icon>
-            </b-button>
-          </td>
-        </tr>
-        <!-- Child rows -->
-        <tr v-if="activeRow === index" class="child-row">
-          <td :colspan="10"> <!-- Use colspan to span all columns in the row -->
-            <table class="user-table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>No.</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Country</th>
-                  <th>State</th>
-                  <th>Birthday</th>
-                  <th>School Name</th>
-                  <th>Experience (Year)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(user, userIndex) in team.userResponses" :key="userIndex" class="child-row">
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                  <td> {{ userIndex + 1 }} </td>
-                  <td> {{ user.firstName }} </td>
-                  <td> {{ user.lastName }} </td>
-                  <td> {{ user.email }} </td>
-                  <td> {{ user.phone }} </td>
-                  <td> {{ user.country }} </td>
-                  <td> {{ user.state }} </td>
-                  <td> {{ user.dateOfBirth }} </td>
-                  <td> {{ user.schoolName }} </td>
-                  <td> {{ user.yearsOfExp }} </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="pagination">
-    <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-      <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-    </button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-      <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-    </button>
-  </div>
-  </div>
-  <div v-else>
-      <!-- Show a loading message or spinner while the data is being fetched -->
-      <div class="loader-container">
-        <i class="fas fa-spinner fa-spin"></i>
+          </div>
+
+          <p>
+            Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }}
+            to {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
+            of {{ totalRecordsModal }} records
+          </p>
+
+          <div class="pagination">
+            <button @click="gotoPageModal(currentPageModal - 1)" :disabled="currentPageModal === 1" class="page-button">
+              <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i>
+            </button>
+            <span>Page {{ currentPageModal }} of {{ totalPagesModal }}</span>
+            <button @click="gotoPageModal(currentPageModal + 1)" :disabled="currentPageModal === totalPagesModal" class="page-button">
+              <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i>
+            </button>
+          </div><br>
+
+            <!-- List of users to be displayed inside the modal -->
+            <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Select</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Country</th>
+                      <th>State</th>
+                      <th>Birthday</th>
+                      <th>School Name</th>
+                      <th>Experience <br>(Year)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(user, userIndex) in paginatedModalUserList" :key="user.id">
+                      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                      <td>
+                      <input
+                        type="checkbox"
+                        :checked="selectedUsers.includes(user.id)"
+                        @change="toggleUserSelection(user.id)"
+                      />
+                    </td>
+                      <!--<td>{{ userIndex + 1 }}</td>-->
+                      <td>{{ user.firstName }}</td>
+                      <td>{{ user.lastName }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.phone }}</td>
+                      <td>{{ user.country }}</td>
+                      <td>{{ user.state }}</td>
+                      <td>{{ user.dateOfBirth }}</td>
+                      <td>{{ user.schoolName }}</td>
+                      <td>{{ user.yearsOfExp }}</td>
+                    </tr>
+                    <tr></tr>
+                  </tbody>
+
+                </table>
+                <div class="text-center">
+                  <button @click="addMembersToTeam" class="add-member-button">Save</button>
+                </div>
+        </b-modal>
+        <br><br>
+        <div class="search-container">
+          <table>
+            <tr>
+              <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
+              <td><input type="text" v-model="searchQuery" placeholder="Search Team Name" class="search-box"></td>
+            </tr>
+          </table>
+        </div>
+        <div v-if="teams && teams.length > 0">
+        <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
+        <div class="pagination">
+          <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
+            <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
+          </button>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
+            <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
+          </button>
+        </div>
+        <table class="main-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Team Name</th>
+              <th>Age Group</th>
+              <th>Teacher Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody v-for="(team, index) in paginatedTeams" :key="index">
+            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
+              <td>
+                <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
+
+              </td>
+              <td v-if="!team.editing">
+                {{ team.teamName }}
+              </td>
+              <td v-else>
+                <input type="text" v-model="team.editingTeamName" class="form-control editing-textbox" />
+              </td>
+
+              <td v-if="!team.editing">
+                {{ ageGroupTextMap[team.ageGroup] }}
+              </td>
+              <td v-else>
+                <b-form-select v-model="team.editingAgeGroup" :options="filteredAgeGroupChoices" class="editing-dropdown">
+                  <template v-slot:first>
+                    <option :value="null" disabled>Select Age Group</option>
+                  </template>
+                </b-form-select>
+              </td>
+              <td v-if="!team.editing">
+                {{ team.teacherName }}
+              </td>
+              <td v-else>
+                <input type="text" v-model="team.editingteacherName" class="form-control editing-textbox" />
+              </td>
+              <!--<td>{{ team.userResponses.length }}</td>-->
+              <td>
+                <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" >
+                  <b-icon icon="person-plus" ></b-icon>
+                </b-button>
+                <!-- Edit Icon -->
+                <b-button @click="editTeam(index)" variant="outline-primary" class="delete-button">
+                  <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
+                  <span v-else><b-icon icon="save"></b-icon></span>
+                </b-button>
+                <!-- Delete Icon -->
+                <b-button
+                class="delete-button"
+                variant="outline-primary"
+                @click="deleteTeam(index)"
+                >
+                  <b-icon icon="trash"></b-icon>
+                </b-button>
+              </td>
+            </tr>
+            <!-- Child rows -->
+            <tr v-if="activeRow === index" class="child-row">
+              <td :colspan="10"> <!-- Use colspan to span all columns in the row -->
+                <table class="user-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>No.</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Country</th>
+                      <th>State</th>
+                      <th>Birthday</th>
+                      <th>School Name</th>
+                      <th>Experience (Year)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(user, userIndex) in team.userResponses" :key="userIndex" class="child-row">
+                      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                      <td> {{ userIndex + 1 }} </td>
+                      <td> {{ user.firstName }} </td>
+                      <td> {{ user.lastName }} </td>
+                      <td> {{ user.email }} </td>
+                      <td> {{ user.phone }} </td>
+                      <td> {{ user.country }} </td>
+                      <td> {{ user.state }} </td>
+                      <td> {{ user.dateOfBirth }} </td>
+                      <td> {{ user.schoolName }} </td>
+                      <td> {{ user.yearsOfExp }} </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pagination">
+        <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
+          <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
+          <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
+        </button>
       </div>
-    </div>
-  </div>
+      </div>
+      <div v-else>
+          <!-- Show a loading message or spinner while the data is being fetched -->
+          <div class="loader-container">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+        </div>
+      </div>
+    </b-tab>
+  </b-tabs>
 </template>
 
 
 <script>
 import axios from "axios";
-import { ageGroupOptions, competitionChoiceOptions, QualificationOptions,countriesOptions,statesOptions } from "../dropdownOptions";
-import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
+import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
+import { IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,GAME_TEAM_BASE_URL } from '@/api';
 
 export default {
   head() {
@@ -272,6 +244,7 @@ export default {
 
   data() {
     return {
+      selectedCompetition: "Innovation Design Challenge",
       currentPageModal: 1,
       itemsPerPageModal: 10,
       currentTeamId: "",
@@ -301,8 +274,8 @@ export default {
   },
   computed: {
     totalRecordsModal() {
-    return this.filteredModalUserList.length;
-  },
+      return this.filteredModalUserList.length;
+    },
     filteredTeams() {
     // If the teams data is not available yet, return an empty array
     if (!this.teams || this.teams.length === 0) {
@@ -346,24 +319,24 @@ export default {
       return this.filteredTeams.length;
     },
     filteredModalUserList() {
-  if (!this.userList) {
-    return [];
-  }
+      if (!this.userList) {
+        return [];
+      }
 
-  // Apply search query filter
-  const query = this.searchQueryModal.trim().toLowerCase();
-  if (!query) {
-    return this.userList; // Return the entire user list if the query is empty
-  }
+    // Apply search query filter
+    const query = this.searchQueryModal.trim().toLowerCase();
+    if (!query) {
+      return this.userList; // Return the entire user list if the query is empty
+    }
 
-  return this.userList.filter((user) => {
-    // Check if user.firstName and user.lastName are defined before using toLowerCase()
-    const firstName = user.firstName ? user.firstName.toLowerCase() : '';
-    const lastName = user.lastName ? user.lastName.toLowerCase() : '';
+    return this.userList.filter((user) => {
+      // Check if user.firstName and user.lastName are defined before using toLowerCase()
+      const firstName = user.firstName ? user.firstName.toLowerCase() : '';
+      const lastName = user.lastName ? user.lastName.toLowerCase() : '';
 
-    return firstName.includes(query) || lastName.includes(query);
-  });
-},
+      return firstName.includes(query) || lastName.includes(query);
+    });
+  },
   paginatedModalUserList() {
     const startIndex = (this.currentPageModal - 1) * this.itemsPerPageModal;
     const endIndex = startIndex + this.itemsPerPageModal;
@@ -384,7 +357,7 @@ export default {
   },
   async mounted() {
     try {
-      this.teamsData = await axios.get(`${IDC_TEAM_BASE_URL}idcteam/teams`);
+      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`);
       this.teams = this.teamsData.data.data;
     } catch (error) {
       // Handle any errors that might occur during the request
@@ -392,9 +365,26 @@ export default {
     }
   },
   methods: {
-    async fetchUsers(teamId,teamName) {
+    async loadTeam() {
+
       try {
-        const response = await axios.get(`${USER_INFO_BASE_URL}userinfo/users`);
+          if (this.selectedCompetition === "Game Arena") {
+            this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`);
+          console.log('ga called')
+          } else if (this.selectedCompetition === "Innovation Design Challenge") {
+            this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`);
+            console.log('IDC called')
+          }
+          this.teams = this.teamsData.data.data;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+    },
+
+    async fetchUsers(teamId,teamName) {
+
+      try {
+        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`);
         this.currentTeamId = teamId;
         this.userList = response.data.data;
         this.currentTeamName = teamName;
@@ -426,8 +416,14 @@ export default {
         // Make the HTTP PUT request to the API endpoint
         const requestBodyJson = JSON.stringify(requestBody);
         console.log('Request Body:', requestBodyJson);
-
-        const response = await axios.get(`${IDC_TEAM_BASE_URL}idcteam/team`, requestBodyJson);
+        let  response
+        if (this.selectedCompetition === "Game Arena") {
+          response = await axios.get(`${GAME_TEAM_BASE_URL}`, requestBodyJson);
+          console.log('ga called')
+        } else if (this.selectedCompetition === "Innovation Design Challenge") {
+            response = await axios.get(`${IDC_TEAM_BASE_URL}`, requestBodyJson);
+            console.log('IDC called')
+        }
 
         // Handle the response, if needed
         console.log('Response from server:', response.data);
@@ -469,19 +465,21 @@ export default {
           team.teacherName = team.editingteacherName;
           team.status = team.editingStatus;
           team.editing = false;
-
           team.isQualifiedPromo = team.editingStatus
 
+          let response;
           const requestBody = {
             id: team.id,
-            isQualifiedPromo: team.isQualifiedPromo
+            teamName : team.teamName,
+            competitionChoice : team.competitionChoice,
+            ageGroup : team.ageGroup,
           };
-
-          console.log('Request Payload 222:', requestBody);
-
           try {
-            // Make the HTTP POST request to the API endpoint
-            const response = await axios.put(`${IDC_TEAM_BASE_URL}idcteam/team`, requestBody);
+             if(this.selectedCompetition === "Game Arena") {
+                response = await axios.put(`${GAME_TEAM_BASE_URL}`, requestBody);
+              }else if (this.selectedCompetition === "Innovation Design Challenge") {
+                response = await axios.put(`${IDC_TEAM_BASE_URL}`, requestBody);
+              }
 
             // Handle the response, if needed
             console.log('Response from server:', response.data);
@@ -550,7 +548,7 @@ export default {
 
     try {
       // Make the HTTP POST request to the API endpoint
-      const response = await axios.put(`${IDC_TEAM_BASE_URL}idcteam/team`, requestBody, {
+      const response = await axios.put(`${IDC_TEAM_BASE_URL}`, requestBody, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -760,6 +758,22 @@ input.form-control.editing-textbox {
   margin-bottom: 10px; /* Add some margin at the bottom */
 }
 
+.editing-dropdown {
+  font-size: 14px; /* Adjust the font size as needed */
+  min-width: 200px; /* Set the minimum width of the dropdown */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 16px;
+  background-color: #fff;
+  color: #555;
+}
 
+/* Optionally, add styles for the dropdown arrow icon */
+.editing-dropdown .dropdown-toggle::after {
+  font-family: 'Font Awesome'; /* Assuming you're using Font Awesome for icons */
+  content: '\f107'; /* Replace with the correct icon code */
+  margin-left: 5px; /* Add some spacing between the text and the icon */
+  color: #555; /* Set the color of the icon */
+}
 
 </style>

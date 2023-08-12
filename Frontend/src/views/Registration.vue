@@ -69,7 +69,7 @@ import { v4 as uuidv4 } from 'uuid'; // Import the uuidv4 function from the uuid
 Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
 import axios from "axios";
-import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
+import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL,GAME_TEAM_BASE_URL} from '@/api';
 
 export default {
 
@@ -130,63 +130,50 @@ export default {
         await deleteUser(user.id);
       }
     },
-    removeExtraProperty() {
-      this.users = this.users.map(user => {
-        // Create a new object without the isEdit property
-        const { isEdit,edit, ...rest } = user;
-        return rest;
-      });
-    },
-    registerTeamMembers() {
-      this.users = this.users.map(user => {
-        // Create a new object without the isEdit property
-        const { isEdit,edit, ...rest } = user;
-        return rest;
-      });
-    },
-    async registerIDCTeam() {
-      try {
-        // Prepare the data for the POST request
 
-        //userResponses: this.users.map(user => ({ ...user, id: uuidv4() })),
-        const numberOfUsers = this.users.length;
+    async register() {
+    // Create a new team object with form data
+    const userIDs = [];
 
-        // Create an array to store the user IDs
-        const userIDs = [];
+    // Create new user for each user in the users array
+    for (const user of this.users) {
+      const userData = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        country: user.country,
+        state: user.state,
+        dateOfBirth: user.dateOfBirth,
+        schoolName: user.schoolName,
+        yearsOfExp: user.yearsOfExp,
+      };
 
-        // Create new user for each user in the users array
-        for (const user of this.users) {
-        const userData = {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          phone: user.phone,
-          country: user.country,
-          state: user.state,
-          dateOfBirth: user.dateOfBirth,
-          schoolName: user.schoolName,
-          yearsOfExp: user.yearsOfExp,
-        };
+        // Call the create new user API
+        const createUserResponse = await axios.post(`${USER_INFO_BASE_URL}`, userData);
+        console.log('Member Registration successful:', createUserResponse.data);
 
-          // Call the create new user API
-          const createUserResponse = await axios.post(`${USER_INFO_BASE_URL}userinfo/user`, userData);
-          console.log('Member Registration successful:', createUserResponse.data);
+        // Push the user ID into the userIDs array
+        userIDs.push(createUserResponse.data.data.id);
+      }
 
-          // Push the user ID into the userIDs array
-          userIDs.push(createUserResponse.data.data.id);
-        }
-
-        //Create IDC Team
-        const teamData = {
+      const teamData = {
           teamName: this.teamName,
           ageGroup: this.ageGroup,
           //teacherName: this.teacherName,
           isQualifiedPromo: false,
           isQualifiedFinal: false,
           isQualifiedFinalSecondStage: false,
-        };
-
-        const createTeamResponse = await axios.post(`${IDC_TEAM_BASE_URL}idcteam/team`, teamData, {
+      };
+      let url = ''
+    if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
+      url = IDC_TEAM_BASE_URL
+    } else if (this.competitionChoice === 'GA' || this.competitionChoice === 'Game Arena'){
+      url = GAME_TEAM_BASE_URL
+    }
+    try {
+        //userResponses: this.users.map(user => ({ ...user, id: uuidv4() })),
+        const createTeamResponse = await axios.post(`${url}`, teamData, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -203,7 +190,7 @@ export default {
         };
 
         //register created user to team
-        const registerTeamResponse = await axios.put(`${IDC_TEAM_BASE_URL}idcteam/team`, RegisterTeamData);
+        const registerTeamResponse = await axios.put(`${url}`, RegisterTeamData);
         console.log('Team Allocation successful:', registerTeamResponse.data);
 
         // Show a success message to the user using VueSweetalert2
@@ -226,20 +213,6 @@ export default {
           timer: 2000, // Display the error message for 2 seconds
         });
       }
-    },
-    register() {
-    // Create a new team object with form data
-    this.removeExtraProperty();
-
-    // Check if the competitionChoice is 'IDC' or 'Innovation Design Challenge'
-    if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
-      // Call the registerIDCTeam() function if the competition choice is IDC or Innovation Design Challenge
-      this.registerIDCTeam();
-    } else {
-      // Handle other competition choices here, if needed
-      // For example, you could call a different function for other competitions or show an error message.
-      // For simplicity, we're not adding the specific implementation here.
-    }
 
     // Reset the form data to clear the input fields after registration
     //this.teamName = null;
@@ -250,10 +223,6 @@ export default {
   },
 
   },
-  mounted() {
-    this.removeExtraProperty(); // Call the method when the component is mounted
-  }
-
 };
 </script>
 <style>
@@ -265,7 +234,6 @@ export default {
 }
 
 .form-container {
-  margin-top: 50px;
   display: flex;
 
   flex-wrap: wrap;

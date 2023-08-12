@@ -1,4 +1,6 @@
 <template>
+ <b-tabs >
+        <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadMetric()">
   <div>
     <br><br>
     <div class="search-container">
@@ -39,7 +41,6 @@
       <tbody v-for="(metric, index) in paginatedMetrics" :key="index">
         <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
           <td>
-            <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
 
           </td>
           <td v-if="!metric.editing">
@@ -99,31 +100,6 @@
             </b-button>
           </td>
         </tr>
-        <!-- Child rows -->
-        <tr v-if="activeRow === index" class="child-row">
-          <td :colspan="10"> <!-- Use colspan to span all columns in the row -->
-            <table class="user-table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>No.</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(user, userIndex) in metric.userResponses" :key="userIndex" class="child-row">
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                  <td> {{ userIndex + 1 }} </td>
-                  <td> {{ user.firstName }} </td>
-                  <td> {{ user.lastName }} </td>
-                  <td> {{ user.email }} </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
       </tbody>
     </table>
     <div class="pagination">
@@ -143,12 +119,15 @@
       </div>
     </div>
   </div>
+    </b-tab>
+    </b-tabs>
 </template>
 
 
 <script>
 import axios from "axios";
-import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
+import { IDC_METRIC_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL,GAME_METRIC_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL } from '@/api';
+import { competitionChoiceOptions } from "../dropdownOptions";
 
 export default {
   head() {
@@ -176,25 +155,31 @@ export default {
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       userList: [],
+      selectedCompetition: "Innovation Design Challenge",
     };
   },
   computed: {
 
     filteredMetrics() {
-    // If the metrics data is not available yet, return an empty array
-    if (!this.metrics || this.metrics.length === 0) {
-      return [];
-    }
+      // If the metrics data is not available yet, return an empty array
+      if (!this.metrics || this.metrics.length === 0) {
+        return [];
+      }
 
-    // If the search query is empty, show all metrics
-    if (this.searchQuery.trim() === '') {
-      return this.metrics;
-    }
+      // If the search query is empty, show all metrics
+      if (this.searchQuery.trim() === '') {
+        // Sort the metrics by "Stage Name" in ascending order (A to Z)
+        return this.metrics.slice().sort((a, b) => {
+          const stageA = a.stageName || '';
+          const stageB = b.stageName || '';
+          return stageA.localeCompare(stageB);
+        });
+      }
 
-    // Otherwise, filter metrics based on the search query
-    const query = this.searchQuery.trim().toLowerCase();
-    return this.metrics.filter((metric) => metric.metricName.toLowerCase().includes(query));
-  },
+      // Otherwise, filter metrics based on the search query
+      const query = this.searchQuery.trim().toLowerCase();
+      return this.metrics.filter((metric) => metric.metricName.toLowerCase().includes(query));
+    },
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
     },
@@ -225,16 +210,39 @@ export default {
   },
   async mounted() {
     try {
-      this.metricsData = await axios.get(`${IDC_TEAM_BASE_URL}idcmetrics/metrics`);
+      this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`);
       this.metrics = this.metricsData.data.data;
-      console.log('Response from server:', metrics.data);
+      console.log('Response from server:', this.metrics.data);
     } catch (error) {
       // Handle any errors that might occur during the request
-      console.error("Error fetching users:", error);
+      console.error("Error fetching metrics:", error);
     }
   },
   methods: {
-    addNewMetric() {
+
+    async toggleRow(index) {
+    if (this.activeRow === index) {
+      this.activeRow = null; // Collapse the row if it's already expanded
+    } else {
+      this.activeRow = index;
+    }
+  },
+     async loadMetric() {
+
+      try {
+        if (this.selectedCompetition === "Game Arena") {
+          this.metricsData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`);
+        console.log('ga called')
+        } else if (this.selectedCompetition === "Innovation Design Challenge") {
+          this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`);
+          console.log('IDC called')
+        }
+        this.metrics = this.metricsData.data.data;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+    async addNewMetric() {
       // Create a new metric object and add it to the beginning of the metrics array
       const newMetric = {
         stageName: "",
@@ -244,8 +252,40 @@ export default {
         editingStageName: "",
         editingMetricName: "",
         editingMetricWeight: 0,
-        userResponses: [],
       };
+
+      const requestBody = {
+            stageName: newMetric.stageName,
+            metricName: newMetric.metricName,
+            metricWeight: newMetric.metricWeight
+      };
+
+
+      try {
+          let url ='';
+            if (this.selectedCompetition === "Game Arena") {
+              url = GAME_METRIC_BASE_URL;
+            } else if (this.selectedCompetition === "Innovation Design Challenge") {
+              url = IDC_METRIC_BASE_URL;
+            }else{
+
+
+            }
+              console.log(url)
+              const response = await axios.post(`${url}`, requestBody);
+              console.log('Response from server (create):', response.data);
+
+              // Add the newly created metric to the beginning of the metrics array
+              this.metrics.unshift(response.data);
+              url ='';
+            }
+
+            // Optional: Perform any additional actions, such as updating the UI.
+          catch (error) {
+            // Handle errors, if any
+            console.error('Error saving metric:', error);
+          }
+
 
       this.metrics.unshift(newMetric);
 
@@ -261,35 +301,6 @@ export default {
       });
     },
 
-    async toggleRow(index) {
-    if (this.activeRow === index) {
-      this.activeRow = null; // Collapse the row if it's already expanded
-    } else {
-      this.activeRow = index;
-      const metric = this.filteredMetrics[index];
-
-      //try {
-        // Make the API call here using the metric ID as the request body
-       //const requestBody = {
-          //id: metric.id,
-        //};
-
-        // Make the HTTP PUT request to the API endpoint
-        //const requestBodyJson = JSON.stringify(requestBody);
-       // console.log('Request Body:', requestBodyJson);
-
-        //const response = await axios.get(`${IDC_TEAM_BASE_URL}idcmetric/metric`, requestBodyJson);
-
-        // Handle the response, if needed
-        //console.log('Response from server:', response.data);
-
-        // Optional: Perform any additional actions, such as updating the UI.
-     // } catch (error) {
-        // Handle errors, if any
-        //console.error('Error calling API:', error);
-      //}
-    }
-  },
       gotoPage(page) {
         if (page >= 1 && page <= this.totalPages) {
           this.currentPage = page;
@@ -316,17 +327,24 @@ export default {
           console.log('Request Payload:', requestBody);
 
           try {
+          let url ='';
+            if (this.selectedCompetition === "Game Arena") {
+              url = GAME_METRIC_BASE_URL;
+            } else if (this.selectedCompetition === "Innovation Design Challenge") {
+             url = IDC_METRIC_BASE_URL;
+            }
             if (metric.id) {
               // If the metric has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${IDC_TEAM_BASE_URL}idcmetrics/metric`, requestBody);
+              const response = await axios.post(`${url}`, requestBody);
               console.log('Response from server (update):', response.data);
             } else {
               // If the metric doesn't have an ID, create a new record using a POST request
-              const response = await axios.post(`${IDC_TEAM_BASE_URL}idcmetrics/metric`, requestBody);
+              const response = await axios.post(`${url}`, requestBody);
               console.log('Response from server (create):', response.data);
 
               // Add the newly created metric to the beginning of the metrics array
               this.metrics.unshift(response.data);
+              url ='';
             }
 
             // Close the modal after the request is successful
