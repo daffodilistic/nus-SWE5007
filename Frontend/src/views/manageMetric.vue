@@ -126,8 +126,9 @@
 
 <script>
 import axios from "axios";
-import { IDC_METRIC_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL,GAME_METRIC_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL } from '@/api';
+import { UPDATE_GAME_METRIC_BASE_URL,IDC_METRIC_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL,GAME_METRIC_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL,CREATE_IDC_METRIC_BASE_URL,UPDATE_IDC_METRIC_BASE_URL} from '@/api';
 import { competitionChoiceOptions } from "../dropdownOptions";
+import token from '/config'
 
 export default {
   head() {
@@ -209,8 +210,12 @@ export default {
     },
   },
   async mounted() {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     try {
-      this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`);
+      this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       this.metrics = this.metricsData.data.data;
       console.log('Response from server:', this.metrics.data);
     } catch (error) {
@@ -228,13 +233,16 @@ export default {
     }
   },
      async loadMetric() {
-
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       try {
         if (this.selectedCompetition === "Game Arena") {
-          this.metricsData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`);
+          this.metricsData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`, { headers });
         console.log('ga called')
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`);
+          this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
           console.log('IDC called')
         }
         this.metrics = this.metricsData.data.data;
@@ -260,23 +268,23 @@ export default {
             metricWeight: newMetric.metricWeight
       };
 
-
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       try {
           let url ='';
             if (this.selectedCompetition === "Game Arena") {
-              url = GAME_METRIC_BASE_URL;
+              url = CREATE_GAME_METRIC_BASE_URL;
             } else if (this.selectedCompetition === "Innovation Design Challenge") {
-              url = IDC_METRIC_BASE_URL;
+              url = CREATE_IDC_METRIC_BASE_URL;
             }else{
-
-
             }
-              console.log(url)
-              const response = await axios.post(`${url}`, requestBody);
+              const response = await axios.post(`${url}`, requestBody, { headers });
               console.log('Response from server (create):', response.data);
 
               // Add the newly created metric to the beginning of the metrics array
-              this.metrics.unshift(response.data);
+              //this.metrics.unshift(response.data);
               url ='';
             }
 
@@ -325,21 +333,24 @@ export default {
           };
 
           console.log('Request Payload:', requestBody);
-
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          };
           try {
           let url ='';
             if (this.selectedCompetition === "Game Arena") {
-              url = GAME_METRIC_BASE_URL;
+              url = UPDATE_GAME_METRIC_BASE_URL;
             } else if (this.selectedCompetition === "Innovation Design Challenge") {
-             url = IDC_METRIC_BASE_URL;
+             url = UPDATE_IDC_METRIC_BASE_URL;
             }
             if (metric.id) {
               // If the metric has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${url}`, requestBody);
+              const response = await axios.post(`${url}`, requestBody, { headers });
               console.log('Response from server (update):', response.data);
             } else {
               // If the metric doesn't have an ID, create a new record using a POST request
-              const response = await axios.post(`${url}`, requestBody);
+              const response = await axios.post(`${url}`, requestBody, { headers });
               console.log('Response from server (create):', response.data);
 
               // Add the newly created metric to the beginning of the metrics array
