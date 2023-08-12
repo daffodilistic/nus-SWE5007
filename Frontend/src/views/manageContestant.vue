@@ -16,8 +16,9 @@
 <script>
 import EditableTable from "@/components/UserEditableTable.vue";
 import axios from "axios";
-import { GET_ALL_USER_INFO_BASE_URL, USER_INFO_BASE_URL} from '@/api';
+import { GET_ALL_USER_INFO_BASE_URL, USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL} from '@/api';
 import { competitionChoiceOptions } from "../dropdownOptions";
+import token from '/config'
 export default {
   components: {
     EditableTable,
@@ -40,14 +41,21 @@ export default {
       selectedCompetition: "Innovation Design Challenge",
     };
   },
+
   async mounted() {
     try {
-      this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`);
-      this.users = this.usersData.data.data;
-    } catch (error) {
-      // Handle any errors that might occur during the request
-      console.error("Error fetching users:", error);
-    }
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+    this.usersData = response.data.data;
+    this.users = this.usersData;
+  } catch (error) {
+    // Handle any errors that might occur during the request
+    console.error("Error fetching users:", error);
+  }
   },
   computed: {
     competitionChoiceOptions() {
@@ -57,13 +65,16 @@ export default {
   methods: {
 
   async loadUsers() {
-
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       try {
         if (this.selectedCompetition === "Game Arena") {
-          this.usersData = await axios.get("http://localhost:3000/data");
+          this.usersData = await axios.get("http://localhost:3000/data", { headers });
         console.log('ga called')
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`);
+          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
           console.log('IDC called')
         }
         this.users = this.usersData.data.data;
@@ -73,11 +84,15 @@ export default {
     },
     async handleUpdateUser(user) {
       this.removeExtraProperty();
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
 
       if (user.id) {
         // User has an ID, so it already exists in the backend, update the user
         try {
-          await axios.put(`${USER_INFO_BASE_URL}`, user);
+          await axios.put(`${UPDATE_USER_INFO_BASE_URL}`, user, { headers });
           // Update the user in the users array after successful API update
           const index = this.users.findIndex(u => u.id === user.id);
           if (index !== -1) {
@@ -88,8 +103,9 @@ export default {
         }
       } else {
         // User doesn't have an ID, so it is a new user, add the user
+        console.log('create block')
         try {
-          const response = await axios.post(`${USER_INFO_BASE_URL}`, user);
+          const response = await axios.post(`${CREATE_USER_INFO_BASE_URL}`, user, { headers });
           // Add the new user to the users array after successful API add
           this.users.push(response.data.data);
         } catch (error) {
