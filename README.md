@@ -16,13 +16,15 @@ It's the final semester
 2. Project setup
 run this command `npm install`
 
-3. The command json-server will start a server using the data in our data.json file.
+3. The command json-server will start a server using the data in our data.json file. [OPTIONAL IF USING LOCAL DATA]
 run this command `json-server data.json`
 
-4. Compiles and hot-reloads for development
+4. Open config.js and update the latest bearer token.
+
+5. Compiles and hot-reloads for development
 run this command `npm run serve`
 
-5. Compiles and minifies for production
+6. Compiles and minifies for production
 run this command `npm run build'
 
 ## Docker Setup
