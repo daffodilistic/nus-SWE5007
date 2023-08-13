@@ -23,9 +23,25 @@ export const QUALIFY_GAME_TEAM_BASE_URL = 'http://localhost:8083/games/qualify-t
 export const GET_ALL_IDC_METRIC_BASE_URL = 'http://localhost:8082/idcmetrics/view-all-metrics'
 export const CREATE_IDC_METRIC_BASE_URL = 'http://localhost:8082/idcmetrics/create-metric'
 export const UPDATE_IDC_METRIC_BASE_URL = 'http://localhost:8082/idcmetrics/update-metric'
+export const CALCULATE_IDC_SCORE_BASE_URL = 'http://localhost:8082/idcmetrics/calculate'
 
 //GAME METRICS
 export const GET_ALL_GAME_METRIC_BASE_URL = 'http://localhost:8083/games/view-all-metrics'
 export const CREATE_GAME_METRIC_BASE_URL = 'http://localhost:8083/games/create-metric'
 export const UPDATE_GAME_METRIC_BASE_URL = 'http://localhost:8083/games/update-metric'
+
+//IDC Group
+export const GET_ALL_IDC_GROUP_BASE_URL = 'http://localhost:8082/idcgroup/view-all-groups'
+export const VIEW_IDC_GROUP_BASE_URL = 'http://localhost:8082/idcgroup/view-group'
+export const CREATE_IDC_GROUP_BASE_URL = 'http://localhost:8082/idcgroup/create-group'
+export const ADD_TEAM_IDC_GROUP_BASE_URL = 'http://localhost:8082/idcgroup/assign-team'
+export const UPDATE_IDC_GROUP_BASE_URL = 'http://localhost:8082/idcgroup/assign-team'
+
+//GAME Group
+export const GET_ALL_GAME_GROUP_BASE_URL = 'http://localhost:8082/gamegroup/view-all-groups'
+export const VIEW_GAME_GROUP_BASE_URL = 'http://localhost:8082/gamegroup/view-group'
+export const CREATE_GAME_GROUP_BASE_URL = 'http://localhost:8082/gamegroup/create-group'
+export const ADD_TEAM_GAME_GROUP_BASE_URL = 'http://localhost:8082/gamegroup/assign-team'
+export const UPDATE_GAME_GROUP_BASE_URL = 'http://localhost:8082/idcgroup/assign-team'
+
 
