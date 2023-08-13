@@ -55,17 +55,18 @@
           <td v-if="!team.editing">
             <p v-if="team.isQualifiedFinalSecondStage">Final 2nd Stage</p>
             <p v-else-if="team.isQualifiedFinal">Final 1st Stage</p>
+            <p v-else-if="team.isQualifiedPrelim">Preliminary Round</p>
             <p v-else-if="team.isQualifiedPromo">Promotional Round</p>
             <p v-else>Not qualified</p>
-              </td>
-              <td v-else>
-                <div class="form-group select">
-            <select v-model="qualification" id="category" class="editing-dropdown">
-              <option value="" disabled selected>Select Qualification Status</option>
-              <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
-            </select>
+          </td>
+          <td v-else>
+            <div class="form-group select">
+              <select v-model="qualification" id="category" class="editing-dropdown">
+                <option value="" disabled selected>Select Qualification Status</option>
+                <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+              </select>
             </div>
-              </td>
+            </td>
           <td>
                 <!-- Edit Icon -->
                 <b-button @click="editTeam(index)" variant="outline-primary" class="delete-button">
@@ -236,13 +237,13 @@ export default {
       return this.filteredTeams.filter((team) => {
         let result = false;
         switch (this.selectedQualification) {
-          case "IDC Promo":
+          case "Promotional Round":
             result = team.isQualifiedPromo;
             break;
-          case "IDC Final":
+          case "Final 1st Stage":
             result = team.isQualifiedFinal;
             break;
-          case "IDC Final Second Stage":
+          case "Final 2nd Stage":
             result = team.isQualifiedFinalSecondStage;
             break;
           default:
@@ -366,6 +367,7 @@ export default {
                 response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
               }
             console.log('Response from server:', response.data);
+            this.loadTeam();
 
           } catch (error) {
             console.error('Error editing team:', error);
@@ -433,15 +435,15 @@ export default {
       this.currentPage = 1; // Reset to the first page when the qualification is changed
     },
     filteredMetricsForTeam(teamIndex) {
-    const team = this.filteredTeamsByQualification[teamIndex];
-    const qualification = team.isQualifiedFinalSecondStage ? "IDC Final Second Stage" :
-                         team.isQualifiedFinal ? "IDC Final" :
-                         team.isQualifiedPromo ? "IDC Promo" : null;
+      const team = this.filteredTeamsByQualification[teamIndex];
+      const qualification = team.isQualifiedFinalSecondStage ? "Final 2nd Stage" :
+                         team.isQualifiedFinal ? "Final 1st Stage" :
+                         team.isQualifiedPromo ? "Promotional Round" : null;
 
-    if (!qualification) {
-      // If the team doesn't have any of the specified qualifications, return an empty array
-      return [];
-    }
+      if (!qualification) {
+        // If the team doesn't have any of the specified qualifications, return an empty array
+        return [];
+      }
 
     // Filter the metrics based on the team's qualification status
     return this.metrics.filter((metric) => metric.stageName === qualification);

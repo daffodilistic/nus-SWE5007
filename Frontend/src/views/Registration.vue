@@ -259,6 +259,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 18px;
+  width: 300px;
 }
 
 .json-display {
