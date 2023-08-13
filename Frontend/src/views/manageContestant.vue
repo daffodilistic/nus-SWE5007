@@ -16,7 +16,7 @@
 <script>
 import EditableTable from "@/components/UserEditableTable.vue";
 import axios from "axios";
-import { GET_ALL_USER_INFO_BASE_URL, USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL} from '@/api';
+import { GET_ALL_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL} from '@/api';
 import { competitionChoiceOptions } from "../dropdownOptions";
 import token from '/config'
 export default {

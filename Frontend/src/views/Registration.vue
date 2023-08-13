@@ -69,7 +69,8 @@ import { v4 as uuidv4 } from 'uuid'; // Import the uuidv4 function from the uuid
 Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
 import axios from "axios";
-import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL,GAME_TEAM_BASE_URL} from '@/api';
+import {ADD_MEMBER_GAME_TEAM_BASE_URL,ADD_MEMBER_IDC_TEAM_BASE_URL,CREATE_IDC_TEAM_BASE_URL,CREATE_GAME_TEAM_BASE_URL,CREATE_USER_INFO_BASE_URL} from '@/api';
+import token from '/config'
 
 export default {
 
@@ -134,7 +135,10 @@ export default {
     async register() {
     // Create a new team object with form data
     const userIDs = [];
-
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     // Create new user for each user in the users array
     for (const user of this.users) {
       const userData = {
@@ -150,7 +154,7 @@ export default {
       };
 
         // Call the create new user API
-        const createUserResponse = await axios.post(`${USER_INFO_BASE_URL}`, userData);
+        const createUserResponse = await axios.post(`${CREATE_USER_INFO_BASE_URL}`, userData, { headers });
         console.log('Member Registration successful:', createUserResponse.data);
 
         // Push the user ID into the userIDs array
@@ -166,21 +170,17 @@ export default {
           isQualifiedFinalSecondStage: false,
       };
       let url = ''
+      let url2 = ''
     if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
-      url = IDC_TEAM_BASE_URL
+      url = CREATE_IDC_TEAM_BASE_URL
+      url2 = ADD_MEMBER_IDC_TEAM_BASE_URL
     } else if (this.competitionChoice === 'GA' || this.competitionChoice === 'Game Arena'){
-      url = GAME_TEAM_BASE_URL
+      url = CREATE_GAME_TEAM_BASE_URL
+      url2 =ADD_MEMBER_GAME_TEAM_BASE_URL
     }
     try {
         //userResponses: this.users.map(user => ({ ...user, id: uuidv4() })),
-        const createTeamResponse = await axios.post(`${url}`, teamData, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length"
-        },
-      });
+        const createTeamResponse = await axios.post(`${url}`, teamData, { headers });
         console.log('Team registration successful:', createTeamResponse.data);
 
         const RegisterTeamData = {
@@ -190,7 +190,7 @@ export default {
         };
 
         //register created user to team
-        const registerTeamResponse = await axios.put(`${url}`, RegisterTeamData);
+        const registerTeamResponse = await axios.put(`${url2}`, RegisterTeamData, { headers });
         console.log('Team Allocation successful:', registerTeamResponse.data);
 
         // Show a success message to the user using VueSweetalert2

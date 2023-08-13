@@ -147,8 +147,9 @@
 
 <script>
 import axios from "axios";
-import { GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL,IDC_TEAM_BASE_URL,GAME_TEAM_BASE_URL } from '@/api';
+import { QUALIFY_GAME_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL } from '@/api';
 import { competitionChoiceOptions,qualificationOptions } from "../dropdownOptions";
+import token from '/config'
 
 export default {
   head() {
@@ -287,8 +288,12 @@ export default {
     },
   },
   async mounted() {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     try {
-      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`);
+      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
       const allTeams = this.teamsData.data.data;
 
       // Filter out teams that do not have any of the specified qualifications
@@ -319,6 +324,7 @@ export default {
           let qualifiedPrelim = false;;
           let qualifiedFinal = false ;
           let qualifiedFinalSec = false ;
+          let requestBody;
 
           if (this.qualification==='PRO'){
             qualifiedPromo = true;
@@ -338,24 +344,26 @@ export default {
           let response;
 
            console.log(requestBody)
+
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          };
+
           try {
              if(this.selectedCompetition === "Game Arena") {
-              const requestBody = {
+              requestBody = {
                   id: team.id,
-                  teamName : team.teamName,
-                  ageGroup : team.ageGroup,
                 };
-               response = await axios.put(`${GAME_TEAM_BASE_URL}`, requestBody);
+               response = await axios.put(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
               }else if (this.selectedCompetition === "Innovation Design Challenge") {
-                const requestBody = {
+                requestBody = {
                   id: team.id,
-                  teamName : team.teamName,
-                  ageGroup : team.ageGroup,
                   isQualifiedPromo : qualifiedPromo,
                   isQualifiedFinal : qualifiedFinal,
                   isQualifiedFinalSecondStage : qualifiedFinalSec
                 };
-                response = await axios.put(`${IDC_TEAM_BASE_URL}`, requestBody);
+                response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
               }
             console.log('Response from server:', response.data);
 
@@ -369,14 +377,18 @@ export default {
       },
 
     async loadTeam() {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       try {
           if (this.selectedCompetition === "Game Arena") {
-            this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`);
+            this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
             const allTeams = this.teamsData.data.data;
             console.log('ga called')
             this.teams = allTeams.filter((team) => team.isQualifiedForElimination);
           }else if (this.selectedCompetition === "Innovation Design Challenge") {
-            this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`);
+            this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
             console.log('IDC called')
             const allTeams = this.teamsData.data.data;
             this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
@@ -441,12 +453,15 @@ export default {
   } else {
     this.activeRow = index;
     const team = this.filteredTeamsByQualification[index];
-
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     try {
       if (this.selectedCompetition === "Game Arena") {
-        this.metricData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`);
+        this.metricData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`, { headers });
       } else if (this.selectedCompetition === "Innovation Design Challenge") {
-        this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`);
+        this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       }
       this.metrics = this.metricData.data.data;
       this.totalRecords = this.metrics.length;

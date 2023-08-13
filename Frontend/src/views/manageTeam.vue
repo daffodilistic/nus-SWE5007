@@ -180,7 +180,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(user, userIndex) in team.userResponses" :key="userIndex" class="child-row">
+                    <tr v-if="teamMembers.userResponses.length === 0">
+                      <td colspan="11">No Members in the team</td>
+                    </tr>
+                    <tr v-else v-for="(user, userIndex) in teamMembers.userResponses" :key="userIndex" class="child-row">
                       <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                       <td> {{ userIndex + 1 }} </td>
                       <td> {{ user.firstName }} </td>
@@ -225,7 +228,8 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
-import { IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,GAME_TEAM_BASE_URL } from '@/api';
+import { ADD_MEMBER_IDC_TEAM_BASE_URL,ADD_MEMBER_GAME_TEAM_BASE_URL,UPDATE_GAME_TEAM_BASE_URL,UPDATE_IDC_TEAM_BASE_URL,VIEW_GAME_TEAM_BASE_URL,VIEW_IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL } from '@/api';
+import token from '/config'
 
 export default {
   head() {
@@ -259,6 +263,7 @@ export default {
       editingStatus: null, // Control the visibility of the modal
       showAddMemberModal: false,
       userList: [],
+      teamMembers:[],
       newChildRow: {
         firstName: "",
         lastName: "",
@@ -356,8 +361,12 @@ export default {
   },
   },
   async mounted() {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     try {
-      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`);
+      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
       this.teams = this.teamsData.data.data;
     } catch (error) {
       // Handle any errors that might occur during the request
@@ -366,13 +375,16 @@ export default {
   },
   methods: {
     async loadTeam() {
-
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       try {
           if (this.selectedCompetition === "Game Arena") {
-            this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`);
+            this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
           console.log('ga called')
           } else if (this.selectedCompetition === "Innovation Design Challenge") {
-            this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`);
+            this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
             console.log('IDC called')
           }
           this.teams = this.teamsData.data.data;
@@ -382,9 +394,12 @@ export default {
     },
 
     async fetchUsers(teamId,teamName) {
-
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       try {
-        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`);
+        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
         this.currentTeamId = teamId;
         this.userList = response.data.data;
         this.currentTeamName = teamName;
@@ -406,7 +421,10 @@ export default {
     } else {
       this.activeRow = index;
       const team = this.filteredTeams[index];
-
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        };
       try {
         // Make the API call here using the team ID as the request body
         const requestBody = {
@@ -417,23 +435,23 @@ export default {
         const requestBodyJson = JSON.stringify(requestBody);
         console.log('Request Body:', requestBodyJson);
         let  response
+
         if (this.selectedCompetition === "Game Arena") {
-          response = await axios.get(`${GAME_TEAM_BASE_URL}`, requestBodyJson);
+          response = await axios.post(`${VIEW_GAME_TEAM_BASE_URL}`, requestBodyJson, { headers });
           console.log('ga called')
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-            response = await axios.get(`${IDC_TEAM_BASE_URL}`, requestBodyJson);
+            response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`, requestBodyJson, { headers });
             console.log('IDC called')
         }
-
+        this.teamMembers = response.data.data;
         // Handle the response, if needed
-        console.log('Response from server:', response.data);
+        console.log('Response from server:', this.teamMembers);
 
         // Optional: Perform any additional actions, such as updating the UI.
       } catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
       }
-
 
     }
   },
@@ -474,11 +492,16 @@ export default {
             competitionChoice : team.competitionChoice,
             ageGroup : team.ageGroup,
           };
+
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          };
           try {
              if(this.selectedCompetition === "Game Arena") {
-                response = await axios.put(`${GAME_TEAM_BASE_URL}`, requestBody);
+                response = await axios.put(`${UPDATE_GAME_TEAM_BASE_URL}`, requestBody, { headers });
               }else if (this.selectedCompetition === "Innovation Design Challenge") {
-                response = await axios.put(`${IDC_TEAM_BASE_URL}`, requestBody);
+                response = await axios.put(`${UPDATE_IDC_TEAM_BASE_URL}`, requestBody, { headers });
               }
 
             // Handle the response, if needed
@@ -545,17 +568,13 @@ export default {
     };
 
     console.log('Request Payload:', requestBody);
-
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     try {
       // Make the HTTP POST request to the API endpoint
-      const response = await axios.put(`${IDC_TEAM_BASE_URL}`, requestBody, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length,X-Requested-With"
-        },
-      });
+      const response = await axios.put(`${ADD_MEMBER_IDC_TEAM_BASE_URL}`, requestBody, { headers });
 
       // Handle the response, if needed
       console.log('Response from server:', response.data);
