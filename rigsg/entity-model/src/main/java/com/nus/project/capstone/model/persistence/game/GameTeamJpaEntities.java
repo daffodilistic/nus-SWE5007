@@ -7,6 +7,7 @@ import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +33,8 @@ public class GameTeamJpaEntities {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "gameTeam")
     private List<UserJpaEntities> users;
 
+    @ManyToMany(mappedBy = "gamesTeam")
+    private List<GamesJpaEntities> games = new ArrayList<>();
     public void addToUsers(UserJpaEntities user) {
         user.setGameTeam(this);
         users.add(user);
