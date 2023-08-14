@@ -1,6 +1,5 @@
 package com.nus.project.capstone.model.persistence.game;
 
-import com.nus.project.capstone.model.entity.game.GameTeamRequests;
 import com.nus.project.capstone.model.entity.game.GamesRequests;
 import lombok.*;
 
@@ -25,18 +24,18 @@ public class GamesJpaEntities {
     /**
      * host
      */
-    @Column(name = "game_team_id_a")
-    private UUID gameTeamIdA;
+    @Column(name = "game_team_id_host")
+    private UUID gameTeamIdHost;
 
     /**
      * opponent
      */
-    @Column(name = "game_team_id_b")
-    private UUID gameTeamIdB;
-    @Column(name = "game_score_a")
-    private Integer gameScoreA;
-    @Column(name = "game_score_b")
-    private Integer gameScoreB;
+    @Column(name = "game_team_id_oppo")
+    private UUID gameTeamIdOppo;
+    @Column(name = "game_score_host")
+    private Integer gameScoreHost;
+    @Column(name = "game_score_oppo")
+    private Integer gameScoreOppo;
     private String gameStatus;
     private String gameOutcome;
 
@@ -57,12 +56,24 @@ public class GamesJpaEntities {
     public static GamesJpaEntities toJpaEntity(GamesRequests g) {
         return GamesJpaEntities.builder()
                 .id(g.getId() == null ? UUID.randomUUID() : g.getId())
-                .gameTeamIdA(UUID.fromString(g.getGameTeamIdA()))
-                .gameTeamIdB(UUID.fromString(g.getGameTeamIdB()))
-                .gameScoreA(g.getGameScoreA())
-                .gameScoreB(g.getGameScoreB())
+                .gameTeamIdHost(UUID.fromString(g.getGameTeamIdHost()))
+                .gameTeamIdOppo(UUID.fromString(g.getGameTeamIdOppo()))
+                .gameScoreHost(g.getGameScoreHost())
+                .gameScoreOppo(g.getGameScoreOppo())
                 .gameStatus(g.getGameStatus())
                 .gameOutcome(g.getGameOutcome())
+                .build();
+    }
+
+    public GamesJpaEntities updateJpaEntity(GamesRequests u) {
+        return GamesJpaEntities.builder()
+                .id(u.getId())
+                .gameTeamIdHost(u.getGameTeamIdHost() == null ? this.getGameTeamIdHost() : UUID.fromString(u.getGameTeamIdHost()))
+                .gameTeamIdOppo(u.getGameTeamIdOppo() == null ? this.getGameTeamIdOppo() : UUID.fromString(u.getGameTeamIdOppo()))
+                .gameScoreHost(u.getGameScoreHost() == null ? this.getGameScoreHost() : u.getGameScoreHost())
+                .gameScoreOppo(u.getGameScoreOppo() == null ? this.getGameScoreOppo() : u.getGameScoreOppo())
+                .gameStatus(u.getGameStatus() == null ? this.getGameStatus() : u.getGameStatus())
+                .gameOutcome(u.getGameOutcome() == null ? this.getGameOutcome() : u.getGameOutcome())
                 .build();
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.Column;
 import java.util.UUID;
 
 @Data
@@ -13,10 +12,10 @@ import java.util.UUID;
 public class GamesRequests {
 
     private UUID id;
-    private String gameTeamIdA;
-    private String gameTeamIdB;
-    private Integer gameScoreA;
-    private Integer gameScoreB;
+    private String gameTeamIdHost;
+    private String gameTeamIdOppo;
+    private Integer gameScoreHost;
+    private Integer gameScoreOppo;
     private String gameStatus;
     private String gameOutcome;
 }

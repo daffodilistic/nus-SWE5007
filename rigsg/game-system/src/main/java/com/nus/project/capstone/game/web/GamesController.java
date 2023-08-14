@@ -1,9 +1,6 @@
 package com.nus.project.capstone.game.web;
 
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
-import com.nus.project.capstone.model.entity.base.UserResponse;
-import com.nus.project.capstone.model.entity.game.GameTeamRequests;
-import com.nus.project.capstone.model.entity.game.GameTeamResponse;
 import com.nus.project.capstone.model.entity.game.GamesRequests;
 import com.nus.project.capstone.model.entity.game.GamesResponse;
 import com.nus.project.capstone.model.persistence.game.GameTeamRepository;
@@ -35,15 +32,15 @@ public class GamesController {
     }
 
     @PostMapping("/game")
-    public ResponseEntity<GeneralMessageEntity> createGame(@RequestBody GamesRequests g) {
+    public ResponseEntity<GeneralMessageEntity> createGames(@RequestBody GamesRequests g) {
 
-        if (g.getGameTeamIdA() == null || g.getGameTeamIdB() == null) {
+        if (g.getGameTeamIdHost() == null || g.getGameTeamIdOppo() == null) {
             return ResponseEntity.ok(GeneralMessageEntity.builder().data("A id & B id must be provided").build());
         }
 
-        val a = gameTeamRepository.findById(UUID.fromString(g.getGameTeamIdA()));
+        val a = gameTeamRepository.findById(UUID.fromString(g.getGameTeamIdHost()));
         if (a.isEmpty()) return ResponseEntity.ok(GeneralMessageEntity.builder().data("Team A not found").build());
-        val b = gameTeamRepository.findById(UUID.fromString(g.getGameTeamIdB()));
+        val b = gameTeamRepository.findById(UUID.fromString(g.getGameTeamIdOppo()));
         if (b.isEmpty()) return ResponseEntity.ok(GeneralMessageEntity.builder().data("Team A not found").build());
 
         val gamesJpa = GamesJpaEntities.toJpaEntity(g);
@@ -56,15 +53,34 @@ public class GamesController {
                 .data(game.getId()).build());
     }
 
+    @PutMapping("/game")
+    public ResponseEntity<GeneralMessageEntity> updateGame(@RequestBody GamesRequests updateGamesRequests) {
+
+        if (updateGamesRequests.getId() == null) {
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Game id must be provided").build());
+        }
+
+        if (gamesRepository.findById(updateGamesRequests.getId()).isEmpty()) {
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data(String.format("Game %s is not found", updateGamesRequests.getId())).build());
+        }
+
+        var game = gamesRepository.findById(updateGamesRequests.getId()).get();
+        game = game.updateJpaEntity(updateGamesRequests);
+
+        val g = gamesRepository.save(game);
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(g.getId()).build());
+    }
+
     @GetMapping("/game")
-    public ResponseEntity<GeneralMessageEntity> readGame(@RequestBody GamesRequests g) {
+    public ResponseEntity<GeneralMessageEntity> readGames(@RequestBody GamesRequests g) {
 
         val game = gamesRepository.findById(g.getId());
         return game.map(gamesJpaEntities -> ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(GamesResponse.toGamesResponse(gamesJpaEntities)).build())).orElseGet(() -> ResponseEntity.ok(GeneralMessageEntity.builder().data("No game found").build()));
     }
 
-    @GetMapping("/game")
+    @GetMapping("/games")
     public ResponseEntity<GeneralMessageEntity> getAllGames() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(gamesRepository.findAll().stream()
