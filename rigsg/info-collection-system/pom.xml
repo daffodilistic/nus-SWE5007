@@ -32,6 +32,7 @@
     </dependencies>
 
     <build>
+		<finalName>info</finalName>
         <plugins>
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>

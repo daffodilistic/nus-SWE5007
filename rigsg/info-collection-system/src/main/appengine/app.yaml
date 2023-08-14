@@ -1,6 +1,7 @@
 runtime: java
 env: flex
-entrypoint: java -Xmx64m -jar target/info-collection-system-1.0.0-SNAPSHOT.jar
+entrypoint: java -Xmx128m -jar info.jar
+service: info
 runtime_config:
     operating_system: "ubuntu22"
     runtime_version: "17"
