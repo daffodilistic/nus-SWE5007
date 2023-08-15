@@ -10,35 +10,43 @@
       <router-link to="/manageTeam" class="menu-item">Manage Team</router-link>
       <router-link to="/manageMetric" class="menu-item">Manage Metric</router-link>
       <router-link v-if="authenticated" to="/login" v-on:click.native="logout()" replace class="menu-item">Logout</router-link>
-      <router-link v-else to="/login" class="menu-item">Login</router-link>
+      <router-link v-else to="/login" v-on:click.native="login()" class="menu-item">Login</router-link>
     </nav>
     <router-view @authenticated="setAuthenticated" />
   </div>
 </template>
 
 <script>
-export default {
-  name: 'App',
-  data() {
-    return {
-      authenticated: false,
-      // this is only for testing purposes no actual app will have this
-      // an api call will validate user credentials
-      mockAccount: {
-        username: "km",
-        password: "km"
-      }
+
+import Vue from 'vue'
+    export default {
+        name: 'App',
+        data() {
+            return {
+                authenticated: Vue.$keycloak.token.length > 0,
+                // this is only for testing purposes no actual app will have this
+                // an api call will validate user credentials
+                mockAccount: {
+                    username: "km",
+                    password: "km"
+                }
+            }
+        },
+        methods: {
+            setAuthenticated(status) {
+                this.authenticated = status;
+            },
+            logout() {
+                this.authenticated = false;
+                Vue.$keycloak.logout()
+            },
+            login() {
+                this.authenticated = true;
+                Vue.$keycloak.login()
+            }
+        }
     }
-  },
-  methods: {
-    setAuthenticated(status) {
-      this.authenticated = status;
-    },
-    logout() {
-      this.authenticated = false;
-    }
-  }
-}
+</script>
 </script>
 
 <style scoped>
