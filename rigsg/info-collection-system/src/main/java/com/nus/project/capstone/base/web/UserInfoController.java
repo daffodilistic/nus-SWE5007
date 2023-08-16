@@ -69,6 +69,6 @@ public class UserInfoController {
     public ResponseEntity<GeneralMessageEntity> getAllUsers() {
         val users = userRepository.findAll();
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(users.stream()
-                .map(UserRequests::toUserRequests).collect(Collectors.toList())).build());
+                .map(UserResponse::toUserResponse).collect(Collectors.toList())).build());
     }
 }
