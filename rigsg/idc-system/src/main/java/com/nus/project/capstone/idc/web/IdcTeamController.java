@@ -84,6 +84,11 @@ public class IdcTeamController {
         }
     }
 
+    @PutMapping("/update-team")
+    public ResponseEntity<GeneralMessageEntity> updateTeamInterface(@RequestBody IdcTeamRequests idcTeamRequests) {
+        return updateTeam(idcTeamRequests);
+    }
+
     private ResponseEntity<GeneralMessageEntity> updateTeam(IdcTeamRequests updateIdcTeamRequests) {
 
         if (updateIdcTeamRequests.getId() == null) {
@@ -115,10 +120,16 @@ public class IdcTeamController {
     }
 
     @GetMapping("/view-all-teams")
-    public ResponseEntity<GeneralMessageEntity> getAllUsers() {
+    public ResponseEntity<GeneralMessageEntity> getAllTeams() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(idcTeamRepository.findAll().stream()
                 .map(IdcTeamResponse::toIdcTeamResponse).collect(Collectors.toList())).build());
     }
 
+    @DeleteMapping("/delete-team")
+    public ResponseEntity<GeneralMessageEntity> deleteTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
+        idcTeamRepository.deleteById(idcTeamRequests.getId());
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(String.format("Delete success for %s", idcTeamRequests.getId())).build());
+    }
 }

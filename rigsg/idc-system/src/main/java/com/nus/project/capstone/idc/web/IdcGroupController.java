@@ -1,9 +1,7 @@
 package com.nus.project.capstone.idc.web;
 
-import com.nus.project.capstone.model.entity.idc.IdcGroupRequests;
+import com.nus.project.capstone.model.entity.idc.*;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
-import com.nus.project.capstone.model.entity.idc.IdcGroupResponse;
-import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
 import com.nus.project.capstone.model.persistence.idc.IdcGroupJpaEntities;
 import com.nus.project.capstone.model.persistence.idc.IdcGroupRepository;
 import com.nus.project.capstone.model.persistence.idc.IdcTeamRepository;
@@ -63,6 +61,11 @@ public class IdcGroupController {
         }
     }
 
+    @PutMapping("/update-group")
+    public ResponseEntity<GeneralMessageEntity> updateGroupInterface(@RequestBody IdcGroupRequests idcGroupRequests) {
+        return updateGroup(idcGroupRequests);
+    }
+
     private ResponseEntity<GeneralMessageEntity> updateGroup(@RequestBody IdcGroupRequests updateIdcGroupRequests) {
 
         if (updateIdcGroupRequests.getId() == null) {
@@ -98,5 +101,12 @@ public class IdcGroupController {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(idcGroupRepository.findAll().stream()
                 .map(IdcGroupResponse::toIdcGroupResponse).collect(Collectors.toList())).build());
+    }
+
+    @DeleteMapping("/delete-group")
+    public ResponseEntity<GeneralMessageEntity> deleteGroup(@RequestBody IdcGroupRequests idcGroupRequests) {
+        idcGroupRepository.deleteById(idcGroupRequests.getId());
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(String.format("Delete success for %s", idcGroupRequests.getId())).build());
     }
 }
