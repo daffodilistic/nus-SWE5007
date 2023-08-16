@@ -86,4 +86,11 @@ public class IdcMetricsController {
                     .data("ids or scores are missing. Skip calculation").build());
         }
     }
+
+    @DeleteMapping("/delete-metrics")
+    public ResponseEntity<GeneralMessageEntity> deleteMetrics(@RequestBody IdcMetricsRequests idcMetricsRequests) {
+        idcMetricsRepository.deleteById(idcMetricsRequests.getId());
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(String.format("Delete success for %s", idcMetricsRequests.getId())).build());
+    }
 }

@@ -71,4 +71,11 @@ public class UserInfoController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(users.stream()
                 .map(UserResponse::toUserResponse).collect(Collectors.toList())).build());
     }
+
+    @DeleteMapping("/delete-user")
+    public ResponseEntity<GeneralMessageEntity> deleteUser(@RequestBody UserRequests userRequests) {
+        userRepository.deleteById(userRequests.getId());
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(String.format("Delete success for %s", userRequests.getId())).build());
+    }
 }
