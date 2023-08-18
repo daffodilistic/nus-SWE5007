@@ -21,7 +21,7 @@ spring:
 
 keycloak:
   auth-server-url: https://keycloak.ric-robotics.xyz
-  principal-attribute: idc-system
+  principal-attribute: info-collection-system
   realm: ricsg
   resource: ricsg
   public-client: true
