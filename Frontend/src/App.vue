@@ -2,9 +2,11 @@
   <div id="app">
     <nav class="top-menu">
       <router-link to="/" class="menu-item">Home</router-link>
-      <router-link to="/registration" class="menu-item">Register</router-link>
+      <router-link to="/registration" class="menu-item">Register Team</router-link>
       <router-link v-if="authenticated" to="/upload" class="menu-item">Upload</router-link>
       <router-link to="/manageContestant" class="menu-item">Manage Contestant</router-link>
+      <router-link to="/manageGroup" class="menu-item">Manage Group</router-link>
+      <router-link to="/score" class="menu-item">Score</router-link>
       <router-link to="/manageTeam" class="menu-item">Manage Team</router-link>
       <router-link to="/manageMetric" class="menu-item">Manage Metric</router-link>
       <router-link v-if="authenticated" to="/login" v-on:click.native="logout()" replace class="menu-item">Logout</router-link>
@@ -63,6 +65,7 @@ import Vue from 'vue'
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   font-size: 16px;
+  margin-bottom: 70px;
 }
 
 .menu-item {

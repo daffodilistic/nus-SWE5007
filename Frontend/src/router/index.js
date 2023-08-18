@@ -65,6 +65,20 @@ const routes = [
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/Upload.vue')
     }
+  },
+  {
+    path: '/score',
+    name: 'Score',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/Score.vue')
+    }
+  },
+  {
+    path: '/manageGroup',
+    name: 'ManageGroup',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/manageGroup.vue')
+    }
   }
 ]
 

@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nus.project.capstone.idc.web.Tools.genericFailureMessage;
+
 @Slf4j
 @RestController
 @RequestMapping("/idcteam")
@@ -39,7 +41,7 @@ public class IdcTeamController {
                 .data(team.getId()).build());
     }
 
-    @GetMapping("/view-team")
+    @PostMapping("/view-team")
     public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
 
         val o = idcTeamRepository.findById(idcTeamRequests.getId());
@@ -82,6 +84,11 @@ public class IdcTeamController {
         }
     }
 
+    @PutMapping("/update-team")
+    public ResponseEntity<GeneralMessageEntity> updateTeamInterface(@RequestBody IdcTeamRequests idcTeamRequests) {
+        return updateTeam(idcTeamRequests);
+    }
+
     private ResponseEntity<GeneralMessageEntity> updateTeam(IdcTeamRequests updateIdcTeamRequests) {
 
         if (updateIdcTeamRequests.getId() == null) {
@@ -113,14 +120,16 @@ public class IdcTeamController {
     }
 
     @GetMapping("/view-all-teams")
-    public ResponseEntity<GeneralMessageEntity> getAllUsers() {
+    public ResponseEntity<GeneralMessageEntity> getAllTeams() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(idcTeamRepository.findAll().stream()
                 .map(IdcTeamResponse::toIdcTeamResponse).collect(Collectors.toList())).build());
     }
 
-    private ResponseEntity<GeneralMessageEntity> genericFailureMessage(){
+    @DeleteMapping("/delete-team")
+    public ResponseEntity<GeneralMessageEntity> deleteTeam(@RequestBody IdcTeamRequests idcTeamRequests) {
+        idcTeamRepository.deleteById(idcTeamRequests.getId());
         return ResponseEntity.ok(GeneralMessageEntity.builder()
-                .data("Update failed. Request contains other illegal params. Pls check.").build());
+                .data(String.format("Delete success for %s", idcTeamRequests.getId())).build());
     }
 }

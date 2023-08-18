@@ -27,7 +27,7 @@ public class IdcMetricsController {
         this.idcMetricsRepository = idcMetricsRepository;
     }
 
-    @GetMapping("/view-metric")
+    @PostMapping("/view-metric")
     public ResponseEntity<GeneralMessageEntity> readMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
 
         val o = idcMetricsRepository.findById(idcMetricsRequests.getId());
@@ -69,7 +69,7 @@ public class IdcMetricsController {
                 .map(IdcMetricsResponse::toIdcMetricsResponse).collect(Collectors.toList())).build());
     }
 
-    @GetMapping("/calculate")
+    @PostMapping("/calculate")
     public ResponseEntity<GeneralMessageEntity> calculateScores(@RequestBody IdcMetricsRequests idcMetricsRequests) {
         float score = 0.0f;
         List<UUID> ids = idcMetricsRequests.getMetricIds();
@@ -85,5 +85,12 @@ public class IdcMetricsController {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
                     .data("ids or scores are missing. Skip calculation").build());
         }
+    }
+
+    @DeleteMapping("/delete-metrics")
+    public ResponseEntity<GeneralMessageEntity> deleteMetrics(@RequestBody IdcMetricsRequests idcMetricsRequests) {
+        idcMetricsRepository.deleteById(idcMetricsRequests.getId());
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(String.format("Delete success for %s", idcMetricsRequests.getId())).build());
     }
 }

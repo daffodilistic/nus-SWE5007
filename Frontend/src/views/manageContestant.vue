@@ -1,22 +1,28 @@
 <template>
   <div id="account">
-    <EditableTable
-      v-model="users"
-      :fields="fields"
-      @submit="handleUpdateUser($event)"
-      @remove="handleRemoveUser($event)"
-      @row-clicked="handleRowClick($event)"
-    ></EditableTable>
+    <b-tabs >
+        <b-tab v-for="option in competitionChoiceOptions" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadUsers()">
+        <EditableTable
+          v-model="users"
+          :fields="fields"
+          @submit="handleUpdateUser($event)"
+          @remove="handleRemoveUser($event)"
+          @row-clicked="handleRowClick($event)"
+        ></EditableTable>
+      </b-tab>
+    </b-tabs>
   </div>
-
 </template>
 <script>
 import EditableTable from "@/components/UserEditableTable.vue";
 import axios from "axios";
-import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
+import { DELETE_USER_INFO_BASE_URL,GET_ALL_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL,GET_ALL_GAMES_BASE_URL} from '@/api';
+import { competitionChoiceOptions } from "../dropdownOptions";
+import token from '/config'
+import Vue from 'vue'
+import Swal from 'sweetalert2';
 
 export default {
-  name: "account",
   components: {
     EditableTable,
   },
@@ -35,26 +41,62 @@ export default {
         { key: "edit", label: "", type: "edit" },
       ],
       users:[],
+      selectedCompetition: "Innovation Design Challenge",
     };
   },
+
   async mounted() {
     try {
-      this.usersData = await axios.get(`${USER_INFO_BASE_URL}userinfo/users`);
-      this.users = this.usersData.data.data;
-    } catch (error) {
-      // Handle any errors that might occur during the request
-      console.error("Error fetching users:", error);
-    }
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+    this.usersData = response.data.data;
+    this.users = this.usersData;
+  } catch (error) {
+    // Handle any errors that might occur during the request
+    console.error("Error fetching users:", error);
+  }
+  },
+  computed: {
+    competitionChoiceOptions() {
+      return competitionChoiceOptions;
+    },
   },
   methods: {
+
+  async loadUsers() {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        if (this.selectedCompetition === "Game Arena") {
+          this.usersData = await axios.get("http://localhost:3000/data", { headers });
+        console.log('ga called')
+        } else if (this.selectedCompetition === "Innovation Design Challenge") {
+          //this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`);
+          console.log('IDC called')
+        }
+        this.users = this.usersData.data.data;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
     async handleUpdateUser(user) {
       this.removeExtraProperty();
-
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
 
       if (user.id) {
         // User has an ID, so it already exists in the backend, update the user
         try {
-          await axios.put(`${USER_INFO_BASE_URL}userinfo/user`, user);
+          await axios.put(`${UPDATE_USER_INFO_BASE_URL}`, user, { headers });
           // Update the user in the users array after successful API update
           const index = this.users.findIndex(u => u.id === user.id);
           if (index !== -1) {
@@ -65,8 +107,9 @@ export default {
         }
       } else {
         // User doesn't have an ID, so it is a new user, add the user
+        console.log('create block')
         try {
-          const response = await axios.post(`${USER_INFO_BASE_URL}userinfo/user`, user);
+          const response = await axios.post(`${CREATE_USER_INFO_BASE_URL}`, user, { headers });
           // Add the new user to the users array after successful API add
           this.users.push(response.data.data);
         } catch (error) {
@@ -78,12 +121,43 @@ export default {
       this.selectedUser = user;
     },
     async handleRemoveUser(user) {
-      if (user.length > 0) {
-        await user.map(async (item) => {
-          await deleteUser(item.id);
-        })
-      } else {
-        await deleteUser(user.id);
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      const confirmation = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (confirmation.isConfirmed) {
+        const requestBody = {
+          id: user.id,
+        };
+
+        console.log('delete response', requestBody);
+        try {
+            const response = await axios.delete(`${DELETE_USER_INFO_BASE_URL}`, {
+          data: requestBody,
+          headers: headers
+        });
+
+          // Show a success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The user has been deleted.',
+            icon: 'success'
+          });
+
+          loadUsers()
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     },
     removeExtraProperty() {
@@ -97,13 +171,16 @@ export default {
 
 };
 </script>
+
 <style scoped>
 #account {
   margin: 20px;
 }
+
 #account .table td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 </style>

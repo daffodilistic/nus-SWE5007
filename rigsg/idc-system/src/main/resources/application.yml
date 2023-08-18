@@ -12,13 +12,15 @@ spring:
   datasource:
     username: dev-ric-app-user
     password: password
+    hikari:
+      minimum-idle: 5
   jpa:
     hibernate:
       ddl-auto: update
   secured: true
 
 keycloak:
-  auth-server-url: http://35.247.139.32:8080
+  auth-server-url: https://keycloak.ric-robotics.xyz
   principal-attribute: idc-system
   realm: ricsg
   resource: ricsg

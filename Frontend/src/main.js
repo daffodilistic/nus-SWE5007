@@ -13,7 +13,6 @@ Vue.use(authentication)
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
-Vue.use(vueCountryRegionSelect)
 Vue.config.productionTip = false
 
 

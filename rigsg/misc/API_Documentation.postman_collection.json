@@ -7,133 +7,16 @@
 	},
 	"item": [
 		{
-			"name": "1. Create a new user",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"firstName\": \"Donald\",\n    \"lastName\": \"Trump\",\n    \"email\": \"donald.trump@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/userinfo/user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"userinfo",
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "2. Update user info",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\",\n    \"firstName\": \"Desmond\",\n    \"lastName\": \"Soh\",\n    \"email\": \"desmond.soh@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/userinfo/user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"userinfo",
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get a user with his userId",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/userinfo/user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"userinfo",
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get all users",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"36a5b817-2226-4f7e-b268-df6903ab2b1a\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/userinfo/users",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"userinfo",
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "3. Create a new IDC team",
+			"name": "Create a new user",
 			"request": {
 				"auth": {
 					"type": "oauth2",
 					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
 						{
 							"key": "username",
 							"value": "matthew",
@@ -155,8 +38,351 @@
 							"type": "string"
 						},
 						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Donald\",\n    \"lastName\": \"Trump\",\n    \"email\": \"donald.trump@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"userName\":\"IamDonaldTrump\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/create-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"create-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a user",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
 							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"5db12fc6-b13a-477c-989f-18d3557c38f9\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/delete-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"delete-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user info",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"ff6ec410-0ae6-46d0-9293-3f7594080dba\",\n    \"firstName\": \"Desmond\",\n    \"lastName\": \"Soh\",\n    \"email\": \"desmond.soh@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/update-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"update-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a user with his userId",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"d53a348c-9b90-4a20-9e95-c8e656658033\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/view-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"view-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/view-all-users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"view-all-users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new IDC team",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
 							"type": "string"
 						},
 						{
@@ -198,7 +424,7 @@
 			"response": []
 		},
 		{
-			"name": "4. Assign a user to a IDC team",
+			"name": "Delete a IDC team",
 			"request": {
 				"auth": {
 					"type": "oauth2",
@@ -206,6 +432,11 @@
 						{
 							"key": "username",
 							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -224,8 +455,72 @@
 							"type": "string"
 						},
 						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"a583122c-8bad-4af4-a2fb-cc2dd7b52828\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcteam/delete-team",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcteam",
+						"delete-team"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assign a user to a IDC team",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
 							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
 							"type": "string"
 						},
 						{
@@ -267,11 +562,16 @@
 			"response": []
 		},
 		{
-			"name": "5. IDC team qualify for stages",
+			"name": "IDC team qualify for stages",
 			"request": {
 				"auth": {
 					"type": "oauth2",
 					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
 						{
 							"key": "username",
 							"value": "siyuan",
@@ -290,11 +590,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -337,13 +632,15 @@
 		},
 		{
 			"name": "Get a IDC team with his team id",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "oauth2",
 					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
 						{
 							"key": "username",
 							"value": "marcus",
@@ -365,11 +662,6 @@
 							"type": "string"
 						},
 						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
-							"type": "string"
-						},
-						{
 							"key": "grant_type",
 							"value": "password_credentials",
 							"type": "string"
@@ -381,7 +673,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -417,6 +709,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -434,11 +731,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -481,13 +773,15 @@
 		},
 		{
 			"name": "Get a IDC metric with metric id",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "oauth2",
 					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
 						{
 							"key": "username",
 							"value": "siyuan",
@@ -509,11 +803,6 @@
 							"type": "string"
 						},
 						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
-							"type": "string"
-						},
-						{
 							"key": "grant_type",
 							"value": "password_credentials",
 							"type": "string"
@@ -525,7 +814,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -558,6 +847,11 @@
 					"type": "oauth2",
 					"oauth2": [
 						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
 							"key": "username",
 							"value": "marcus",
 							"type": "string"
@@ -575,11 +869,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -612,11 +901,16 @@
 			"response": []
 		},
 		{
-			"name": "6. Create/modify a IDC metric",
+			"name": "Create/modify a IDC metric",
 			"request": {
 				"auth": {
 					"type": "oauth2",
 					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
 						{
 							"key": "username",
 							"value": "matthew",
@@ -635,11 +929,6 @@
 						{
 							"key": "clientId",
 							"value": "ricsg",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
 							"type": "string"
 						},
 						{
@@ -681,14 +970,85 @@
 			"response": []
 		},
 		{
-			"name": "7. Calculate total scores given 3 metrics",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
+			"name": "Delete a IDC metric",
 			"request": {
 				"auth": {
 					"type": "oauth2",
 					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"d1899dfc-bef4-452a-977b-057c0b630a26\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcmetrics/delete-metrics",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcmetrics",
+						"delete-metrics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Calculate total scores given 3 metrics",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
 						{
 							"key": "username",
 							"value": "siyuan",
@@ -710,8 +1070,351 @@
 							"type": "string"
 						},
 						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"metricIds\": [\"4b2a611e-278f-11ee-944f-42010a400030\",\"4b2c26f2-278f-11ee-944f-42010a400030\",\"4b95bd4c-278f-11ee-944f-42010a400030\"],\r\n    \"metricScores\": [50, 50, 50]\r\n}\r\n\r\n//metricIds are 3 metrics within that stage (see database)\r\n// metricScores are each score assigned to them",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcmetrics/calculate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcmetrics",
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
 							"key": "accessTokenUrl",
-							"value": "http://35.247.139.32:8080/realms/ricsg/protocol/openid-connect/token",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"groupName\": \"IDC Group X\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/create-group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"create-group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a IDC group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"4d53bb20-217f-4047-9ed1-970f3659a429\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/delete-group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"delete-group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assign team to a new group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"d961b8c1-e4fd-4465-a6f0-c674188a1705\",\n    \"teamIds\": [\"a52e5593-ba2e-410b-ae66-725f8f0f48ee\"]\n}\n\n// id here is the group id",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/assign-team",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"assign-team"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a IDC group with group id",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"d82d66c8-1750-11ee-8166-42010a400015\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcgroup/view-group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcgroup",
+						"view-group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all IDC Groups",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "oQg8obbXNQKp6eMlPKnUbMQJVNpl4Xpk",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
 							"type": "string"
 						},
 						{
@@ -730,7 +1433,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"metricIds\": [\"4b1f24f2-278f-11ee-944f-42010a400030\",\"4b2178d8-278f-11ee-944f-42010a400030\",\"4b2348e8-278f-11ee-944f-42010a400030\"],\r\n    \"metricScores\": [50, 50, 50]\r\n}\r\n\r\n//metricIds are 3 metrics within that stage (see database)\r\n// metricScores are each score assigned to them",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -738,15 +1441,53 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/idcmetrics/calculate",
+					"raw": "http://localhost:8082/idcgroup/view-all-groups",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8082",
 					"path": [
-						"idcmetrics",
-						"calculate"
+						"idcgroup",
+						"view-all-groups"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all users App Engine",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://info-dot-sapient-symbol-388402.as.r.appspot.com/userinfo/view-all-users",
+					"protocol": "https",
+					"host": [
+						"info-dot-sapient-symbol-388402",
+						"as",
+						"r",
+						"appspot",
+						"com"
+					],
+					"path": [
+						"userinfo",
+						"view-all-users"
 					]
 				}
 			},

@@ -17,9 +17,11 @@ public class GameTeamResponse {
 
     private UUID id;
     private List<UserResponse> userResponses;
+    private String name;
     public static GameTeamResponse toGameTeamResponse(GameTeamJpaEntities g) {
         return GameTeamResponse.builder()
                 .id(g.getId())
+                .name(g.getTeamName())
                 .build();
     }
 }

@@ -1,4 +1,6 @@
 <template>
+ <b-tabs >
+        <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadMetric()">
   <div>
     <br><br>
     <div class="search-container">
@@ -39,22 +41,19 @@
       <tbody v-for="(metric, index) in paginatedMetrics" :key="index">
         <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
           <td>
-            <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
 
           </td>
           <td v-if="!metric.editing">
             {{ metric.stageName }}
           </td>
           <td v-else>
-            <input
-              type="text"
-              v-model="metric.editingStageName"
-              @keydown.enter="saveMetric(metric)"
-              @keydown.esc="cancelEditing(metric)"
-              class="form-control editing-textbox"
-            />
+            <div class="form-group select">
+              <select v-model="stageName" id="category" class="editing-dropdown">
+                <option value="" disabled selected>Select Qualification Status</option>
+                <option v-for="option in filteredStageNameOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+              </select>
+            </div>
           </td>
-
           <td v-if="!metric.editing">
             {{ metric.metricName }}
           </td>
@@ -99,31 +98,6 @@
             </b-button>
           </td>
         </tr>
-        <!-- Child rows -->
-        <tr v-if="activeRow === index" class="child-row">
-          <td :colspan="10"> <!-- Use colspan to span all columns in the row -->
-            <table class="user-table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>No.</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(user, userIndex) in metric.userResponses" :key="userIndex" class="child-row">
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                  <td> {{ userIndex + 1 }} </td>
-                  <td> {{ user.firstName }} </td>
-                  <td> {{ user.lastName }} </td>
-                  <td> {{ user.email }} </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
       </tbody>
     </table>
     <div class="pagination">
@@ -143,12 +117,17 @@
       </div>
     </div>
   </div>
+    </b-tab>
+    </b-tabs>
 </template>
 
 
 <script>
 import axios from "axios";
-import { IDC_TEAM_BASE_URL, USER_INFO_BASE_URL } from '@/api';
+import { DELETE_IDC_METRIC_BASE_URL,CREATE_GAME_METRIC_BASE_URL,UPDATE_GAME_METRIC_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL,CREATE_IDC_METRIC_BASE_URL,UPDATE_IDC_METRIC_BASE_URL} from '@/api';
+import { competitionChoiceOptions,stageNameOptions } from "../dropdownOptions";
+import token from '/config'
+import Swal from 'sweetalert2';
 
 export default {
   head() {
@@ -167,6 +146,7 @@ export default {
 
   data() {
     return {
+      stageName:'',
       currentMetricId: "",
       currentMetricName: "",
       searchQuery: '',
@@ -176,25 +156,41 @@ export default {
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       userList: [],
+      selectedCompetition: "Innovation Design Challenge",
     };
   },
   computed: {
-
+    stageNameOptions() {
+      return stageNameOptions;
+    },
+    filteredStageNameOptions() {
+    if (this.selectedCompetition === "Game Arena") {
+      return this.stageNameOptions.filter(option => option.competitionId === '2');
+    } else if (this.selectedCompetition === "Innovation Design Challenge") {
+      return this.stageNameOptions.filter(option => option.competitionId === '1');
+    }
+    return [];
+    },
     filteredMetrics() {
-    // If the metrics data is not available yet, return an empty array
-    if (!this.metrics || this.metrics.length === 0) {
-      return [];
-    }
+      // If the metrics data is not available yet, return an empty array
+      if (!this.metrics || this.metrics.length === 0) {
+        return [];
+      }
 
-    // If the search query is empty, show all metrics
-    if (this.searchQuery.trim() === '') {
-      return this.metrics;
-    }
+      // If the search query is empty, show all metrics
+      if (this.searchQuery.trim() === '') {
+        // Sort the metrics by "Stage Name" in ascending order (A to Z)
+        return this.metrics.slice().sort((a, b) => {
+          const stageA = a.stageName || '';
+          const stageB = b.stageName || '';
+          return stageA.localeCompare(stageB);
+        });
+      }
 
-    // Otherwise, filter metrics based on the search query
-    const query = this.searchQuery.trim().toLowerCase();
-    return this.metrics.filter((metric) => metric.metricName.toLowerCase().includes(query));
-  },
+      // Otherwise, filter metrics based on the search query
+      const query = this.searchQuery.trim().toLowerCase();
+      return this.metrics.filter((metric) => metric.metricName.toLowerCase().includes(query));
+    },
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
     },
@@ -224,17 +220,47 @@ export default {
     },
   },
   async mounted() {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
     try {
-      this.metricsData = await axios.get(`${IDC_TEAM_BASE_URL}idcmetrics/metrics`);
+      this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       this.metrics = this.metricsData.data.data;
-      console.log('Response from server:', metrics.data);
+      console.log('Response from server:', this.metrics.data);
     } catch (error) {
       // Handle any errors that might occur during the request
-      console.error("Error fetching users:", error);
+      console.error("Error fetching metrics:", error);
     }
   },
   methods: {
-    addNewMetric() {
+
+    async toggleRow(index) {
+    if (this.activeRow === index) {
+      this.activeRow = null; // Collapse the row if it's already expanded
+    } else {
+      this.activeRow = index;
+    }
+  },
+     async loadMetric() {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        if (this.selectedCompetition === "Game Arena") {
+          this.metricsData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`, { headers });
+        console.log('ga called')
+        } else if (this.selectedCompetition === "Innovation Design Challenge") {
+          this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
+          console.log('IDC called')
+        }
+        this.metrics = this.metricsData.data.data;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+    async addNewMetric() {
       // Create a new metric object and add it to the beginning of the metrics array
       const newMetric = {
         stageName: "",
@@ -244,52 +270,14 @@ export default {
         editingStageName: "",
         editingMetricName: "",
         editingMetricWeight: 0,
-        userResponses: [],
       };
 
       this.metrics.unshift(newMetric);
 
       // Update the currentPage to 1 to ensure the newly added metric appears on the first page
       this.currentPage = 1;
-
-      // Scroll to the newly added metric (optional)
-      this.$nextTick(() => {
-        const metricRowElement = document.getElementById(`metric-row-0`);
-        if (metricRowElement) {
-          metricRowElement.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      });
     },
 
-    async toggleRow(index) {
-    if (this.activeRow === index) {
-      this.activeRow = null; // Collapse the row if it's already expanded
-    } else {
-      this.activeRow = index;
-      const metric = this.filteredMetrics[index];
-
-      //try {
-        // Make the API call here using the metric ID as the request body
-       //const requestBody = {
-          //id: metric.id,
-        //};
-
-        // Make the HTTP PUT request to the API endpoint
-        //const requestBodyJson = JSON.stringify(requestBody);
-       // console.log('Request Body:', requestBodyJson);
-
-        //const response = await axios.get(`${IDC_TEAM_BASE_URL}idcmetric/metric`, requestBodyJson);
-
-        // Handle the response, if needed
-        //console.log('Response from server:', response.data);
-
-        // Optional: Perform any additional actions, such as updating the UI.
-     // } catch (error) {
-        // Handle errors, if any
-        //console.error('Error calling API:', error);
-      //}
-    }
-  },
       gotoPage(page) {
         if (page >= 1 && page <= this.totalPages) {
           this.currentPage = page;
@@ -307,31 +295,44 @@ export default {
 
           metric.editing = false;
 
-          const requestBody = {
-            stageName: metric.stageName,
-            metricName: metric.metricName,
-            metricWeight: metric.metricWeight
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           };
-
-          console.log('Request Payload:', requestBody);
-
           try {
+          let url = '';
+          let url2 = '';
+            if (this.selectedCompetition === "Game Arena") {
+              url = UPDATE_GAME_METRIC_BASE_URL;
+              url2 = CREATE_GAME_METRIC_BASE_URL;
+            } else if (this.selectedCompetition === "Innovation Design Challenge") {
+             url = UPDATE_IDC_METRIC_BASE_URL;
+             url2 = CREATE_IDC_METRIC_BASE_URL;
+            }
             if (metric.id) {
+              const requestBody = {
+                stageName: metric.stageName,
+                metricName: metric.metricName,
+                metricWeight: metric.metricWeight
+              };
               // If the metric has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${IDC_TEAM_BASE_URL}idcmetrics/metric`, requestBody);
+              const response = await axios.post(`${url}`, requestBody, { headers });
               console.log('Response from server (update):', response.data);
             } else {
+              const requestBody = {
+                stageName: this.stageName,
+                metricName: metric.metricName,
+                metricWeight: metric.metricWeight
+              };
               // If the metric doesn't have an ID, create a new record using a POST request
-              const response = await axios.post(`${IDC_TEAM_BASE_URL}idcmetrics/metric`, requestBody);
+              const response = await axios.post(`${url2}`, requestBody, { headers });
               console.log('Response from server (create):', response.data);
 
               // Add the newly created metric to the beginning of the metrics array
-              this.metrics.unshift(response.data);
+              this.metrics.unshift(response.data.data);
+              url ='';
             }
-
-            // Close the modal after the request is successful
-            this.showAddMemberModal = false;
-
+            this.loadMetric();
             // Optional: Perform any additional actions, such as updating the UI.
           } catch (error) {
             // Handle errors, if any
@@ -346,10 +347,54 @@ export default {
         }
       },
       // Method to delete a metric
-      deleteMetric(index) {
-        if (confirm("Are you sure you want to delete this metric?")) {
-          this.filteredMetrics.splice(index, 1);
+      async deleteMetric(index) {
+        const metric = this.filteredMetrics[index];
+        const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        };
+
+        const confirmation = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'You won\'t be able to revert this!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (confirmation.isConfirmed) {
+          const requestBody = {
+            id: metric.id,
+          };
+
+        console.log('delete response', requestBody);
+        try {
+          if(this.selectedCompetition === "Game Arena") {
+                response = await axios.delete(`${DELETE_IDC_METRIC_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+               });
+              }else if (this.selectedCompetition === "Innovation Design Challenge") {
+                response = await axios.delete(`${DELETE_IDC_METRIC_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+              });
+           }
+
+          // Show a success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The user has been deleted.',
+            icon: 'success'
+          });
+
+          loadMetric()
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
+      }
       },
       // Method to add a new child row
       addChildRow(metricIndex) {
@@ -583,6 +628,23 @@ input.form-control.editing-textbox {
   margin-right: 5px; /* Add some space between the icon and the button */
 }
 
+.editing-dropdown {
+  font-size: 14px; /* Adjust the font size as needed */
+  min-width: 200px; /* Set the minimum width of the dropdown */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 16px;
+  background-color: #fff;
+  color: #555;
+}
+
+/* Optionally, add styles for the dropdown arrow icon */
+.editing-dropdown .dropdown-toggle::after {
+  font-family: 'Font Awesome'; /* Assuming you're using Font Awesome for icons */
+  content: '\f107'; /* Replace with the correct icon code */
+  margin-left: 5px; /* Add some spacing between the text and the icon */
+  color: #555; /* Set the color of the icon */
+}
 
 
 </style>
