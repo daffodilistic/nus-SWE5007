@@ -17,7 +17,6 @@
 </template>
 
 <script>
-
 import Vue from 'vue'
     export default {
         name: 'App',
@@ -46,7 +45,6 @@ import Vue from 'vue'
             }
         }
     }
-</script>
 </script>
 
 <style scoped>

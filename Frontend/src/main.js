@@ -5,6 +5,7 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import vueCountryRegionSelect from 'vue3-country-region-select'
 import authentication from "@/plugins/authentication"
 
 Vue.use(authentication)
@@ -16,11 +17,11 @@ Vue.config.productionTip = false
 
 
 Vue.$keycloak
-  .init({
+  .init({ 
     // onLoad: 'login-required',
     redirectUri:'http://localhost:8080/',
-    pkceMethod: 'S256',
-    checkLoginIframe: false,
+    pkceMethod: 'S256', 
+    checkLoginIframe: false, 
   })
   .then(() => {
     new Vue({
