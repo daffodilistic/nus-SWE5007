@@ -124,9 +124,10 @@
 
 <script>
 import axios from "axios";
-import { CREATE_GAME_METRIC_BASE_URL,UPDATE_GAME_METRIC_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL,CREATE_IDC_METRIC_BASE_URL,UPDATE_IDC_METRIC_BASE_URL} from '@/api';
+import { DELETE_IDC_METRIC_BASE_URL,CREATE_GAME_METRIC_BASE_URL,UPDATE_GAME_METRIC_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL,CREATE_IDC_METRIC_BASE_URL,UPDATE_IDC_METRIC_BASE_URL} from '@/api';
 import { competitionChoiceOptions,stageNameOptions } from "../dropdownOptions";
 import token from '/config'
+import Swal from 'sweetalert2';
 
 export default {
   head() {
@@ -346,10 +347,54 @@ export default {
         }
       },
       // Method to delete a metric
-      deleteMetric(index) {
-        if (confirm("Are you sure you want to delete this metric?")) {
-          this.filteredMetrics.splice(index, 1);
+      async deleteMetric(index) {
+        const metric = this.filteredMetrics[index];
+        const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        };
+
+        const confirmation = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'You won\'t be able to revert this!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (confirmation.isConfirmed) {
+          const requestBody = {
+            id: metric.id,
+          };
+
+        console.log('delete response', requestBody);
+        try {
+          if(this.selectedCompetition === "Game Arena") {
+                response = await axios.delete(`${DELETE_IDC_METRIC_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+               });
+              }else if (this.selectedCompetition === "Innovation Design Challenge") {
+                response = await axios.delete(`${DELETE_IDC_METRIC_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+              });
+           }
+
+          // Show a success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The user has been deleted.',
+            icon: 'success'
+          });
+
+          loadMetric()
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
+      }
       },
       // Method to add a new child row
       addChildRow(metricIndex) {

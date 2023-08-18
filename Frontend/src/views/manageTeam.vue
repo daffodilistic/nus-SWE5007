@@ -114,7 +114,7 @@
                 <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
               </td>
               <td v-if="!team.editing">
-                {{ team.teamName }}
+                {{ team.name }}
               </td>
               <td v-else>
                 <input type="text" v-model="team.editingTeamName" class="form-control editing-textbox" />
@@ -221,8 +221,9 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
-import { ADD_MEMBER_IDC_TEAM_BASE_URL,ADD_MEMBER_GAME_TEAM_BASE_URL,UPDATE_GAME_TEAM_BASE_URL,UPDATE_IDC_TEAM_BASE_URL,VIEW_GAME_TEAM_BASE_URL,VIEW_IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL } from '@/api';
+import { DELETE_IDC_TEAM_BASE_URL, ADD_MEMBER_IDC_TEAM_BASE_URL,ADD_MEMBER_GAME_TEAM_BASE_URL,UPDATE_GAME_TEAM_BASE_URL,UPDATE_IDC_TEAM_BASE_URL,VIEW_GAME_TEAM_BASE_URL,VIEW_IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL } from '@/api';
 import token from '/config'
+import Swal from 'sweetalert2';
 
 export default {
   head() {
@@ -519,10 +520,53 @@ export default {
         }
       },
       // Method to delete a team
-      deleteTeam(index) {
-        if (confirm("Are you sure you want to delete this team?")) {
-          this.filteredTeams.splice(index, 1);
+      async deleteTeam(index) {
+        const team = this.filteredTeams[index];
+        const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        };
+        const confirmation = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (confirmation.isConfirmed) {
+        const requestBody = {
+          id: team.id,
+        };
+
+        console.log('delete response', requestBody);
+        try {
+          if(this.selectedCompetition === "Game Arena") {
+                const response = await axios.delete(`${DELETE_IDC_TEAM_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+              });
+              }else if (this.selectedCompetition === "Innovation Design Challenge") {
+                const response = await axios.delete(`${DELETE_IDC_TEAM_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+           });
+           }
+
+          // Show a success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The user has been deleted.',
+            icon: 'success'
+          });
+
+          loadTeam()
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
+      }
       },
       // Method to add a new child row
       addChildRow(teamIndex) {

@@ -66,6 +66,7 @@
                 </div>
         </b-modal>
         <br><br>
+        <!--END OF MODAL-->
         <div class="search-container">
           <table>
             <tr>
@@ -73,6 +74,10 @@
               <td><input type="text" v-model="searchQuery" placeholder="Search group Name" class="search-box"></td>
             </tr>
           </table>
+        </div>
+         <div class="add-button">
+          <b-button variant="outline-primary" size="lg" @click="addNewGroup"><b-icon icon="file-earmark-plus" ></b-icon>
+          </b-button><br>
         </div>
         <div v-if="groups && groups.length > 0">
         <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
@@ -95,9 +100,9 @@
             </tr>
           </thead>
           <tbody v-for="(group, index) in paginatedTeams" :key="index">
-            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
+            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="group.editing ? null : toggleRow(index)">
               <td>
-                <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
+                <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon"></i>
               </td>
               <td v-if="!group.editing">
                 {{ group.groupName }}
@@ -125,7 +130,7 @@
                 <b-button
                 class="delete-button"
                 variant="outline-primary"
-                @click="deleteTeam(index)"
+                @click="deleteGroup(index)"
                 >
                   <b-icon icon="trash"></b-icon>
                 </b-button>
@@ -186,8 +191,10 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
-import { VIEW_GAME_GROUP_BASE_URL,VIEW_IDC_GROUP_BASE_URL,GET_ALL_IDC_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,ADD_TEAM_IDC_GROUP_BASE_URL} from '@/api';
+import { DELETE_IDC_GROUP_BASE_URL, CREATE_IDC_GROUP_BASE_URL,UPDATE_IDC_GROUP_BASE_URL,VIEW_GAME_GROUP_BASE_URL,VIEW_IDC_GROUP_BASE_URL,GET_ALL_IDC_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,ADD_TEAM_IDC_GROUP_BASE_URL} from '@/api';
 import token from '/config'
+import Swal from 'sweetalert2';
+
 
 export default {
   head() {
@@ -232,7 +239,7 @@ export default {
     totalRecordsModal() {
       return this.filteredModalTeamList.length;
     },
-    filteredTeams() {
+    filteredGroups() {
     // If the groups data is not available yet, return an empty array
     if (!this.groups || this.groups.length === 0) {
       return [];
@@ -257,12 +264,12 @@ export default {
       return QualificationOptions;
     },
     totalPages() {
-      return Math.ceil(this.filteredTeams.length / this.itemsPerPage);
+      return Math.ceil(this.filteredGroups.length / this.itemsPerPage);
     },
     paginatedTeams() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.filteredTeams.slice(startIndex, endIndex);
+      return this.filteredGroups.slice(startIndex, endIndex);
     },
     startIndex() {
       return (this.currentPage - 1) * this.itemsPerPage + 1;
@@ -272,7 +279,7 @@ export default {
       return endIndex > this.totalRecords ? this.totalRecords : endIndex;
     },
     totalRecords() {
-      return this.filteredTeams.length;
+      return this.filteredGroups.length;
     },
     filteredModalTeamList() {
       if (!this.teamList) {
@@ -325,6 +332,73 @@ export default {
     }
   },
   methods: {
+    async editGroup(index) {
+        const group = this.filteredGroups[index];
+        if (group.editing) {
+          console.log(group.editing)
+          // Save the changes
+          group.groupName = group.editingGroupName;
+
+          group.editing = false;
+
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          };
+          try {
+          let url = '';
+          let url2 = '';
+            if (this.selectedCompetition === "Game Arena") {
+              url = UPDATE_GAME_METRIC_BASE_URL;
+              url2 = CREATE_GAME_METRIC_BASE_URL;
+            } else if (this.selectedCompetition === "Innovation Design Challenge") {
+             url = UPDATE_IDC_GROUP_BASE_URL;
+             url2 = CREATE_IDC_GROUP_BASE_URL;
+            }
+            if (group.id) {
+              const requestBody = {
+                groupName: group.groupName,
+              };
+              // If the group has an ID, update the existing record using a PUT request
+              const response = await axios.post(`${url}`, requestBody, { headers });
+              console.log('Response from server (update):', response.data);
+            } else {
+              const requestBody = {
+                groupName: group.groupName,
+              };
+              // If the group doesn't have an ID, create a new record using a POST request
+              const response = await axios.post(`${url2}`, requestBody, { headers });
+              console.log('Response from server (create):', requestBody , response.data);
+
+              // Add the newly created group to the beginning of the groups array
+              this.groups.unshift(response.data.data);
+              url ='';
+            }
+            //this.loadGroup();
+            // Optional: Perform any additional actions, such as updating the UI.
+          } catch (error) {
+            // Handle errors, if any
+            console.error('Error saving group:', error);
+          }
+        } else {
+          // Enter editing mode
+          group.editingGroupName = group.groupName;
+          group.editing = true;
+        }
+      },
+    async addNewGroup() {
+      // Create a new group object and add it to the beginning of the groups array
+      const newGroup = {
+        groupName: "",
+        editing: true, // Set editing to true to enable editing mode for the new group
+        editingGroupName: "",
+      };
+
+      this.groups.unshift(newGroup);
+
+      // Update the currentPage to 1 to ensure the newly added group appears on the first page
+      this.currentPage = 1;
+    },
     async loadGroup() {
       const headers = {
         'Content-Type': 'application/json',
@@ -377,7 +451,7 @@ export default {
       this.activeRow = null; // Collapse the row if it's already expanded
     } else {
       this.activeRow = index;
-      const group = this.filteredTeams[index];
+      const group = this.filteredGroups[index];
       const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -417,59 +491,58 @@ export default {
           this.currentPage = page;
         }
       },
-      // Method to toggle editing mode for a group
-      async editGroup(index) {
-        const group = this.filteredTeams[index];
-        if (group.editing) {
-          // Save the changes
-          group.groupName = group.editingGroupName;
-          group.judgeName = group.editingJudgeName;
-          group.editing = false;
 
-          let response;
-          const requestBody = {
-            id: group.id,
-            groupName : group.groupName,
-          };
+      async deleteGroup(index) {
+        const group = this.filteredGroups[index];
+        const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        };
+        const confirmation = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      });
 
-          const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          };
-          try {
-             if(this.selectedCompetition === "Game Arena") {
-                response = await axios.put(`${UPDATE_GAME_GROUP_BASE_URL}`, requestBody, { headers });
+      if (confirmation.isConfirmed) {
+        const requestBody = {
+          id: group.id,
+        };
+
+        console.log('delete response', requestBody);
+        try {
+          if(this.selectedCompetition === "Game Arena") {
+                const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+              });
               }else if (this.selectedCompetition === "Innovation Design Challenge") {
-                response = await axios.put(`${UPDATE_IDC_GROUP_BASE_URL}`, requestBody, { headers });
-              }
+                const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
+                data: requestBody,
+                headers: headers
+           });
+           }
 
-            // Handle the response, if needed
-            console.log('Response from server:', response.data);
+          // Show a success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The user has been deleted.',
+            icon: 'success'
+          });
 
-            // Close the modal after the request is successful
-            this.showAddTeamModal = false;
-
-            // Optional: Perform any additional actions, such as updating the UI.
-          } catch (error) {
-            // Handle errors, if any
-            console.error('Error adding members to group:', error);
-          }
-        } else {
-          // Enter editing mode
-          group.editingGroupName = group.groupName;
-          group.editingJudgeName = group.judgeName;
-          group.editing = true;
+          loadTeam()
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
-      },
-      // Method to delete a group
-      deleteTeam(index) {
-        if (confirm("Are you sure you want to delete this group?")) {
-          this.filteredTeams.splice(index, 1);
-        }
+      }
       },
       // Method to add a new child row
       addChildRow(teamIndex) {
-        const group = this.filteredTeams[teamIndex];
+        const group = this.filteredGroups[teamIndex];
         group.idcTeamResponses.push({ ...this.newChildRow });
         // Set the initial country and state values for the new child row
         const newUserIndex = group.idcTeamResponses.length - 1;
@@ -717,5 +790,19 @@ input.form-control.editing-textbox {
   margin-left: 5px; /* Add some spacing between the text and the icon */
   color: #555; /* Set the color of the icon */
 }
+
+/* Style the button icon */
+.add-button b-icon {
+  font-size: 20px;
+  margin-right: 5px; /* Add some space between the icon and the button */
+}
+
+.add-button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-right: 27px;
+}
+
 
 </style>

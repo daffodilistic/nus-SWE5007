@@ -16,9 +16,12 @@
 <script>
 import EditableTable from "@/components/UserEditableTable.vue";
 import axios from "axios";
-import { GET_ALL_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL} from '@/api';
+import { DELETE_USER_INFO_BASE_URL,GET_ALL_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL,GET_ALL_GAMES_BASE_URL} from '@/api';
 import { competitionChoiceOptions } from "../dropdownOptions";
 import token from '/config'
+import Vue from 'vue'
+import Swal from 'sweetalert2';
+
 export default {
   components: {
     EditableTable,
@@ -74,7 +77,8 @@ export default {
           this.usersData = await axios.get("http://localhost:3000/data", { headers });
         console.log('ga called')
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+          //this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`);
           console.log('IDC called')
         }
         this.users = this.usersData.data.data;
@@ -117,12 +121,43 @@ export default {
       this.selectedUser = user;
     },
     async handleRemoveUser(user) {
-      if (user.length > 0) {
-        await user.map(async (item) => {
-          await deleteUser(item.id);
-        })
-      } else {
-        await deleteUser(user.id);
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      const confirmation = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (confirmation.isConfirmed) {
+        const requestBody = {
+          id: user.id,
+        };
+
+        console.log('delete response', requestBody);
+        try {
+            const response = await axios.delete(`${DELETE_USER_INFO_BASE_URL}`, {
+          data: requestBody,
+          headers: headers
+        });
+
+          // Show a success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The user has been deleted.',
+            icon: 'success'
+          });
+
+          loadUsers()
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       }
     },
     removeExtraProperty() {
