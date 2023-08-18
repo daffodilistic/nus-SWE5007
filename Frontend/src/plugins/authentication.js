@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Keycloak from 'keycloak-js'
 
 const options= {
-    url: 'http://35.247.139.32:8080',
+    url: 'https://keycloak.ric-robotics.xyz',
     realm: 'ricsg',
     clientId: 'ricsg-app',
   };
