@@ -23,6 +23,7 @@ public class UserRequests {
     private String phoneNumber;
     private String schoolName;
     private Integer yearsOfExp;
+    private String userName; // for keycloak use only
 
     public static UserRequests toUserRequests(UserJpaEntities u) {
         return UserRequests.builder()
