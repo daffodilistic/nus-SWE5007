@@ -102,6 +102,7 @@
           <thead>
             <tr>
               <th></th>
+              <th>S/No</th>
               <th>Team Name</th>
               <th>Age Group</th>
               <th>Teacher Name</th>
@@ -113,8 +114,9 @@
               <td>
                 <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
               </td>
+              <td>{{ startIndex + index }}</td>
               <td v-if="!team.editing">
-                {{ team.name }}
+                {{ team.teamName }}
               </td>
               <td v-else>
                 <input type="text" v-model="team.editingTeamName" class="form-control editing-textbox" />
@@ -140,7 +142,7 @@
                   <b-icon icon="person-plus" ></b-icon>
                 </b-button>
                 <!-- Edit Icon -->
-                <b-button @click="editTeam(index)" variant="outline-primary" class="delete-button">
+                <b-button @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
                   <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
@@ -148,7 +150,7 @@
                 <b-button
                 class="delete-button"
                 variant="outline-primary"
-                @click="deleteTeam(index)"
+                @click="deleteTeam(startIndex + index-1 )"
                 >
                   <b-icon icon="trash"></b-icon>
                 </b-button>
@@ -303,9 +305,9 @@ export default {
       return Math.ceil(this.filteredTeams.length / this.itemsPerPage);
     },
     paginatedTeams() {
-      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      return this.filteredTeams.slice(startIndex, endIndex);
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage + 1;
+      const endIndex = Math.min(startIndex + this.itemsPerPage - 1, this.totalRecords);
+      return this.filteredTeams.slice(startIndex - 1, endIndex); // Adjust indices to 0-based
     },
     startIndex() {
       return (this.currentPage - 1) * this.itemsPerPage + 1;
@@ -540,19 +542,29 @@ export default {
         const requestBody = {
           id: team.id,
         };
+        const requestBody2 = {
+          id: team.id,
+          teamName: team.teamName,
+          userIds:[]
+        };
 
         console.log('delete response', requestBody);
+
         try {
           if(this.selectedCompetition === "Game Arena") {
+                const response2 = await axios.put(`${ADD_MEMBER_IDC_TEAM_BASE_URL}`, requestBody2, { headers });
                 const response = await axios.delete(`${DELETE_IDC_TEAM_BASE_URL}`, {
                 data: requestBody,
                 headers: headers
               });
+
               }else if (this.selectedCompetition === "Innovation Design Challenge") {
+                const response2 = await axios.put(`${ADD_MEMBER_IDC_TEAM_BASE_URL}`, requestBody2, { headers });
                 const response = await axios.delete(`${DELETE_IDC_TEAM_BASE_URL}`, {
                 data: requestBody,
                 headers: headers
            });
+
            }
 
           // Show a success message
@@ -562,7 +574,7 @@ export default {
             icon: 'success'
           });
 
-          loadTeam()
+          this.loadTeam()
         } catch (error) {
           console.error("Error fetching data:", error);
         }
