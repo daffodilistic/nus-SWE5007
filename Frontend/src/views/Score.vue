@@ -69,7 +69,7 @@
             </td>
           <td>
                 <!-- Edit Icon -->
-                <b-button @click="editTeam(index)" variant="outline-primary" class="delete-button">
+                <b-button @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
                   <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
@@ -77,7 +77,7 @@
                 <b-button
                 class="delete-button"
                 variant="outline-primary"
-                @click="deleteTeam(index)"
+                @click="deleteTeam(startIndex + index -1)"
                 >
                   <b-icon icon="trash"></b-icon>
                 </b-button>
