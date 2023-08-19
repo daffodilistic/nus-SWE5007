@@ -13,6 +13,7 @@ import java.util.UUID;
 public class PresentationRequests {
 
     private UUID id;
+    private String stage;
     private Integer score;
     private String venue;
     private Instant dateTime;

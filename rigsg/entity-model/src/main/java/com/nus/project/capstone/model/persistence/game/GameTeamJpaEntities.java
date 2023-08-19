@@ -24,7 +24,6 @@ public class GameTeamJpaEntities {
     @Column(nullable = false, name = "game_team_id")
     private UUID id;
     private String teamName;
-    private String competitionChoice;
     private String ageGroup;
     private Integer qualificationRoundScore;
     private Integer qualificationRoundPoint;
@@ -44,7 +43,6 @@ public class GameTeamJpaEntities {
         return GameTeamJpaEntities.builder()
                 .id(g.getId() == null ? UUID.randomUUID() : g.getId())
                 .teamName(g.getTeamName())
-                .competitionChoice(g.getCompetitionChoice())
                 .ageGroup(g.getAgeGroup())
                 .qualificationRoundScore(g.getQualificationRoundScore())
                 .qualificationRoundPoint(g.getQualificationRoundPoint())
@@ -57,8 +55,6 @@ public class GameTeamJpaEntities {
         return GameTeamJpaEntities.builder()
                 .id(u.getId())
                 .teamName(u.getTeamName() == null ? this.getTeamName() : u.getTeamName())
-                .competitionChoice(u.getCompetitionChoice() == null ? this.getCompetitionChoice()
-                        : u.getCompetitionChoice())
                 .ageGroup(u.getAgeGroup() == null ? this.getAgeGroup() : u.getAgeGroup())
                 .qualificationRoundScore(u.getQualificationRoundScore() == null ? this.getQualificationRoundScore()
                         : u.getQualificationRoundScore())

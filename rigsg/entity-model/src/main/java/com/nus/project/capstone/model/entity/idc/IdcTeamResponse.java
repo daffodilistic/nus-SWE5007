@@ -9,6 +9,7 @@ import lombok.Data;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -26,6 +27,7 @@ public class IdcTeamResponse {
     private UUID teacherId;
     private Set<UUID> userIds;
     private List<UserResponse> userResponses;
+    private List<PresentationResponse> presentationResponses;
 
     public static IdcTeamResponse toIdcTeamResponse(IdcTeamJpaEntities i) {
         return IdcTeamResponse.builder()
@@ -37,6 +39,8 @@ public class IdcTeamResponse {
                 .isQualifiedFinal(i.getIsQualifiedFinal())
                 .isQualifiedFinalSecondStage(i.getIsQualifiedFinalSecondStage())
                 .teacherId(i.getTeacherId())
+                .presentationResponses(i.getPresentations().stream()
+                        .map(PresentationResponse::toPresentationResponse).collect(Collectors.toList()))
                 .build();
     }
 }
