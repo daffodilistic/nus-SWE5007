@@ -32,6 +32,7 @@
       <thead>
         <tr>
           <th></th>
+          <th>S/No</th>
           <th>Stage Name</th>
           <th>Metric Name</th>
           <th>Metric Weight</th>
@@ -43,6 +44,7 @@
           <td>
 
           </td>
+          <td>{{ startIndex + index }}</td>
           <td v-if="!metric.editing">
             {{ metric.stageName }}
           </td>
@@ -84,7 +86,7 @@
 
           <td>
             <!-- Edit Icon -->
-            <b-button @click="editMetric(index)" variant="outline-primary" class="delete-button">
+            <b-button @click="editMetric(startIndex + index -1)" variant="outline-primary" class="delete-button">
               <span v-if="!metric.editing"><b-icon icon="pencil"></b-icon></span>
               <span v-else><b-icon icon="save"></b-icon></span>
             </b-button>
@@ -92,7 +94,7 @@
             <b-button
             class="delete-button"
             variant="outline-primary"
-            @click="deleteMetric(index)"
+            @click="deleteMetric(startIndex + index -1)"
             >
               <b-icon icon="trash"></b-icon>
             </b-button>
