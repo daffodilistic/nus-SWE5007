@@ -14,7 +14,6 @@ public class GameTeamRequests {
 
     private UUID id;
     private String teamName;
-    private String competitionChoice;
     private String ageGroup;
     private Integer qualificationRoundScore;
     private Integer qualificationRoundPoint;

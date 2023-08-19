@@ -5,6 +5,7 @@ import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,6 +24,8 @@ public class IdcTeamRequests {
     private Boolean isQualifiedFinalSecondStage;
     private UUID teacherId;
     private Set<UUID> userIds;
+    private List<PresentationRequests> presentationRequestsList;
+
     public static IdcTeamRequests toIdcTeamRequests(IdcTeamJpaEntities i) {
         return IdcTeamRequests.builder()
                 .id(i.getId())
