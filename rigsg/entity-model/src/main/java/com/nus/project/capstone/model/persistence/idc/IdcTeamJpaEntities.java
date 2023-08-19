@@ -35,6 +35,9 @@ public class IdcTeamJpaEntities {
     @JoinColumn(name = "idc_group_id", referencedColumnName = "idc_group_id")
     private IdcGroupJpaEntities idcGroup;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "idcTeam")
+    private List<PresentationJpaEntities> presentations;
+
     public void addToUsers(UserJpaEntities user) {
         user.setIdcTeam(this);
         users.add(user);
