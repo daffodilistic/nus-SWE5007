@@ -9,6 +9,10 @@ spring:
       credentials:
         location: classpath:sapient-symbol-388402-63f104db32e1.json
       project-id: sapient-symbol-388402
+      bucket:
+        credential: sapient-symbol-388402-c394d7904e67.json
+        id: idc-resources
+        dirName: participants
   datasource:
     username: dev-ric-app-user
     password: password
