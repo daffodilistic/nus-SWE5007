@@ -1,0 +1,32 @@
+name: Deploy Backend to Production
+on:
+  push:
+    tags:
+      - v0.*
+      - v1.*
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        services: [ game-system, idc-system, info-collection-system, user-profile-management ]
+    continue-on-error: true
+    permissions:
+      contents: "read"
+      id-token: "write"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout
+        uses: "actions/checkout@v3"
+
+      - name: Build and Deploy Spring Boot application
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "17"
+      - run: |
+          cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/resources
+          rm application.yml
+          mv application_docker.yml application.yml
+          cd ${{ github.workspace }}/rigsg
+          ./mvnw --projects info-collection-system --also-make clean package spring-boot:repackage appengine:deploy -D server.port=8080 -D skipTests=true -D app.deploy.projectId=sapient-symbol-388402 -D app.deploy.version=${{  github.ref_name }}
