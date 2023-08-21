@@ -272,8 +272,8 @@
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
 import { DELETE_IDC_TEAM_BASE_URL, ADD_MEMBER_IDC_TEAM_BASE_URL,ADD_MEMBER_GAME_TEAM_BASE_URL,UPDATE_GAME_TEAM_BASE_URL,UPDATE_IDC_TEAM_BASE_URL,VIEW_GAME_TEAM_BASE_URL,VIEW_IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL } from '@/api';
-import token from '/config'
 import Swal from 'sweetalert2';
+import Vue from 'vue'
 
 export default {
   head() {
@@ -409,7 +409,7 @@ export default {
   async mounted() {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
@@ -434,7 +434,7 @@ export default {
     async loadTeam() {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
           if (this.selectedCompetition === "Game Arena") {
@@ -453,7 +453,7 @@ export default {
     async fetchUsers(teamId,teamName) {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
         const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
@@ -469,7 +469,7 @@ export default {
     async viewScore(teamId) {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       const requestBody = {
         id: teamId,
@@ -500,7 +500,7 @@ export default {
       const team = this.filteredTeams[index];
       const headers = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
       try {
         // Make the API call here using the team ID as the request body
@@ -572,7 +572,7 @@ export default {
 
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Vue.$keycloak.token}`
           };
           try {
              if(this.selectedCompetition === "Game Arena") {
@@ -607,7 +607,7 @@ export default {
         const team = this.filteredTeams[index];
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
         const confirmation = await Swal.fire({
         title: 'Are you sure?',
@@ -691,7 +691,7 @@ export default {
     console.log('Request Payload:', requestBody);
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       // Make the HTTP POST request to the API endpoint

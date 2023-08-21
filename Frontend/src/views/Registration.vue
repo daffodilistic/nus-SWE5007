@@ -70,7 +70,6 @@ Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
 import axios from "axios";
 import {ADD_MEMBER_GAME_TEAM_BASE_URL,ADD_MEMBER_IDC_TEAM_BASE_URL,CREATE_IDC_TEAM_BASE_URL,CREATE_GAME_TEAM_BASE_URL,CREATE_USER_INFO_BASE_URL} from '@/api';
-import token from '/config'
 
 export default {
 
@@ -137,7 +136,7 @@ export default {
     const userIDs = [];
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     // Create new user for each user in the users array
     for (const user of this.users) {

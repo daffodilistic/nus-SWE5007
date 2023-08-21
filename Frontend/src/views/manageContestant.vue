@@ -197,8 +197,8 @@
 import axios from "axios";
 import { GET_ALL_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL,DELETE_USER_INFO_BASE_URL} from '@/api';
 import { competitionChoiceOptions,countriesOptions,statesOptions } from "../dropdownOptions";
-import token from '/config'
 import Swal from 'sweetalert2';
+import Vue from 'vue'
 
 export default {
   head() {
@@ -297,7 +297,7 @@ export default {
   async mounted() {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
@@ -320,7 +320,7 @@ export default {
      async loadUser() {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
@@ -410,7 +410,7 @@ export default {
 
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Vue.$keycloak.token}`
           };
           try {
           let url = '';
@@ -427,7 +427,7 @@ export default {
               const requestBody = {
                 id: user.id,
                 firstName: user.firstName,
-                lastName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 country: selectedCountryName,
@@ -485,7 +485,7 @@ export default {
         const user = this.filteredUsers[index];
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
 
         const confirmation = await Swal.fire({
