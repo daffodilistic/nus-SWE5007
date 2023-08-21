@@ -2,7 +2,7 @@
   <b-tabs >
     <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadTeam()">
       <div>
-        <!-- Add Member Modal -->
+        <!-- Add Member Modal START-->
         <b-modal
           v-model="showAddMemberModal"
           modal-class="custom-modal"
@@ -78,6 +78,50 @@
                   <button @click="addMembersToTeam" class="add-member-button">Save</button>
                 </div>
         </b-modal>
+        <!-- Add Member Modal END-->
+
+         <!-- show history Modal START-->
+        <b-modal
+          v-model="showHistoryModal"
+          modal-class="custom-modal"
+          title="Competition Score"
+          hide-footer
+        >
+            <!-- List of users to be displayed inside the modal -->
+            <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th>S/No</th>
+                      <th>Stage</th>
+                      <th>Venue</th>
+                      <th>Score</th>
+                      <th>Date / Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="presentationList.length === 0">
+                      <tr>
+                        <td colspan="5"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                      <tr v-for="(presentation, presentationIndex) in presentationList" :key="presentation.id">
+
+                        <td>{{ presentationIndex + 1 }}</td>
+                        <td>{{ presentation.stage }}</td>
+                        <td>{{ presentation.venue }}</td>
+                        <td>{{ presentation.score }} / 100</td>
+                        <td>{{ formatDateTime(presentation.dateTime) }}</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+
+                  </tbody>
+                </table>
+
+        </b-modal>
+        <!-- show history Modal END-->
         <br><br>
         <div class="search-container">
           <table>
@@ -140,6 +184,10 @@
               <td>
                 <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" >
                   <b-icon icon="person-plus" ></b-icon>
+                </b-button>
+                <!-- View Icon -->
+                <b-button @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
+                  <b-icon icon="eye"></b-icon>
                 </b-button>
                 <!-- Edit Icon -->
                 <b-button @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
@@ -258,7 +306,9 @@ export default {
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       showAddMemberModal: false,
+      showHistoryModal: false,
       userList: [],
+      presentationList: [],
       teamMembers:[],
       newChildRow: {
         firstName: "",
@@ -370,6 +420,17 @@ export default {
     }
   },
   methods: {
+    formatDateTime(dateTime) {
+      const date = new Date(dateTime);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  },
     async loadTeam() {
       const headers = {
         'Content-Type': 'application/json',
@@ -400,6 +461,26 @@ export default {
         this.userList = response.data.data;
         this.currentTeamName = teamName;
         this.showAddMemberModal = true; // Show the modal after fetching the users
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    async viewScore(teamId) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      const requestBody = {
+        id: teamId,
+      };
+      try {
+        const response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+        const teamObject = response.data.data
+        this.presentationList = teamObject.presentationResponses
+        console.log("data:", this.presentationList);
+
+        this.showHistoryModal = true; // Show the modal after fetching the users
       }
       catch (error) {
         console.error("Error fetching users:", error);
@@ -580,16 +661,7 @@ export default {
         }
       }
       },
-      // Method to add a new child row
-      addChildRow(teamIndex) {
-        const team = this.filteredTeams[teamIndex];
-        team.userResponses.push({ ...this.newChildRow });
-        // Set the initial country and state values for the new child row
-        const newUserIndex = team.userResponses.length - 1;
-        const newUser = team.userResponses[newUserIndex];
-        newUser.country = null;
-        newUser.statesOptions = [];
-      },
+
       toggleUserSelection(userId) {
       if (this.selectedUsers.includes(userId)) {
         this.selectedUsers = this.selectedUsers.filter((selectedUserId) => selectedUserId !== userId);
