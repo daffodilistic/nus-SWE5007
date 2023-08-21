@@ -312,12 +312,13 @@ export default {
             }
             if (metric.id) {
               const requestBody = {
+                id:metric.id,
                 stageName: metric.stageName,
                 metricName: metric.metricName,
                 metricWeight: metric.metricWeight
               };
               // If the metric has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${url}`, requestBody, { headers });
+              const response = await axios.put(`${url}`, requestBody, { headers });
               console.log('Response from server (update):', response.data);
             } else {
               const requestBody = {
