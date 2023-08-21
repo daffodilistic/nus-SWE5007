@@ -10,8 +10,8 @@ spring:
       platform: postgres
   datasource:
     url: jdbc:postgresql://10.41.160.3:5432/ric-database
-    username: dev-ric-app-user
-    password: password
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
     driverClassName: org.postgresql.Driver
     hikari:
       minimum-idle: 5
@@ -19,7 +19,7 @@ spring:
     hibernate:
       ddl-auto: update
 # For enabling/disabling keycloak integration
-  secured: false
+  secured: true
 
 keycloak:
   auth-server-url: https://keycloak.ric-robotics.xyz
