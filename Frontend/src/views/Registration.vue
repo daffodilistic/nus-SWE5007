@@ -85,6 +85,7 @@ export default {
       data:[],
       country: null,
       fields: [
+        { key: "userName", label: "User Name", type: "text", required: true },
         { key: "firstName", label: "First Name", type: "text", required: true },
         { key: "lastName", label: "Last Name", type: "text", required: true },
         { key: "email", label: "Email", type: "email", required: true, pattern: ".+@bootstrapvue\\.com" },
@@ -141,6 +142,7 @@ export default {
     // Create new user for each user in the users array
     for (const user of this.users) {
       const userData = {
+        userName: user.userName,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
