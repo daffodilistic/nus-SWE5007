@@ -1,5 +1,6 @@
 package com.nus.project.capstone.idc.web;
 
+import com.nus.project.capstone.idc.service.GCPFileUploadService;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
@@ -30,13 +31,16 @@ public class IdcTeamController {
     private final IdcTeamRepository idcTeamRepository;
     private final UserRepository userRepository;
     private final PresentationRepository presentationRepository;
+    private final GCPFileUploadService fileUploadService;
 
     @Autowired
     public IdcTeamController(IdcTeamRepository idcTeamRepository, UserRepository userRepository,
-                             PresentationRepository presentationRepository) {
+                             PresentationRepository presentationRepository,
+                             GCPFileUploadService fileUploadService) {
         this.idcTeamRepository = idcTeamRepository;
         this.userRepository = userRepository;
         this.presentationRepository = presentationRepository;
+        this.fileUploadService = fileUploadService;
     }
 
     @PostMapping("/create-team")
