@@ -27,8 +27,10 @@ public class GCPFileUploadService {
 
     private static final Logger logger = LogManager.getLogger(GCPFileUploadService.class);
     private static final String PRIM = "Preliminary";
+    public static final String PRIM_FILE_SUFFIX = ".pdf";
     private static final String PROMO = "Promotional";
-    private String gcpDirectoryName;
+    public static final String PROMO_FILE_SUFFIX = ".mp4";
+    private final String gcpDirectoryName;
     private Bucket bucket;
 
     @Autowired
@@ -78,18 +80,18 @@ public class GCPFileUploadService {
                                             String round) throws Exception {
         String fileName = gcpDirectoryName + "/" + teamName + "-" + round + "-" + System.currentTimeMillis();
         if (round.equals(PRIM)){
-            return fileName + ".pdf";
+            return fileName + PRIM_FILE_SUFFIX;
         } else if (round.equals(PROMO)){
-            return fileName + ".mp4";
+            return fileName + PROMO_FILE_SUFFIX;
         } else {
             throw new Exception("Unknown round: " + round);
         }
     }
 
     private String getRound(String uploadFilePath) throws Exception {
-        if (uploadFilePath.contains(".pdf")){
+        if (uploadFilePath.contains(PRIM_FILE_SUFFIX)){
             return PRIM;
-        } else if (uploadFilePath.contains(".mp4")){
+        } else if (uploadFilePath.contains(PROMO_FILE_SUFFIX)){
             return PROMO;
         } else {
             throw new Exception("Invalid file type uploaded! " +

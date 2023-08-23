@@ -3,6 +3,7 @@ package com.nus.project.capstone.idc.web;
 import com.nus.project.capstone.idc.service.GCPFileUploadService;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserResponse;
+import com.nus.project.capstone.model.entity.idc.FileUploadRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nus.project.capstone.idc.service.GCPFileUploadService.PRIM_FILE_SUFFIX;
+import static com.nus.project.capstone.idc.service.GCPFileUploadService.PROMO_FILE_SUFFIX;
 import static com.nus.project.capstone.idc.web.Tools.genericFailureMessage;
 
 @Slf4j
@@ -159,4 +162,37 @@ public class IdcTeamController {
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(String.format("Delete success for %s", idcTeamRequests.getId())).build());
     }
+
+    @PostMapping("/upload-prim-file")
+    public ResponseEntity<GeneralMessageEntity> uploadPrimFile(@RequestBody FileUploadRequests fileUploadRequests) {
+        if (fileUploadRequests.getLocalFilePath().substring(fileUploadRequests.getLocalFilePath().length() - 4).equals(PRIM_FILE_SUFFIX)){
+            var teamId = idcTeamRepository.findById(fileUploadRequests.getIdcTeamId());
+            if(teamId.isEmpty()){
+                return ResponseEntity.ok(GeneralMessageEntity.builder()
+                        .data(String.format("Team ID %s cannot be found", fileUploadRequests.getIdcTeamId())).build());
+            } else {
+                return fileUploadService.uploadFileToGCP(fileUploadRequests.getLocalFilePath(), teamId.get().getTeamName());
+            }
+        } else {
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data("Invalid file! must end with .pdf").build());
+        }
+    }
+
+    @PostMapping("/upload-promo-file")
+    public ResponseEntity<GeneralMessageEntity> uploadPromoFile(@RequestBody FileUploadRequests fileUploadRequests) {
+        if (fileUploadRequests.getLocalFilePath().substring(fileUploadRequests.getLocalFilePath().length() - 4).equals(PROMO_FILE_SUFFIX)){
+            var teamId = idcTeamRepository.findById(fileUploadRequests.getIdcTeamId());
+            if(teamId.isEmpty()){
+                return ResponseEntity.ok(GeneralMessageEntity.builder()
+                        .data(String.format("Team ID %s cannot be found", fileUploadRequests.getIdcTeamId())).build());
+            } else {
+                return fileUploadService.uploadFileToGCP(fileUploadRequests.getLocalFilePath(), teamId.get().getTeamName());
+            }
+        } else {
+            return ResponseEntity.ok(GeneralMessageEntity.builder()
+                    .data("Invalid file! must end with .mp4").build());
+        }
+    }
+
 }
