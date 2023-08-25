@@ -49,7 +49,7 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                     .and()
                     .csrf().disable()
                     .authorizeRequests()
-                    .antMatchers("/**/view**").hasAnyRole("participant", "judge")
+                    .antMatchers("/**/view**", "/**/upload**").hasAnyRole("participant", "judge")
                     .antMatchers("/**/create**", "/**/update**", "/**/delete**").hasRole("admin")
                     .antMatchers("/idcteam/qualify**").hasRole("judge")
                     .antMatchers("/idcteam/assign-user").hasRole("admin")

@@ -128,9 +128,8 @@
 import axios from "axios";
 import { DELETE_IDC_METRIC_BASE_URL,CREATE_GAME_METRIC_BASE_URL,UPDATE_GAME_METRIC_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL,CREATE_IDC_METRIC_BASE_URL,UPDATE_IDC_METRIC_BASE_URL} from '@/api';
 import { competitionChoiceOptions,stageNameOptions } from "../dropdownOptions";
-import token from '/config'
 import Swal from 'sweetalert2';
-
+import Vue from 'vue'
 export default {
   head() {
     return {
@@ -224,7 +223,7 @@ export default {
   async mounted() {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
@@ -247,7 +246,7 @@ export default {
      async loadMetric() {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
@@ -299,7 +298,7 @@ export default {
 
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Vue.$keycloak.token}`
           };
           try {
           let url = '';
@@ -313,12 +312,13 @@ export default {
             }
             if (metric.id) {
               const requestBody = {
+                id:metric.id,
                 stageName: metric.stageName,
                 metricName: metric.metricName,
                 metricWeight: metric.metricWeight
               };
               // If the metric has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${url}`, requestBody, { headers });
+              const response = await axios.put(`${url}`, requestBody, { headers });
               console.log('Response from server (update):', response.data);
             } else {
               const requestBody = {
@@ -353,7 +353,7 @@ export default {
         const metric = this.filteredMetrics[index];
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
 
         const confirmation = await Swal.fire({

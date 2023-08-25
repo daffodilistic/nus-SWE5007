@@ -41,23 +41,25 @@
           <th>Team Name</th>
           <th>Age Group</th>
           <th>Teacher Name</th>
+          <th>Score</th>
           <th>Qualification Status</th>
         </tr>
       </thead>
-      <tbody v-for="(team, index) in paginatedTeamsByQualification" :key="index">
+
+      <tbody v-for="(team, index) in filteredTeamsByQualification" :key="index">
         <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
           <td>
             <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
           </td>
           <td>{{ team.teamName }}</td>
-          <td> {{ ageGroupTextMap[team.ageGroup] }} </td>
+          <td>{{ ageGroupTextMap[team.ageGroup] }} </td>
           <td>{{ team.teacherName }}</td>
+          <td>{{ team.presentationResponses }}</td>
           <td v-if="!team.editing">
             <p v-if="team.isQualifiedFinalSecondStage">Final 2nd Stage</p>
             <p v-else-if="team.isQualifiedFinal">Final 1st Stage</p>
-            <p v-else-if="team.isQualifiedPrelim">Preliminary Round</p>
             <p v-else-if="team.isQualifiedPromo">Promotional Round</p>
-            <p v-else>Not qualified</p>
+            <p v-else>Not Qualified</p>
           </td>
           <td v-else>
             <div class="form-group select">
@@ -73,14 +75,6 @@
                   <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
-                <!-- Delete Icon -->
-                <b-button
-                class="delete-button"
-                variant="outline-primary"
-                @click="deleteTeam(startIndex + index -1)"
-                >
-                  <b-icon icon="trash"></b-icon>
-                </b-button>
               </td>
         </tr>
     <!-- Child rows for metrics -->
@@ -92,10 +86,9 @@
                   <th></th>
                   <th>Metric Name</th>
                   <th>Metric Weightage</th>
-                  <th>Judge Score</th>
-                  <th>Judge By</th>
+                  <th>Score <br>(out of 100)</th>
+                  <th>Preview Score</th>
                   <th>Action</th>
-                  <th>Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -104,21 +97,24 @@
                   <td>{{ metric.metricName }}</td>
                   <td>{{ metric.metricWeight * 100 +"%" }}</td>
                   <td><input type="number" v-model="metric.enteredScore" class="form-control" :min="0"></td>
-                  <td>{{ }}</td>
-                  <td>
-                    <!-- Edit Icon -->
-                    <b-button @click="editMetric(index)" variant="outline-primary" class="delete-button">
-                      <span v-if="!metric.editing"><b-icon icon="pencil"></b-icon></span>
-                      <span v-else><b-icon icon="save"></b-icon></span>
+                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
+                      :rowspan="filteredMetricsForTeam(index).length"
+                      class="score-cell">
+                    <div class="score">{{  calculatedScore }}</div>
+                  </td>
+                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
+                      :rowspan="filteredMetricsForTeam(index).length">
+                    <b-button @click="previewScore(index)" variant="outline-primary" class="delete-button">
+                      <b-icon icon="calculator"></b-icon>
                     </b-button>
                   </td>
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
-                :rowspan="filteredMetricsForTeam(index).length"
-                class="score-cell">
-              <div class="score">80</div>
-            </td>
+                      :rowspan="filteredMetricsForTeam(index).length">
+                    <b-button @click="editMetric(index)" variant="outline-primary" class="delete-button">
+                      <b-icon icon="save"></b-icon>
+                    </b-button>
+                  </td>
                 </tr>
-
               </tbody>
             </table>
           </td>
@@ -148,9 +144,9 @@
 
 <script>
 import axios from "axios";
-import { QUALIFY_GAME_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL } from '@/api';
+import { CALCULATE_IDC_SCORE_BASE_URL,UPDATE_IDC_TEAM_BASE_URL, QUALIFY_GAME_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL } from '@/api';
 import { competitionChoiceOptions,qualificationOptions } from "../dropdownOptions";
-import token from '/config'
+import Vue from 'vue'
 
 export default {
   head() {
@@ -169,27 +165,21 @@ export default {
 
   data() {
     return {
+      calculatedScore: null,
       qualification: "",
       selectedCompetition: "Innovation Design Challenge",
       metricRequestBody: [],
       totalPages: 1,
       totalRecords: 0,
       selectedQualification: null,
-      currentTeamId: "",
-      currentTeamName: "",
-      selectedUsers: [],
       searchQuery: '',
       teams:[],
+      presentations:[],
       activeRow: null,
       itemsPerPage: 10, // Number of teams per page
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
-      userList: [],
       metrics: [],
-      newChildRow: {
-        firstName: "",
-        lastName: "",
-      },
     };
   },
   computed: {
@@ -233,7 +223,7 @@ export default {
         return this.filteredTeams;
       }
 
-      // Filter teams based on the selected qualification
+      /*Filter teams based on the selected qualification
       return this.filteredTeams.filter((team) => {
         let result = false;
         switch (this.selectedQualification) {
@@ -251,7 +241,7 @@ export default {
         }
 
         return result;
-      });
+      });*/
     },
 
     filteredTeams() {
@@ -291,19 +281,19 @@ export default {
   async mounted() {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
       const allTeams = this.teamsData.data.data;
 
       // Filter out teams that do not have any of the specified qualifications
-      this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
+      //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
+      this.teams = allTeams
+      this.presentations = teams.presentationResponses
       this.totalRecords = this.teams.length;
-      console.log(teams)
+      console.log("presentations"+ this.teams)
 
-      //this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`);
-      //this.metrics = this.metricData.data.data;
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -312,33 +302,27 @@ export default {
   methods: {
     async editTeam(index) {
         const team = this.filteredTeams[index];
+
         if (team.editing) {
           team.editing = false;
           /*
           'FTS', 'Final 2nd Stage'
           'FFS', 'Final 1st Stage'
-          'PRE', 'Preliminary Round'
           'PRO', 'Promotional Round'
           'DIQ', 'Not Qualified'
           */
           let qualifiedPromo = false;
-          let qualifiedPrelim = false;;
           let qualifiedFinal = false ;
           let qualifiedFinalSec = false ;
           let requestBody;
 
           if (this.qualification==='PRO'){
             qualifiedPromo = true;
-          }else if(this.qualification==='PRE'){
-            qualifiedPromo = true;
-            qualifiedPrelim = true;
           }else if(this.qualification==='FFS'){
             qualifiedPromo = true;
-            qualifiedPrelim = true;
             qualifiedFinal = true;
           }else if(this.qualification==='FTS'){
             qualifiedPromo = true;
-            qualifiedPrelim = true;
             qualifiedFinal = true;
             qualifiedFinalSec = true;
           }
@@ -348,7 +332,7 @@ export default {
 
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Vue.$keycloak.token}`
           };
 
           try {
@@ -381,7 +365,7 @@ export default {
     async loadTeam() {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
           if (this.selectedCompetition === "Game Arena") {
@@ -401,17 +385,15 @@ export default {
         }
     },
 
-    editMetric(index) {
-      // Your existing editMetric method implementation...
-
-      // After editing is done, call the new method to create the JSON request body
-      this.createMetricRequestBody();
-    },
-    createMetricRequestBody() {
-      // Clear the existing JSON request body
+    async editMetric(index) {
+       const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      };
 
       // Loop through each metric and add the required data to the array
       const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
+      const team = this.filteredTeams[index];
       const metricIdsArray = [];
       const metricScoreArray = [];
       for (const metric of metricsForTeam) {
@@ -424,10 +406,92 @@ export default {
         metricScores: metricScoreArray
       };
 
-      const requestBodyJson = JSON.stringify(this.metricRequestBody);
+      let stage = '';
+      if (team.isQualifiedFinalSecondStage){
+        stage = "Final 2nd Stage";
+      }else if(team.isQualifiedFinal){
+        stage = "Final 1st Stage";
+      }else if(team.isQualifiedPromo){
+        stage = "Promotional Round";
+      }
 
-      // Print the requestBodyJson in the console
-      console.log("RequestBody JSON:", requestBodyJson);
+      let CalScoreResponse = '';
+      let updateTeamURL='';
+      try {
+          if (this.selectedCompetition === "Game Arena") {
+            CalScoreResponse = await axios.post(`${GET_ALL_GAME_TEAM_BASE_URL}`,this.metricRequestBody, { headers });
+            updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
+          }else if (this.selectedCompetition === "Innovation Design Challenge") {
+            CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
+            updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
+          }
+          console.log(CalScoreResponse.data)
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+
+        const presentationArray = [];
+        const presentationObject = {
+          score: CalScoreResponse.data.data,
+          stage: stage,
+          venue: 'some venue'
+        };
+        presentationArray.push(presentationObject)
+        const updateTeamRequestBody = {
+          id: team.id,
+          presentationRequestsList: presentationArray
+        };
+        console.log(updateTeamRequestBody)
+        try {
+
+          const updateTeamResponse = await axios.put(`${updateTeamURL}`,updateTeamRequestBody, { headers });
+          console.log(updateTeamResponse.data)
+        } catch (error) {
+          console.error("Error updating team:", error);
+        }
+    },
+     async previewScore(index) {
+       const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      };
+
+      // Loop through each metric and add the required data to the array
+      const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
+      const team = this.filteredTeams[index];
+      const metricIdsArray = [];
+      const metricScoreArray = [];
+      for (const metric of metricsForTeam) {
+        metricIdsArray.push(metric.id);
+        metricScoreArray.push(metric.enteredScore)
+      }
+
+      this.metricRequestBody = {
+        metricIds: metricIdsArray,
+        metricScores: metricScoreArray
+      };
+
+      let stage = '';
+      if (team.isQualifiedFinalSecondStage){
+        stage = "Final 2nd Stage";
+      }else if(team.isQualifiedFinal){
+        stage = "Final 1st Stage";
+      }else if(team.isQualifiedPromo){
+        stage = "Promotional Round";
+      }
+
+      let CalScoreResponse = '';
+      try {
+          if (this.selectedCompetition === "Game Arena") {
+            CalScoreResponse = await axios.post(`${GET_ALL_GAME_TEAM_BASE_URL}`,this.metricRequestBody, { headers });
+          }else if (this.selectedCompetition === "Innovation Design Challenge") {
+            CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
+          }
+          this.calculatedScore = CalScoreResponse.data.data
+          console.log(calculatedScore)
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
     },
 
     updateSelectedQualification(qualification) {
@@ -449,7 +513,7 @@ export default {
     return this.metrics.filter((metric) => metric.stageName === qualification);
   },
 
-   async toggleRow(index) {
+  async toggleRow(index) {
   if (this.activeRow === index) {
     this.activeRow = null; // Collapse the row if it's already expanded
   } else {
@@ -457,7 +521,7 @@ export default {
     const team = this.filteredTeamsByQualification[index];
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       if (this.selectedCompetition === "Game Arena") {
@@ -477,13 +541,6 @@ export default {
         this.currentPage = page;
       }
     },
-
-      // Method to delete a metricData
-      deleteTeam(index) {
-        if (confirm("Are you sure you want to delete this metricData?")) {
-          this.filteredTeams.splice(index, 1);
-        }
-      },
   },
   watch: {
     // Watch for changes in the filteredTeamsByQualification computed property

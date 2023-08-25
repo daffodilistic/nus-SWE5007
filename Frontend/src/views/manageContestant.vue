@@ -33,6 +33,7 @@
         <tr>
           <th></th>
           <th>S/No</th>
+          <th>User Name</th>
           <th>First Name</th>
           <th>Last Name</th>
           <th>Email</th>
@@ -51,6 +52,16 @@
 
           </td>
           <td>{{ startIndex + index }}</td>
+          <td v-if="!user.editing">
+            {{ user.userName }}
+          </td>
+          <td v-else>
+            <input
+              type="text"
+              v-model="user.editingUserName"
+              class="form-control editing-textbox"
+            />
+          </td>
           <td v-if="!user.editing">
             {{ user.firstName }}
           </td>
@@ -197,8 +208,8 @@
 import axios from "axios";
 import { GET_ALL_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL,DELETE_USER_INFO_BASE_URL} from '@/api';
 import { competitionChoiceOptions,countriesOptions,statesOptions } from "../dropdownOptions";
-import token from '/config'
 import Swal from 'sweetalert2';
+import Vue from 'vue'
 
 export default {
   head() {
@@ -217,6 +228,7 @@ export default {
 
   data() {
     return {
+      userName:'',
       firstName:'',
       lastName:'',
       country:'',
@@ -297,7 +309,7 @@ export default {
   async mounted() {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
@@ -320,7 +332,7 @@ export default {
      async loadUser() {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
@@ -338,6 +350,7 @@ export default {
     async addNewUser() {
       // Create a new user object and add it to the beginning of the users array
       const newUser = {
+        userName: "",
         firstName: "",
         lastName: "",
         email: "",
@@ -348,6 +361,7 @@ export default {
         schoolName: "",
         yearsOfExp:0,
         editing: true, // Set editing to true to enable editing mode for the new user
+        editingUserName: "",
         editingFirstName: "",
         editingLastName: "",
         editingEmail: "",
@@ -396,6 +410,7 @@ export default {
         }
         if (user.editing) {
           // Save the changes
+          user.userName = user.editingUserName;
           user.firstName = user.editingFirstName;
           user.lastName = user.editingLastName;
           user.phoneNumber = user.editingPhoneNumber;
@@ -410,7 +425,7 @@ export default {
 
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Vue.$keycloak.token}`
           };
           try {
           let url = '';
@@ -426,8 +441,9 @@ export default {
             if (user.id) {
               const requestBody = {
                 id: user.id,
+                userName: user.userName,
                 firstName: user.firstName,
-                lastName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 country: selectedCountryName,
@@ -442,6 +458,7 @@ export default {
             // If the user doesn't have an ID, create a new record using a POST request
             else {
               const requestBody = {
+                userName: user.userName,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
@@ -468,6 +485,7 @@ export default {
           }
         } else {
           // Enter editing mode
+          user.editingUserName = user.userName;
           user.editingFirstName = user.firstName;
           user.editingLastName = user.lastName;
           user.editingPhoneNumber = user.phoneNumber;
@@ -485,7 +503,7 @@ export default {
         const user = this.filteredUsers[index];
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
 
         const confirmation = await Swal.fire({

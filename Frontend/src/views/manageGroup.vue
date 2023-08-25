@@ -94,6 +94,7 @@
           <thead>
             <tr>
               <th></th>
+               <th>S/No</th>
               <th>Group Name</th>
               <th>Judge</th>
               <th>Actions</th>
@@ -104,6 +105,7 @@
               <td>
                 <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon"></i>
               </td>
+              <td>{{ startIndex + index }}</td>
               <td v-if="!group.editing">
                 {{ group.groupName }}
               </td>
@@ -122,7 +124,7 @@
                   <b-icon icon="person-plus" ></b-icon>
                 </b-button>
                 <!-- Edit Icon -->
-                <b-button @click="editGroup(index)" variant="outline-primary" class="delete-button">
+                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button">
                   <span v-if="!group.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
@@ -130,7 +132,7 @@
                 <b-button
                 class="delete-button"
                 variant="outline-primary"
-                @click="deleteGroup(index)"
+                @click="deleteGroup(startIndex + index -1)"
                 >
                   <b-icon icon="trash"></b-icon>
                 </b-button>
@@ -192,9 +194,8 @@
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
 import { DELETE_IDC_GROUP_BASE_URL, CREATE_IDC_GROUP_BASE_URL,UPDATE_IDC_GROUP_BASE_URL,VIEW_GAME_GROUP_BASE_URL,VIEW_IDC_GROUP_BASE_URL,GET_ALL_IDC_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,ADD_TEAM_IDC_GROUP_BASE_URL} from '@/api';
-import token from '/config'
 import Swal from 'sweetalert2';
-
+import Vue from 'vue'
 
 export default {
   head() {
@@ -321,7 +322,7 @@ export default {
   async mounted() {
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, { headers });
@@ -343,7 +344,7 @@ export default {
 
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Vue.$keycloak.token}`
           };
           try {
           let url = '';
@@ -374,7 +375,7 @@ export default {
               this.groups.unshift(response.data.data);
               url ='';
             }
-            //this.loadGroup();
+            this.loadGroup();
             // Optional: Perform any additional actions, such as updating the UI.
           } catch (error) {
             // Handle errors, if any
@@ -402,7 +403,7 @@ export default {
     async loadGroup() {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
           if (this.selectedCompetition === "Game Arena") {
@@ -421,7 +422,7 @@ export default {
     async fetchTeams(groupId,groupName) {
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
     let response = '';
     try {
@@ -454,7 +455,7 @@ export default {
       const group = this.filteredGroups[index];
       const headers = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
       try {
         // Make the API call here using the group ID as the request body
@@ -496,7 +497,7 @@ export default {
         const group = this.filteredGroups[index];
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
         const confirmation = await Swal.fire({
         title: 'Are you sure?',
@@ -512,15 +513,21 @@ export default {
         const requestBody = {
           id: group.id,
         };
+        const requestBody2 = {
+          id: group.id,
+          teamIds:[]
+        };
 
         console.log('delete response', requestBody);
         try {
           if(this.selectedCompetition === "Game Arena") {
+                const response2 = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody2, { headers });
                 const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
                 data: requestBody,
                 headers: headers
               });
               }else if (this.selectedCompetition === "Innovation Design Challenge") {
+                const response2 = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody2, { headers });
                 const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
                 data: requestBody,
                 headers: headers
@@ -534,7 +541,7 @@ export default {
             icon: 'success'
           });
 
-          loadTeam()
+          this.loadGroup();
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -577,7 +584,7 @@ export default {
     console.log('Request Payload:', requestBody);
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       const response = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody, { headers });
