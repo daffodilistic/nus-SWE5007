@@ -29,7 +29,7 @@ jobs:
           rm application.yml
           mv application_docker.yml application.yml
           cd ${{ github.workspace }}/rigsg
-          APP_VERSION=$(${GITHUB_REF:10}--$(git rev-parse --short HEAD) | tr . -)
+          APP_VERSION=$(echo ${GITHUB_REF:10}--$(git rev-parse --short HEAD) | tr . -)
           echo "app_version=$APP_VERSION" >> $GITHUB_ENV
 
       - name: Build Spring Boot application and deploy to App Engine
