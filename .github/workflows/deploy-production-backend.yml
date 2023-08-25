@@ -34,4 +34,5 @@ jobs:
 
       - name: Build Spring Boot application and deploy to App Engine
         run: |
+          cd ${{ github.workspace }}/rigsg
           ./mvnw --projects info-collection-system --also-make clean package spring-boot:repackage appengine:deploy -D server.port=8080 -D skipTests=true -D app.deploy.projectId=sapient-symbol-388402 -D app.deploy.version=${{ env.app_version }}
