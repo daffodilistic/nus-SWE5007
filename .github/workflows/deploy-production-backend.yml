@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: "actions/checkout@v3"
 
-      - name: Build and Deploy Spring Boot application
+      - name: Setup build environment and settings
         uses: actions/setup-java@v3
         with:
           distribution: "temurin" # See 'Supported distributions' for available options
@@ -31,4 +31,7 @@ jobs:
           cd ${{ github.workspace }}/rigsg
           APP_VERSION=$(${GITHUB_REF:10}--$(git rev-parse --short HEAD) | tr . -)
           echo "app_version=$APP_VERSION" >> $GITHUB_ENV
+
+      - name: Build Spring Boot application and deploy to App Engine
+        run: |
           ./mvnw --projects info-collection-system --also-make clean package spring-boot:repackage appengine:deploy -D server.port=8080 -D skipTests=true -D app.deploy.projectId=sapient-symbol-388402 -D app.deploy.version=${{ env.app_version }}
