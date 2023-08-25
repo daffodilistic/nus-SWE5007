@@ -29,5 +29,6 @@ jobs:
           rm application.yml
           mv application_docker.yml application.yml
           cd ${{ github.workspace }}/rigsg
-          export APP_VERSION=$(${GITHUB_REF:10}--$(git rev-parse --short HEAD) | tr . -)
-          ./mvnw --projects info-collection-system --also-make clean package spring-boot:repackage appengine:deploy -D server.port=8080 -D skipTests=true -D app.deploy.projectId=sapient-symbol-388402 -D app.deploy.version=${APP_VERSION}
+          APP_VERSION=$(${GITHUB_REF:10}--$(git rev-parse --short HEAD) | tr . -)
+          echo "app_version=$APP_VERSION" >> $GITHUB_ENV
+          ./mvnw --projects info-collection-system --also-make clean package spring-boot:repackage appengine:deploy -D server.port=8080 -D skipTests=true -D app.deploy.projectId=sapient-symbol-388402 -D app.deploy.version=${{ env.app_version }}
