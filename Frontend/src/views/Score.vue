@@ -52,6 +52,9 @@
                   :class="{'green-score': response.score > 50, 'red-score': response.score <= 50}">
               {{ response.score }}
             </span>
+            <span v-else>
+              Not Scored
+            </span>
           </td>
           <td v-if="!team.editing">
             {{ getQualificationStatus(team) }}
