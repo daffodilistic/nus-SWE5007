@@ -16,6 +16,7 @@ export const ageGroupOptions = [
   export const qualificationOptions = [
     { value: 'FTS', text: 'Final 2nd Stage', competitionId:'1'},
     { value: 'FFS', text: 'Final 1st Stage', competitionId:'1'},
+    { value: 'PRE', text: 'Preliminary Round', competitionId:'1'},
     { value: 'PRO', text: 'Promotional Round', competitionId:'1'},
     { value: 'DIQ', text: 'Not Qualified', competitionId:'1'},
     { value: 'ELR', text: 'Elimination Round', competitionId:'2'},
@@ -29,6 +30,7 @@ export const ageGroupOptions = [
     { value: 'Promotional Round', text: 'Promotional Round', competitionId:'1'},
     { value: 'Qualification Round', text: 'Qualification Round', competitionId:'2'},
     { value: 'Eimination Round', text: 'Eimination Round', competitionId:'2'},
+    { value: 'Not Qualified', text: 'Not Qualified', competitionId:'1'},
   ];
 
   export const countriesOptions = [
