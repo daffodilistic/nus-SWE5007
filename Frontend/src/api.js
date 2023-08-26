@@ -48,7 +48,10 @@ export const CREATE_GAME_GROUP_BASE_URL = 'http://localhost:8082/gamegroup/creat
 export const ADD_TEAM_GAME_GROUP_BASE_URL = 'http://localhost:8082/gamegroup/assign-team'
 export const UPDATE_GAME_GROUP_BASE_URL = 'http://localhost:8082/gamegroup/update-group'
 
-
 //GAMES
 export const GET_ALL_GAMES_BASE_URL = 'http://localhost:8083/games/games'
+
+//UPLOAD
+export const UPLOAD_PRIM_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/upload-prim-file'
+export const UPLOAD_PROMO_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/upload-promo-file'
 
