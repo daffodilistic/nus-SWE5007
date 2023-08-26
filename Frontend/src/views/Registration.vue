@@ -65,7 +65,6 @@ import Vue from 'vue';
 import EditableTable from "@/components/RegisterEditableTable.vue";
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
-import { v4 as uuidv4 } from 'uuid'; // Import the uuidv4 function from the uuid library
 Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
 import axios from "axios";
@@ -112,10 +111,7 @@ export default {
   },
   methods: {
     async handleUpdateUser(user) {
-    if (!user.id) {
-      // Add UUID to new users
-      user.id = uuidv4();
-    }
+
     if (user.id) {
       await updateUser(user);
     } else {
@@ -180,7 +176,7 @@ export default {
       url2 =ADD_MEMBER_GAME_TEAM_BASE_URL
     }
     try {
-        //userResponses: this.users.map(user => ({ ...user, id: uuidv4() })),
+
         const createTeamResponse = await axios.post(`${url}`, teamData, { headers });
         console.log('Team registration successful:', createTeamResponse.data);
 
