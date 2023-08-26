@@ -195,10 +195,13 @@ export default {
     return ageGroupMap;
   },
     filteredTeamsByQualification() {
-
       if (!this.selectedQualification) {
-        // If no qualification is selected, return all teams
-        return this.filteredTeams;
+        // If no qualification is selected, return only not qualified teams.
+        return this.filteredTeams.filter((team) => {
+          let result = false;
+          result = !team.isQualifiedPromo;
+          return result;
+        });
       }
 
       //Filter teams based on the selected qualification
@@ -261,7 +264,7 @@ export default {
       const allTeams = this.teamsData.data.data;
 
       // Filter out teams that do not have any of the specified qualifications
-      //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
+      //this.teams = allTeams.filter((team) => team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage);
       this.teams = allTeams
       this.presentations = teams.presentationResponses
       this.totalRecords = this.teams.length;
@@ -304,12 +307,12 @@ export default {
           let qualifiedFinalSec = false ;
           let requestBody;
 
-          if (this.qualification==='PRO'){
+          if (this.qualification==='Promotional Round'){
             qualifiedPromo = true;
-          }else if(this.qualification==='FFS'){
+          }else if(this.qualification==='Final 1st Stage'){
             qualifiedPromo = true;
             qualifiedFinal = true;
-          }else if(this.qualification==='FTS'){
+          }else if(this.qualification==='Final 2nd Stage'){
             qualifiedPromo = true;
             qualifiedFinal = true;
             qualifiedFinalSec = true;
@@ -394,15 +397,6 @@ export default {
         metricScores: metricScoreArray
       };
 
-      let stage = '';
-      if (team.isQualifiedFinalSecondStage){
-        stage = "Final 2nd Stage";
-      }else if(team.isQualifiedFinal){
-        stage = "Final 1st Stage";
-      }else if(team.isQualifiedPromo){
-        stage = "Promotional Round";
-      }
-
       let CalScoreResponse = '';
       let updateTeamURL='';
       try {
@@ -420,8 +414,8 @@ export default {
 
         const presentationArray = [];
         const presentationObject = {
-          score: CalScoreResponse.data.data,
-          stage: stage,
+          score: Math.round(CalScoreResponse.data.data),
+          stage: this.getQualificationStatus(team),
           venue: 'some venue'
         };
         presentationArray.push(presentationObject)
@@ -460,15 +454,6 @@ export default {
         metricScores: metricScoreArray
       };
 
-      let stage = '';
-      if (team.isQualifiedFinalSecondStage){
-        stage = "Final 2nd Stage";
-      }else if(team.isQualifiedFinal){
-        stage = "Final 1st Stage";
-      }else if(team.isQualifiedPromo){
-        stage = "Promotional Round";
-      }
-
       let CalScoreResponse = '';
       try {
           if (this.selectedCompetition === "Game Arena") {
@@ -476,7 +461,7 @@ export default {
           }else if (this.selectedCompetition === "Innovation Design Challenge") {
             CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
           }
-          this.calculatedScore = CalScoreResponse.data.data
+          this.calculatedScore = Math.round(CalScoreResponse.data.data);
           console.log(calculatedScore)
         } catch (error) {
           console.error("Error fetching data:", error);
