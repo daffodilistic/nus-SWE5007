@@ -9,7 +9,6 @@
 
 <script>
 import Vue from 'vue'
-
 export default {
   data() {
     if (Vue.$keycloak.token.length>0){
@@ -26,7 +25,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Set the background image and adjust the background properties */
 .home {
   background-image: url('../assets/BG.jpg'); /* Replace with your image path */

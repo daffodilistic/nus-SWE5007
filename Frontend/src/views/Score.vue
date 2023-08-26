@@ -523,7 +523,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .green-score {
   color: green;
 }

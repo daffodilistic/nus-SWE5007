@@ -35,10 +35,8 @@
                       </tr>
                       <tr><br><br></tr>
                     </template>
-
                   </tbody>
                 </table>
-
         </b-modal>
         <!-- show history Modal END-->
       <div class="form-container">
@@ -309,18 +307,19 @@ export default {
 
 /* Modal Styles */
 .custom-modal .modal-dialog  {
-    max-width: 1300px; /* Set the max width of the modal */
+    max-width: 1300px;
+    min-width: 1300px; /* Set the max width of the modal */
     text-align: center;
   }
 
 /* Center the modal title */
-.custom-modal .modal-header {
-  text-align: center;
-}
+
 
 .modal-table {
   width: 100%; /* Set the table width to take full width of the modal */
   /* Optionally, you can set a max-width for the table if needed */
-  /* max-width: 800px; */
+  min-width: 450px;
+  text-align: center;
+
 }
 </style>

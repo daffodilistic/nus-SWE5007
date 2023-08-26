@@ -226,7 +226,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 #app {
   padding: 20px;
   font-family: Arial, sans-serif;

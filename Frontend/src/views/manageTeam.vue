@@ -5,7 +5,7 @@
         <!-- Add Member Modal START-->
         <b-modal
           v-model="showAddMemberModal"
-          modal-class="custom-modal"
+          modal-class="modal-lg"
           hide-footer
         >
         <!-- Search bar for filtering users -->
@@ -18,7 +18,7 @@
               class="search-box"
             >
           </div>
-          <p>
+          <p class="pagination-info">
             Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }}
             to {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
             of {{ totalRecordsModal }} records
@@ -39,15 +39,9 @@
                     <tr>
                       <th></th>
                       <th>Select</th>
+                      <th>User Name</th>
                       <th>First Name</th>
                       <th>Last Name</th>
-                      <th>Email</th>
-                      <th>Phone</th>
-                      <th>Country</th>
-                      <th>State</th>
-                      <th>Birthday</th>
-                      <th>School Name</th>
-                      <th>Experience <br>(Year)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -61,15 +55,9 @@
                       />
                     </td>
                       <!--<td>{{ userIndex + 1 }}</td>-->
+                      <td>{{ user.userName }}</td>
                       <td>{{ user.firstName }}</td>
                       <td>{{ user.lastName }}</td>
-                      <td>{{ user.email }}</td>
-                      <td>{{ user.phone }}</td>
-                      <td>{{ user.country }}</td>
-                      <td>{{ user.state }}</td>
-                      <td>{{ user.dateOfBirth }}</td>
-                      <td>{{ user.schoolName }}</td>
-                      <td>{{ user.yearsOfExp }}</td>
                     </tr>
                     <tr></tr>
                   </tbody>
@@ -83,7 +71,7 @@
          <!-- show history Modal START-->
         <b-modal
           v-model="showHistoryModal"
-          modal-class="custom-modal"
+          modal-class="modal-lg"
           title="Competition Score"
           hide-footer
         >
@@ -101,7 +89,7 @@
                   <tbody>
                     <template v-if="presentationList.length === 0">
                       <tr>
-                        <td colspan="5"><br><br>No records available.</td>
+                        <td colspan="10" class="centered-cell"><br><br>No records available.</td>
                       </tr>
                       <tr><br><br></tr>
                     </template>
@@ -212,12 +200,11 @@
                     <tr>
                       <th></th>
                       <th>No.</th>
+                      <th>User Name</th>
                       <th>First Name</th>
                       <th>Last Name</th>
                       <th>Email</th>
                       <th>Phone</th>
-                      <th>Country</th>
-                      <th>State</th>
                       <th>Birthday</th>
                       <th>School Name</th>
                       <th>Experience (Year)</th>
@@ -230,12 +217,11 @@
                     <tr v-else v-for="(user, userIndex) in teamMembers.userResponses" :key="userIndex" class="child-row">
                       <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                       <td> {{ userIndex + 1 }} </td>
+                      <td> {{ user.userName }} </td>
                       <td> {{ user.firstName }} </td>
                       <td> {{ user.lastName }} </td>
                       <td> {{ user.email }} </td>
                       <td> {{ user.phone }} </td>
-                      <td> {{ user.country }} </td>
-                      <td> {{ user.state }} </td>
                       <td> {{ user.dateOfBirth }} </td>
                       <td> {{ user.schoolName }} </td>
                       <td> {{ user.yearsOfExp }} </td>
@@ -310,17 +296,6 @@ export default {
       userList: [],
       presentationList: [],
       teamMembers:[],
-      newChildRow: {
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        country: "",
-        state: "",
-        birthday: "",
-        schoolName: "",
-        experience: "",
-      },
     };
   },
   computed: {
@@ -713,22 +688,36 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Main Table Styles */
 .main-table {
 
   width: 100%;
-  border-collapse: collapse;
-  font-size: 16px;
-  text-align: left;
-  margin-bottom: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  font-size: 22px;
 }
 
 .main-table th,
 .main-table td {
-  padding: 10px 20px;
-  border-bottom: 1px solid #ccc;
+padding: 8px;
   text-align: center;
+  font-size: 14px;
+  background-color: #f6f6f6;
+}
+.main-table th {
+  background-color: #d7e7f2;
+  font-weight: bold;
+}
+
+
+/* Hover effect for clickable rows */
+.main-table tbody tr:hover {
+  background-color: #f2f2f2;
+  cursor: pointer;
 }
 
 /* Nested Table Styles */
@@ -738,11 +727,17 @@ export default {
   font-size: 14px;
 }
 
-.user-table th,
+.user-table th{
+  padding: 8px 16px;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+  background-color: #bad4e6;
+}
 .user-table td {
   padding: 8px 16px;
   border-bottom: 1px solid #ccc;
   text-align: center;
+  background-color: white;
 }
 
 
@@ -797,7 +792,6 @@ export default {
 .search-container {
   display: flex;
   justify-content: flex-end; /* Aligns the search box to the right */
-  margin-bottom: 20px;
   margin-right:65px;
 }
 
@@ -847,7 +841,7 @@ input.form-control.editing-textbox {
 
 /* Modal Styles */
 .custom-modal .modal-dialog  {
-    max-width: 1300px; /* Set the max width of the modal */
+    max-width: 800px; /* Set the max width of the modal */
     text-align: center;
   }
 
@@ -916,4 +910,12 @@ input.form-control.editing-textbox {
   color: #555; /* Set the color of the icon */
 }
 
+.pagination-info {
+  text-align: center; /* Center-align the text */
+  margin: 20px 0; /* Add some margin for spacing */
+}
+
+.centered-cell {
+  text-align: center;
+}
 </style>
