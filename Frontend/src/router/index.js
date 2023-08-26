@@ -60,10 +60,17 @@ const routes = [
     }
   },
   {
-    path: '/upload',
-    name: 'Upload',
+    path: '/contestantUpload',
+    name: 'ContestantUpload',
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/contestantUpload.vue')
+    }
+  },
+  {
+    path: '/contestantProfile',
+    name: 'ContestantProfile',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/contestantProfile.vue')
     }
   },
   {
