@@ -63,7 +63,7 @@ const routes = [
     path: '/upload',
     name: 'Upload',
     component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/Upload.vue')
+      return import(/* webpackChunkName: "about" */ '../views/contestantUpload.vue')
     }
   },
   {
