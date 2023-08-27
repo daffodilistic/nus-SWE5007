@@ -2,6 +2,28 @@
   <b-tabs >
      <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadTeam()">
     <br><br>
+     <!-- show upload START-->
+        <b-modal
+          v-model="showUploadModal"
+          modal-class="custom-modal"
+          hide-footer
+        >
+            <!-- List of users to be displayed inside the modal -->
+           <form class="upload-type">
+            <div>
+              <span style="font-size: 18px; color: #676767;">{{ displayTitleText(team) }}</span><br><br>
+              <p v-html="displayGuideline(team)"></p>
+            </div>
+            <br>
+            <div class="form-row">
+
+              <input type="file" name="file-upload" id="file-upload" @change="onFileChange" accept=".pdf,.doc,.docx,.xlsx,.csv" />
+            </div>
+            <br><br>
+            <b-button type="submit" @click="upload(team)" variant="outline-primary" class="delete-button">Upload</b-button>
+          </form>
+        </b-modal>
+        <!-- show upload Modal END-->
      <!-- show history Modal START-->
         <b-modal
           v-model="showHistoryModal"
@@ -45,24 +67,27 @@
           <td>
             <div class="form-group">
               <label><i class="fa fa-users fa-lg" style='color: rgb(65, 127, 202)'></i></label>
-              <label class="label-color">Team Name :&nbsp;&nbsp;</label>
+              <label class="label-color">Team Name :</label>
               {{ team.teamName }}
             </div>
           </td>
           <td>
             <div class="form-group select">
               <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
-              <label class="label-color">Age Group :&nbsp;&nbsp;</label>
+              <label class="label-color">Age Group :</label>
               {{ ageGroupTextMap[team.ageGroup] }}
             </div>
           </td>
           <td>
             <div class="form-group select">
               <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
-              <label class="label-color">Team Qualification :&nbsp;&nbsp;</label>
-              {{ getQualificationStatus(team) }}&nbsp;&nbsp;
+              <label class="label-color">Team Qualification :</label>
+              {{ getQualificationStatus(team) }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <b-button @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
                 <b-icon icon="eye"></b-icon>
+              </b-button>&nbsp;
+              <b-button @click="viewUpload(team)" variant="outline-primary" class="delete-button">
+                <b-icon icon="cloud-upload"></b-icon>
               </b-button>
             </div>
 
@@ -130,7 +155,7 @@
 
 <script>
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {VIEW_IDC_TEAM_BASE_URL} from '@/api';
+import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL} from '@/api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -142,7 +167,9 @@ export default {
       idcTeamId: "7c8f5f5b-e85e-4e66-a40f-bde7ff9db5ab",
       team:'',
       showHistoryModal: false,
+      showUploadModal: false,
       presentationList: [],
+      selectedFile: null, // Initialize the selectedFile variable
     };
   },
   computed: {
@@ -206,6 +233,9 @@ export default {
         console.error("Error fetching users:", error);
       }
     },
+    async viewUpload(teamId) {
+      this.showUploadModal = true;
+    },
     getQualificationStatus(team) {
       let qualificationStatus;
 
@@ -242,6 +272,105 @@ export default {
           console.error("Error fetching data:", error);
         }
     },
+    displayTitleText(team) {
+      if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+        return "Please upload proposal";
+      } else if (team.isQualifiedPromo && team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+        return "Please upload video";
+      }
+    },
+
+    displayGuideline(team) {
+      if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+        return `
+          <span style="font-size: 14px; color: #333;">Guidelines:<br>
+          a) The writing is concise, easy to understand, and demonstrates good choice of words.<br>
+          b) The proposal demonstrates the efforts that the students have put in to understand the user story.</span>`;
+      } else if (team.isQualifiedPromo && team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+         return `
+          <span style="font-size: 14px; color: #333;">Guidelines:<br>
+          a) Background Summary: The video should concisely describe the user story and the robotics idea.<br>
+          b) Design idea: The participant should explain the theory and knowledge behind the design.<br>
+          c) Functionality: The video should explain the functionality of the robot, how it is implemented and why it performs the use case.<br>
+          d) Presentation: The presentation should be logical, fluent and easy to understand. The presenter should appear decently, and the video should be smooth and good in quality.</span>`;
+      }
+    },
+
+    onFileChange(event) {
+      // Handle the file change event here
+      this.selectedFile = event.target.files[0];
+      console.log("Selected File:", selectedFile);
+      console.log("File Name:", selectedFile.name);
+      console.log("File Size:", selectedFile.size);
+      console.log("File Type:", selectedFile.type);
+      // You can perform any further processing with the selected file here
+    },
+    async upload(team) {
+
+      if (!this.selectedFile) {
+        console.log("No file selected.");
+        return;
+      }
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      };
+
+      const formData = new FormData();
+      formData.append("file", this.selectedFile);
+      formData.append("localFilePath", this.selectedFile.name);
+      formData.append("idcTeamId", team.id);
+
+      try {
+        const requestBody = {
+          localFilePath: this.selectedFile, // Using the file name here
+          idcTeamId: team.id, // Fill in the team ID
+          fileContent: null // This will hold the file content
+        };
+
+        // Read the file content using FileReader
+        const reader = new FileReader();
+
+        // Define the onload event handler for the reader
+        reader.onload = async (event) => {
+          requestBody.fileContent = event.target.result;
+          console.log('requestBody:', requestBody.fileContent);
+
+          let response = '';
+
+          if (this.selectedCompetition === "Game Arena") {
+            response = await axios.post(`${test}`, formData, { headers });
+            console.log('ga called');
+          } else if (this.selectedCompetition === "Innovation Design Challenge") {
+
+             if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+                 response = await axios.post(`${UPLOAD_PROMO_FILE_IDC_BASE_URL}`, formData, {
+                  headers: {
+                  "Content-Type": "multipart/form-data",
+                  "Authorization": `Bearer ${Vue.$keycloak.token}`
+                }});
+                console.log('IDC PRO called'+ response);
+              } else if (team.isQualifiedPromo && team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+                response = await axios.post(`${UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  "Authorization": `Bearer ${Vue.$keycloak.token}`
+                }});
+              }
+          }
+
+          // Handle the response, if needed
+          console.log('Response from server:', response.data);
+        };
+
+        // Read the file as an ArrayBuffer (binary data)
+        reader.readAsArrayBuffer(this.selectedFile);
+      } catch (error) {
+        // Handle errors, if any
+        console.error('Error calling API:', error);
+      }
+    }
   },
 };
 </script>
@@ -320,6 +449,17 @@ export default {
   /* Optionally, you can set a max-width for the table if needed */
   min-width: 450px;
   text-align: center;
+}
 
+button[type="submit"] {
+  padding: 10px 0;
+  width: 100%;
+  /* Set the button width to 100% of its parent container */
+  background: linear-gradient(to bottom right, #5DADE2);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 20px;
 }
 </style>
