@@ -27,6 +27,7 @@
       <thead>
         <tr>
           <th></th>
+          <th>S/No</th>
           <th>Team Name</th>
           <th>Age Group</th>
           <th>Teacher Name</th>
@@ -56,23 +57,8 @@
               Not Scored
             </span>
           </td>
-          <td v-if="!team.editing">
-            {{ getQualificationStatus(team) }}
-          </td>
-          <td v-else>
-            <div class="form-group select">
-              <select v-model="qualification" id="category" class="editing-dropdown">
-                <option value="" disabled selected>Select Qualification Status</option>
-                <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
-              </select>
-            </div>
-            </td>
           <td>
-            <!-- Edit Icon -->
-            <b-button @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
-              <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
-              <span v-else><b-icon icon="save"></b-icon></span>
-            </b-button>
+            {{getQualificationStatus(team) }}
           </td>
         </tr>
     <!-- Child rows for metrics -->
@@ -85,6 +71,7 @@
                   <th>Metric Name</th>
                   <th>Metric Weightage</th>
                   <th>Score <br>(out of 100)</th>
+                  <th>Qualification</th>
                   <th>Preview Score</th>
                   <th>Action</th>
                 </tr>
@@ -95,7 +82,17 @@
                   <td>{{ metric.metricName }}</td>
                   <td>{{ metric.metricWeight * 100 +"%" }}</td>
                   <td><input type="number" v-model="metric.enteredScore" class="form-control" :min="0"></td>
+
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
+                      :rowspan="filteredMetricsForTeam(index).length">
+                  <div class="form-group select">
+                    <select v-model="qualification" id="category" class="editing-dropdown">
+                      <option value="" disabled selected>Select Qualification Status</option>
+                      <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+                    </select>
+                  </div>
+                  </td>
+                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
                       :rowspan="filteredMetricsForTeam(index).length"
                       class="score-cell">
                     <div class="score">{{  calculatedScore }}</div>
@@ -104,14 +101,13 @@
                       :rowspan="filteredMetricsForTeam(index).length">
                     <b-button @click="previewScore(index)" variant="outline-primary" class="delete-button">
                       <b-icon icon="calculator"></b-icon>
-                    </b-button>
-                  </td>
-                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
-                      :rowspan="filteredMetricsForTeam(index).length">
+                    </b-button><br>
+
                     <b-button @click="editMetric(index)" variant="outline-primary" class="delete-button">
                       <b-icon icon="save"></b-icon>
                     </b-button>
                   </td>
+
                 </tr>
               </tbody>
             </table>
@@ -294,67 +290,6 @@ export default {
 
       return qualificationStatus;
     },
-    async editTeam(index) {
-        const team = this.filteredTeams[index];
-
-        if (team.editing) {
-          team.editing = false;
-          /*
-          'FTS', 'Final 2nd Stage'
-          'FFS', 'Final 1st Stage'
-          'PRO', 'Promotional Round'
-          'DIQ', 'Not Qualified'
-          */
-          let qualifiedPromo = false;
-          let qualifiedFinal = false ;
-          let qualifiedFinalSec = false ;
-          let requestBody;
-
-          if (this.qualification==='Promotional Round'){
-            qualifiedPromo = true;
-          }else if(this.qualification==='Final 1st Stage'){
-            qualifiedPromo = true;
-            qualifiedFinal = true;
-          }else if(this.qualification==='Final 2nd Stage'){
-            qualifiedPromo = true;
-            qualifiedFinal = true;
-            qualifiedFinalSec = true;
-          }
-          let response;
-
-           console.log(requestBody)
-
-          const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Vue.$keycloak.token}`
-          };
-
-          try {
-             if(this.selectedCompetition === "Game Arena") {
-              requestBody = {
-                  id: team.id,
-                };
-               response = await axios.put(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
-              }else if (this.selectedCompetition === "Innovation Design Challenge") {
-                requestBody = {
-                  id: team.id,
-                  isQualifiedPromo : qualifiedPromo,
-                  isQualifiedFinal : qualifiedFinal,
-                  isQualifiedFinalSecondStage : qualifiedFinalSec
-                };
-                response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
-              }
-            console.log('Response from server:', response.data);
-            this.loadTeam();
-
-          } catch (error) {
-            console.error('Error editing team:', error);
-          }
-        } else {
-          // Enter editing mode
-          team.editing = true;
-        }
-      },
 
     async loadTeam() {
       const headers = {
@@ -390,6 +325,30 @@ export default {
       const team = this.filteredTeams[index];
       const metricIdsArray = [];
       const metricScoreArray = [];
+
+      /*
+      'FTS', 'Final 2nd Stage'
+      'FFS', 'Final 1st Stage'
+      'PRO', 'Promotional Round'
+      'DIQ', 'Not Qualified'
+       */
+      let qualifiedPromo = false;
+      let qualifiedFinal = false ;
+      let qualifiedFinalSec = false ;
+      let requestBody;
+      let response;
+
+      if (this.qualification==='Promotional Round'){
+        qualifiedPromo = true;
+      }else if(this.qualification==='Final 1st Stage'){
+        qualifiedPromo = true;
+        qualifiedFinal = true;
+      }else if(this.qualification==='Final 2nd Stage'){
+        qualifiedPromo = true;
+        qualifiedFinal = true;
+        qualifiedFinalSec = true;
+      }
+
       for (const metric of metricsForTeam) {
         metricIdsArray.push(metric.id);
         metricScoreArray.push(metric.enteredScore)
@@ -399,18 +358,30 @@ export default {
         metricIds: metricIdsArray,
         metricScores: metricScoreArray
       };
-
       let CalScoreResponse = '';
       let updateTeamURL='';
       try {
           if (this.selectedCompetition === "Game Arena") {
+            requestBody = {
+              id: team.id,
+            };
             CalScoreResponse = await axios.post(`${GET_ALL_GAME_TEAM_BASE_URL}`,this.metricRequestBody, { headers });
             updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
+            response = await axios.put(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
+
           }else if (this.selectedCompetition === "Innovation Design Challenge") {
+            requestBody = {
+              id: team.id,
+              isQualifiedPromo : qualifiedPromo,
+              isQualifiedFinal : qualifiedFinal,
+              isQualifiedFinalSecondStage : qualifiedFinalSec
+            };
             CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
             updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
+            response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
           }
-          console.log(CalScoreResponse.data)
+          console.log('CalScore Response:', CalScoreResponse.data)
+          console.log('Qualify Response:', response.data);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -418,7 +389,7 @@ export default {
         const presentationArray = [];
         const presentationObject = {
           score: Math.round(CalScoreResponse.data.data),
-          stage: this.getQualificationStatus(team),
+          stage: this.qualification,
           venue: 'some venue'
         };
         presentationArray.push(presentationObject)
