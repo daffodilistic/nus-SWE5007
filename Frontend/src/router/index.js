@@ -60,13 +60,6 @@ const routes = [
     }
   },
   {
-    path: '/contestantUpload',
-    name: 'ContestantUpload',
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/contestantUpload.vue')
-    }
-  },
-  {
     path: '/contestantProfile',
     name: 'ContestantProfile',
     component: function () {
