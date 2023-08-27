@@ -42,7 +42,6 @@
       <tbody v-for="(metric, index) in paginatedMetrics" :key="index">
         <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
           <td>
-
           </td>
           <td>{{ startIndex + index }}</td>
           <td v-if="!metric.editing">
@@ -168,9 +167,9 @@ export default {
     if (this.selectedCompetition === "Game Arena") {
       return this.stageNameOptions.filter(option => option.competitionId === '2');
     } else if (this.selectedCompetition === "Innovation Design Challenge") {
-      return this.stageNameOptions.filter(option => option.competitionId === '1');
+      return this.stageNameOptions.filter(option => option.competitionId === '1' && option.value !== 'Not Qualified');
     }
-    return [];
+      return [];
     },
     filteredMetrics() {
       // If the metrics data is not available yet, return an empty array
