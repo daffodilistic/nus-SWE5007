@@ -73,7 +73,7 @@
           </td>
           <td>
             <div class="form-group select">
-              <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
+              <label><i class="fas fa-user-tag" style='color: rgb(65, 127, 202)'></i></label>
               <label class="label-color">Age Group :</label>
               {{ ageGroupTextMap[team.ageGroup] }}
             </div>
