@@ -21,9 +21,9 @@ public class GcpCloudUploadDemo {
         String uploadFilePAth = "D:\\java2\\cny.mp4";
         byte[] fileData = FileUtils.readFileToByteArray(new File(uploadFilePAth));
         String contentType = Files.probeContentType(Paths.get(uploadFilePAth));
-        String gcpBucketCredential = "D:\\java2\\nus-SWE5007\\rigsg\\idc-system\\src\\main\\resources\\sapient-symbol-388402-c394d7904e67.json";
-        String gcpProjectId = "sapient-symbol-388402";
-        String gcpBucketId = "idc-resources";
+        String gcpBucketCredential = "D:\\java2\\nus-SWE5007\\rigsg\\idc-system\\src\\main\\resources\\dev-bucket-credential.json";
+        String gcpProjectId = "shaped-splicer-397009";
+        String gcpBucketId = "idc-system-resources";
         String gcpDirectoryName = "participants";
 
         InputStream inputStream = new FileInputStream(gcpBucketCredential);
