@@ -38,3 +38,14 @@ To run the services locally for development use, use the following command:
 ```shell
 docker compose up --remove-orphans
 ```
+
+## Github Actions setup
+The Github Actions workflow builds the JAR file and directly deploys the
+application to Google App Engine. The workflow is triggered on every tag pushed
+to the repository.
+
+See the workflow YAML files defined in the `.github/workflows` folder for details.
+
+The following Github Secrets are required:
+- `POSTGRES_USERNAME`: The username for the Postgres database
+- `POSTGRES_PASSWORD`: The password for the Postgres database
