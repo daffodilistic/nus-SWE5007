@@ -24,10 +24,9 @@
     </div>
 
     <div class="add-button">
-      <b-button variant="outline-primary" size="lg" @click="addNewUser"><b-icon icon="person-plus" ></b-icon>
-      </b-button><br>
-
-    </div>
+      <b-button variant="outline-primary" @click="addNewUser"><b-icon icon="person-plus" ></b-icon>
+      </b-button>
+    </div><br>
     <table class="main-table">
       <thead>
         <tr>
@@ -545,50 +544,31 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Main Table Styles */
 .main-table {
 
   width: 100%;
-  border-collapse: collapse;
-  font-size: 16px;
-  text-align: left;
-  margin-bottom: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  font-size: 22px;
 }
 
 .main-table th,
 .main-table td {
-  padding: 10px 20px;
-  border-bottom: 1px solid #ccc;
+padding: 8px;
   text-align: center;
-}
-
-/* Nested Table Styles */
-.user-table {
-  width: 100%;
-  border-collapse: collapse;
   font-size: 14px;
+  background-color: #f6f6f6;
+}
+.main-table th {
+  background-color: #d7e7f2;
+  font-weight: bold;
 }
 
-.user-table th,
-.user-table td {
-  padding: 8px 16px;
-  border-bottom: 1px solid #ccc;
-  text-align: center;
-}
-
-/* Toggle Row Styling */
-.nested-row {
-  display: table-row;
-  text-align: center; /* Center the text content horizontally */
-}
-
-.nested-row td {
-  border: none;
-  padding: 0;
-  text-align: center; /* Center the text content horizontally */
-  vertical-align: middle; /* Center the content vertically within the cell */
-}
 
 /* Hover effect for clickable rows */
 .main-table tbody tr:hover {
@@ -669,42 +649,6 @@ input.form-control.editing-textbox {
   min-width: 100px;
 }
 
-/* Modal Styles */
-.custom-modal .modal-dialog  {
-    max-width: 1300px; /* Set the max width of the modal */
-    text-align: center;
-  }
-
-/* Center the modal title */
-.custom-modal .modal-header {
-  text-align: center;
-}
-
-.modal-table {
-  width: 100%; /* Set the table width to take full width of the modal */
-  /* Optionally, you can set a max-width for the table if needed */
-  /* max-width: 800px; */
-}
-
-.add-member-button {
-  padding: 10px 20px;
-  background-color: #5DADE2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-
-}
-
-.text-center {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  text-align: center;
-}
-
 .loader-container {
   display: flex;
   justify-content: center;
@@ -714,23 +658,6 @@ input.form-control.editing-textbox {
 
 .fa-spinner {
   font-size: 32px; /* Adjust the size as needed */
-}
-
-.modal-title-center {
-  text-align: center;
-  font-size: 30px; /* Adjust the font size as needed */
-  margin-bottom: 10px; /* Add some margin at the bottom */
-}
-
-.add-user-button {
-  padding: 10px 20px;
-  background-color: #2ecc71;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
 }
 
 .add-button {

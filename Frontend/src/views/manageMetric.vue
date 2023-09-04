@@ -27,7 +27,7 @@
       <b-button variant="outline-primary" size="lg" @click="addNewMetric"><b-icon icon="file-earmark-plus" ></b-icon>
       </b-button><br>
 
-    </div>
+    </div><br>
     <table class="main-table">
       <thead>
         <tr>
@@ -42,7 +42,6 @@
       <tbody v-for="(metric, index) in paginatedMetrics" :key="index">
         <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
           <td>
-
           </td>
           <td>{{ startIndex + index }}</td>
           <td v-if="!metric.editing">
@@ -168,9 +167,9 @@ export default {
     if (this.selectedCompetition === "Game Arena") {
       return this.stageNameOptions.filter(option => option.competitionId === '2');
     } else if (this.selectedCompetition === "Innovation Design Challenge") {
-      return this.stageNameOptions.filter(option => option.competitionId === '1');
+      return this.stageNameOptions.filter(option => option.competitionId === '1' && option.value !== 'Not Qualified');
     }
-    return [];
+      return [];
     },
     filteredMetrics() {
       // If the metrics data is not available yet, return an empty array
@@ -421,67 +420,39 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Main Table Styles */
 .main-table {
 
   width: 100%;
-  border-collapse: collapse;
-  font-size: 16px;
-  text-align: left;
-  margin-bottom: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  font-size: 22px;
 }
 
 .main-table th,
 .main-table td {
-  padding: 10px 20px;
-  border-bottom: 1px solid #ccc;
+padding: 8px;
   text-align: center;
-}
-
-/* Nested Table Styles */
-.user-table {
-  width: 100%;
-  border-collapse: collapse;
   font-size: 14px;
+  background-color: #f6f6f6;
+}
+.main-table th {
+  background-color: #d7e7f2;
+  font-weight: bold;
 }
 
-.user-table th,
-.user-table td {
-  padding: 8px 16px;
-  border-bottom: 1px solid #ccc;
-  text-align: center;
-}
-
-
-
-/* Toggle Row Styling */
-.nested-row {
-  display: table-row;
-  text-align: center; /* Center the text content horizontally */
-}
-
-.nested-row td {
-  border: none;
-  padding: 0;
-  text-align: center; /* Center the text content horizontally */
-  vertical-align: middle; /* Center the content vertically within the cell */
-}
 
 /* Hover effect for clickable rows */
 .main-table tbody tr:hover {
   background-color: #f2f2f2;
   cursor: pointer;
 }
-
-
-
 .active-row {
   background-color: rgb(218, 234, 253)/* Light blue for active parent row */
-}
-
-.child-row {
-  background-color: rgb(244, 249, 255);
 }
 
 .pagination {
@@ -553,42 +524,6 @@ input.form-control.editing-textbox {
   min-width: 100px;
 }
 
-/* Modal Styles */
-.custom-modal .modal-dialog  {
-    max-width: 1300px; /* Set the max width of the modal */
-    text-align: center;
-  }
-
-/* Center the modal title */
-.custom-modal .modal-header {
-  text-align: center;
-}
-
-.modal-table {
-  width: 100%; /* Set the table width to take full width of the modal */
-  /* Optionally, you can set a max-width for the table if needed */
-  /* max-width: 800px; */
-}
-
-.add-member-button {
-  padding: 10px 20px;
-  background-color: #5DADE2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-
-}
-
-.text-center {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  text-align: center;
-}
-
 .loader-container {
   display: flex;
   justify-content: center;
@@ -598,23 +533,6 @@ input.form-control.editing-textbox {
 
 .fa-spinner {
   font-size: 32px; /* Adjust the size as needed */
-}
-
-.modal-title-center {
-  text-align: center;
-  font-size: 30px; /* Adjust the font size as needed */
-  margin-bottom: 10px; /* Add some margin at the bottom */
-}
-
-.add-metric-button {
-  padding: 10px 20px;
-  background-color: #2ecc71;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
 }
 
 .add-button {

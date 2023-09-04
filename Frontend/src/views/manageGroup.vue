@@ -601,22 +601,36 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Main Table Styles */
 .main-table {
 
   width: 100%;
-  border-collapse: collapse;
-  font-size: 16px;
-  text-align: left;
-  margin-bottom: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  font-size: 22px;
 }
 
 .main-table th,
 .main-table td {
-  padding: 10px 20px;
-  border-bottom: 1px solid #ccc;
+padding: 8px;
   text-align: center;
+  font-size: 14px;
+  background-color: #f6f6f6;
+}
+.main-table th {
+  background-color: #d7e7f2;
+  font-weight: bold;
+}
+
+
+/* Hover effect for clickable rows */
+.main-table tbody tr:hover {
+  background-color: #f2f2f2;
+  cursor: pointer;
 }
 
 .team-table {
@@ -625,11 +639,18 @@ export default {
   font-size: 14px;
 }
 
-.team-table th,
+.team-table th{
+  padding: 8px 16px;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+  background-color: #bad4e6;
+}
+
 .team-table td {
   padding: 8px 16px;
   border-bottom: 1px solid #ccc;
   text-align: center;
+  background-color: white;
 }
 
 .nested-row {

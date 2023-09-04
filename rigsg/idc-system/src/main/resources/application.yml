@@ -5,16 +5,16 @@ spring:
     gcp:
       sql:
         database-name: ric-database
-        instance-connection-name: sapient-symbol-388402:asia-southeast1:dev-ric-database
+        instance-connection-name: shaped-splicer-397009:asia-southeast1:prd-ric-database
       credentials:
-        location: classpath:sapient-symbol-388402-63f104db32e1.json
-      project-id: sapient-symbol-388402
+        location: classpath:prod-sql-credential.json
+      project-id: shaped-splicer-397009
       bucket:
-        credential: classpath:sapient-symbol-388402-c394d7904e67.json
-        id: idc-resources
+        credential: classpath:dev-bucket-credential.json
+        id: idc-system-resources
         dirName: participants
   datasource:
-    username: dev-ric-app-user
+    username: prd-ric-app-user
     password: password
     hikari:
       minimum-idle: 5

@@ -8,14 +8,11 @@
         <tr>
           <td><p class="h3 mb-2"><b-icon icon="filter" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
           <td>
-            <b-form-select v-model="selectedQualification" class="filter-dropdown">
-              <template v-slot:first>
-                <option :value="null" disabled>Select Stage Name</option>
-              </template>
-              <option v-for="stageName in distinctStageNames" :key="stageName" :value="stageName">
-                {{ stageName }}
-              </option>
-            </b-form-select>
+            <select name="game-type" class="filter-dropdown" v-model="selectedQualification">
+              <option value="" disabled selected>Select Stage Name</option>
+              <!-- Use v-for to loop through competitionChoiceOptions -->
+              <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+            </select>
           </td>
           <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
           <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
@@ -24,20 +21,13 @@
       </table>
     </div>
     <div v-if="teams && teams.length > 0">
-    <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
-    <div class="pagination">
-      <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-        <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-        <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-      </button>
-    </div>
+    <p>Showing {{ totalRecords }} records</p>
+
     <table class="main-table">
       <thead>
         <tr>
           <th></th>
+          <th>S/No</th>
           <th>Team Name</th>
           <th>Age Group</th>
           <th>Teacher Name</th>
@@ -51,31 +41,25 @@
           <td>
             <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
           </td>
+          <td>{{ startIndex + index }}</td>
           <td>{{ team.teamName }}</td>
           <td>{{ ageGroupTextMap[team.ageGroup] }} </td>
           <td>{{ team.teacherName }}</td>
-          <td>{{ team.presentationResponses }}</td>
-          <td v-if="!team.editing">
-            <p v-if="team.isQualifiedFinalSecondStage">Final 2nd Stage</p>
-            <p v-else-if="team.isQualifiedFinal">Final 1st Stage</p>
-            <p v-else-if="team.isQualifiedPromo">Promotional Round</p>
-            <p v-else>Not Qualified</p>
+          <td v-if="team.presentationResponses.length === 0">
+            Not Scored
           </td>
-          <td v-else>
-            <div class="form-group select">
-              <select v-model="qualification" id="category" class="editing-dropdown">
-                <option value="" disabled selected>Select Qualification Status</option>
-                <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
-              </select>
-            </div>
-            </td>
+          <td v-for="(response, index) in team.presentationResponses" :key="index">
+            <span v-if="response.stage === getQualificationStatus(team)"
+                  :class="{'green-score': response.score > 50, 'red-score': response.score <= 50}">
+              {{ response.score }}
+            </span>
+            <span v-else>
+              Not Scored
+            </span>
+          </td>
           <td>
-                <!-- Edit Icon -->
-                <b-button @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
-                  <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
-                  <span v-else><b-icon icon="save"></b-icon></span>
-                </b-button>
-              </td>
+            {{getQualificationStatus(team) }}
+          </td>
         </tr>
     <!-- Child rows for metrics -->
     <tr v-if="activeRow === index " class="child-row">
@@ -87,6 +71,7 @@
                   <th>Metric Name</th>
                   <th>Metric Weightage</th>
                   <th>Score <br>(out of 100)</th>
+                  <th>Qualification</th>
                   <th>Preview Score</th>
                   <th>Action</th>
                 </tr>
@@ -97,7 +82,17 @@
                   <td>{{ metric.metricName }}</td>
                   <td>{{ metric.metricWeight * 100 +"%" }}</td>
                   <td><input type="number" v-model="metric.enteredScore" class="form-control" :min="0"></td>
+
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
+                      :rowspan="filteredMetricsForTeam(index).length">
+                  <div class="form-group select">
+                    <select v-model="qualification" id="category" class="editing-dropdown">
+                      <option value="" disabled selected>Select Qualification Status</option>
+                      <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+                    </select>
+                  </div>
+                  </td>
+                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
                       :rowspan="filteredMetricsForTeam(index).length"
                       class="score-cell">
                     <div class="score">{{  calculatedScore }}</div>
@@ -106,14 +101,13 @@
                       :rowspan="filteredMetricsForTeam(index).length">
                     <b-button @click="previewScore(index)" variant="outline-primary" class="delete-button">
                       <b-icon icon="calculator"></b-icon>
-                    </b-button>
-                  </td>
-                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
-                      :rowspan="filteredMetricsForTeam(index).length">
+                    </b-button><br>
+
                     <b-button @click="editMetric(index)" variant="outline-primary" class="delete-button">
                       <b-icon icon="save"></b-icon>
                     </b-button>
                   </td>
+
                 </tr>
               </tbody>
             </table>
@@ -121,15 +115,6 @@
         </tr>
       </tbody>
     </table>
-    <div class="pagination">
-    <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-      <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-    </button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-      <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-    </button>
-  </div>
   </div>
   <div v-else>
       <!-- Show a loading message or spinner while the data is being fetched -->
@@ -145,7 +130,7 @@
 <script>
 import axios from "axios";
 import { CALCULATE_IDC_SCORE_BASE_URL,UPDATE_IDC_TEAM_BASE_URL, QUALIFY_GAME_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL } from '@/api';
-import { competitionChoiceOptions,qualificationOptions } from "../dropdownOptions";
+import { competitionChoiceOptions,stageNameOptions } from "../dropdownOptions";
 import Vue from 'vue'
 
 export default {
@@ -169,9 +154,8 @@ export default {
       qualification: "",
       selectedCompetition: "Innovation Design Challenge",
       metricRequestBody: [],
-      totalPages: 1,
       totalRecords: 0,
-      selectedQualification: null,
+      selectedQualification: '',
       searchQuery: '',
       teams:[],
       presentations:[],
@@ -180,33 +164,26 @@ export default {
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       metrics: [],
+
     };
   },
   computed: {
-    qualificationOptions() {
-      return qualificationOptions;
+
+    stageNameOptions() {
+      return stageNameOptions;
     },
     filteredQualificationOptions() {
     if (this.selectedCompetition === "Game Arena") {
-      return this.qualificationOptions.filter(option => option.competitionId === '2');
+      return this.stageNameOptions.filter(option => option.competitionId === '2');
     } else if (this.selectedCompetition === "Innovation Design Challenge") {
-      return this.qualificationOptions.filter(option => option.competitionId === '1');
+      return this.stageNameOptions.filter(option => option.competitionId === '1');
     }
     return [];
     },
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
     },
-    distinctStageNames() {
-      const stageNames = new Set();
-      // Check if this.metrics is defined and is an array before iterating over it
-      if (Array.isArray(this.metrics)) {
-        this.metrics.forEach((metric) => {
-          stageNames.add(metric.stageName);
-        });
-      }
-      return Array.from(stageNames);
-    },
+
     ageGroupTextMap() {
     // Define a mapping of age group values to their corresponding text
     const ageGroupMap = {
@@ -216,32 +193,39 @@ export default {
     };
     return ageGroupMap;
   },
-
     filteredTeamsByQualification() {
       if (!this.selectedQualification) {
-        // If no qualification is selected, return all teams
-        return this.filteredTeams;
+        // If no qualification is selected, return only not qualified teams.
+        return this.filteredTeams.filter((team) => {
+          let result = false;
+          result = !team.isQualifiedPromo;
+          return result;
+        });
       }
 
-      /*Filter teams based on the selected qualification
+      //Filter teams based on the selected qualification
       return this.filteredTeams.filter((team) => {
         let result = false;
         switch (this.selectedQualification) {
           case "Promotional Round":
-            result = team.isQualifiedPromo;
+            result = team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage;
             break;
           case "Final 1st Stage":
-            result = team.isQualifiedFinal;
+            result = team.isQualifiedFinal && !team.isQualifiedFinalSecondStage;
             break;
           case "Final 2nd Stage":
             result = team.isQualifiedFinalSecondStage;
+            break;
+          case "Not Qualified":
+            result = !team.isQualifiedPromo;
             break;
           default:
             result = false;
         }
 
         return result;
-      });*/
+
+      });
     },
 
     filteredTeams() {
@@ -259,23 +243,14 @@ export default {
     const query = this.searchQuery.trim().toLowerCase();
     return this.teams.filter((team) => team.teamName.toLowerCase().includes(query));
   },
-  totalPagesByQualification() {
-    return Math.ceil(this.filteredTeamsByQualification.length / this.itemsPerPage);
-  },
-  paginatedTeamsByQualification() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.filteredTeamsByQualification.slice(startIndex, endIndex);
-  },
+
+
     startIndex() {
       return (this.currentPage - 1) * this.itemsPerPage + 1;
     },
     endIndex() {
       const endIndex = this.currentPage * this.itemsPerPage;
       return endIndex > this.totalRecords ? this.totalRecords : endIndex;
-    },
-    totalRecordsByQualification() {
-      return this.filteredTeamsByQualification.length;
     },
   },
   async mounted() {
@@ -288,7 +263,7 @@ export default {
       const allTeams = this.teamsData.data.data;
 
       // Filter out teams that do not have any of the specified qualifications
-      //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
+      //this.teams = allTeams.filter((team) => team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage);
       this.teams = allTeams
       this.presentations = teams.presentationResponses
       this.totalRecords = this.teams.length;
@@ -300,67 +275,21 @@ export default {
 
   },
   methods: {
-    async editTeam(index) {
-        const team = this.filteredTeams[index];
+    getQualificationStatus(team) {
+      let qualificationStatus;
 
-        if (team.editing) {
-          team.editing = false;
-          /*
-          'FTS', 'Final 2nd Stage'
-          'FFS', 'Final 1st Stage'
-          'PRO', 'Promotional Round'
-          'DIQ', 'Not Qualified'
-          */
-          let qualifiedPromo = false;
-          let qualifiedFinal = false ;
-          let qualifiedFinalSec = false ;
-          let requestBody;
+      if (team.isQualifiedFinalSecondStage) {
+        qualificationStatus = "Final 2nd Stage";
+      } else if (team.isQualifiedFinal) {
+        qualificationStatus = "Final 1st Stage";
+      } else if (team.isQualifiedPromo) {
+        qualificationStatus = "Promotional Round";
+      } else {
+        qualificationStatus = "Not Qualified";
+      }
 
-          if (this.qualification==='PRO'){
-            qualifiedPromo = true;
-          }else if(this.qualification==='FFS'){
-            qualifiedPromo = true;
-            qualifiedFinal = true;
-          }else if(this.qualification==='FTS'){
-            qualifiedPromo = true;
-            qualifiedFinal = true;
-            qualifiedFinalSec = true;
-          }
-          let response;
-
-           console.log(requestBody)
-
-          const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Vue.$keycloak.token}`
-          };
-
-          try {
-             if(this.selectedCompetition === "Game Arena") {
-              requestBody = {
-                  id: team.id,
-                };
-               response = await axios.put(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
-              }else if (this.selectedCompetition === "Innovation Design Challenge") {
-                requestBody = {
-                  id: team.id,
-                  isQualifiedPromo : qualifiedPromo,
-                  isQualifiedFinal : qualifiedFinal,
-                  isQualifiedFinalSecondStage : qualifiedFinalSec
-                };
-                response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
-              }
-            console.log('Response from server:', response.data);
-            this.loadTeam();
-
-          } catch (error) {
-            console.error('Error editing team:', error);
-          }
-        } else {
-          // Enter editing mode
-          team.editing = true;
-        }
-      },
+      return qualificationStatus;
+    },
 
     async loadTeam() {
       const headers = {
@@ -370,14 +299,14 @@ export default {
       try {
           if (this.selectedCompetition === "Game Arena") {
             this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-            const allTeams = this.teamsData.data.data;
+            this.teams = this.teamsData.data.data;
             console.log('ga called')
             this.teams = allTeams.filter((team) => team.isQualifiedForElimination);
           }else if (this.selectedCompetition === "Innovation Design Challenge") {
             this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
             console.log('IDC called')
-            const allTeams = this.teamsData.data.data;
-            this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
+           this.teams = this.teamsData.data.data;
+            //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
           }
           this.totalRecords = this.teams.length;
         } catch (error) {
@@ -396,6 +325,30 @@ export default {
       const team = this.filteredTeams[index];
       const metricIdsArray = [];
       const metricScoreArray = [];
+
+      /*
+      'FTS', 'Final 2nd Stage'
+      'FFS', 'Final 1st Stage'
+      'PRO', 'Promotional Round'
+      'DIQ', 'Not Qualified'
+       */
+      let qualifiedPromo = false;
+      let qualifiedFinal = false ;
+      let qualifiedFinalSec = false ;
+      let requestBody;
+      let response;
+
+      if (this.qualification==='Promotional Round'){
+        qualifiedPromo = true;
+      }else if(this.qualification==='Final 1st Stage'){
+        qualifiedPromo = true;
+        qualifiedFinal = true;
+      }else if(this.qualification==='Final 2nd Stage'){
+        qualifiedPromo = true;
+        qualifiedFinal = true;
+        qualifiedFinalSec = true;
+      }
+
       for (const metric of metricsForTeam) {
         metricIdsArray.push(metric.id);
         metricScoreArray.push(metric.enteredScore)
@@ -405,35 +358,38 @@ export default {
         metricIds: metricIdsArray,
         metricScores: metricScoreArray
       };
-
-      let stage = '';
-      if (team.isQualifiedFinalSecondStage){
-        stage = "Final 2nd Stage";
-      }else if(team.isQualifiedFinal){
-        stage = "Final 1st Stage";
-      }else if(team.isQualifiedPromo){
-        stage = "Promotional Round";
-      }
-
       let CalScoreResponse = '';
       let updateTeamURL='';
       try {
           if (this.selectedCompetition === "Game Arena") {
+            requestBody = {
+              id: team.id,
+            };
             CalScoreResponse = await axios.post(`${GET_ALL_GAME_TEAM_BASE_URL}`,this.metricRequestBody, { headers });
             updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
+            response = await axios.put(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
+
           }else if (this.selectedCompetition === "Innovation Design Challenge") {
+            requestBody = {
+              id: team.id,
+              isQualifiedPromo : qualifiedPromo,
+              isQualifiedFinal : qualifiedFinal,
+              isQualifiedFinalSecondStage : qualifiedFinalSec
+            };
             CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
             updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
+            response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
           }
-          console.log(CalScoreResponse.data)
+          console.log('CalScore Response:', CalScoreResponse.data)
+          console.log('Qualify Response:', response.data);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
 
         const presentationArray = [];
         const presentationObject = {
-          score: CalScoreResponse.data.data,
-          stage: stage,
+          score: Math.round(CalScoreResponse.data.data),
+          stage: this.qualification,
           venue: 'some venue'
         };
         presentationArray.push(presentationObject)
@@ -446,6 +402,7 @@ export default {
 
           const updateTeamResponse = await axios.put(`${updateTeamURL}`,updateTeamRequestBody, { headers });
           console.log(updateTeamResponse.data)
+          this.loadTeam();
         } catch (error) {
           console.error("Error updating team:", error);
         }
@@ -471,15 +428,6 @@ export default {
         metricScores: metricScoreArray
       };
 
-      let stage = '';
-      if (team.isQualifiedFinalSecondStage){
-        stage = "Final 2nd Stage";
-      }else if(team.isQualifiedFinal){
-        stage = "Final 1st Stage";
-      }else if(team.isQualifiedPromo){
-        stage = "Promotional Round";
-      }
-
       let CalScoreResponse = '';
       try {
           if (this.selectedCompetition === "Game Arena") {
@@ -487,7 +435,7 @@ export default {
           }else if (this.selectedCompetition === "Innovation Design Challenge") {
             CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
           }
-          this.calculatedScore = CalScoreResponse.data.data
+          this.calculatedScore = Math.round(CalScoreResponse.data.data);
           console.log(calculatedScore)
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -530,17 +478,11 @@ export default {
         this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       }
       this.metrics = this.metricData.data.data;
-      this.totalRecords = this.metrics.length;
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
 },
-  gotoPage(page) {
-      if (page >= 1 && page <= this.totalPagesByQualification) {
-        this.currentPage = page;
-      }
-    },
   },
   watch: {
     // Watch for changes in the filteredTeamsByQualification computed property
@@ -552,7 +494,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.green-score {
+  color: green;
+}
+
+.red-score {
+  color: red;
+}
 /* Main Table Styles */
 .main-table {
   width: 100%;
