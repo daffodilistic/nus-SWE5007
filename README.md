@@ -44,8 +44,15 @@ The Github Actions workflow builds the JAR file and directly deploys the
 application to Google App Engine. The workflow is triggered on every tag pushed
 to the repository.
 
-See the workflow YAML files defined in the `.github/workflows` folder for details.
+See the workflow YAML files defined in the `.github/workflows` folder for
+details.
 
 The following Github Secrets are required:
 - `POSTGRES_USERNAME`: The username for the Postgres database
 - `POSTGRES_PASSWORD`: The password for the Postgres database
+
+## Google App Engine setup
+1. App Engine Admin API needs to be enabled in the Google Cloud Console, under
+the menu option "APIs and services".
+1. Ensure that the correct default service account used for App Engine is set 
+in App Engine -> Settings.

@@ -1,7 +1,7 @@
 runtime: java
 env: flex
-entrypoint: java -Xmx128m -jar demo-0.0.1-SNAPSHOT.jar
-service: demo
+entrypoint: java -Xmx128m -jar demo.jar
+service: default
 runtime_config:
     operating_system: "ubuntu22"
     runtime_version: "17"
