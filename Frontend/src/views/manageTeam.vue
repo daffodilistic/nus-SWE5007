@@ -7,6 +7,7 @@
           v-model="showAddMemberModal"
           modal-class="modal-lg"
           hide-footer
+          id="showUserModal"
         >
         <!-- Search bar for filtering users -->
         <div class="search-container">
@@ -59,11 +60,11 @@
                       <td>{{ user.firstName }}</td>
                       <td>{{ user.lastName }}</td>
                     </tr>
-                    <tr></tr>
+
                   </tbody>
                 </table>
                 <div class="text-center">
-                  <button @click="addMembersToTeam" class="add-member-button">Save</button>
+                  <button id = "addMembersToTeam" @click="addMembersToTeam" class="add-member-button">Save</button>
                 </div>
         </b-modal>
         <!-- Add Member Modal END-->
@@ -71,6 +72,7 @@
          <!-- show history Modal START-->
         <b-modal
           v-model="showHistoryModal"
+          id="showHistoryModal"
           modal-class="modal-lg"
           title="Competition Score"
           hide-footer
@@ -102,7 +104,7 @@
                         <td>{{ presentation.score }} / 100</td>
                         <td>{{ formatDateTime(presentation.dateTime) }}</td>
                       </tr>
-                      <tr><br><br></tr>
+
                     </template>
 
                   </tbody>
@@ -144,7 +146,7 @@
           <tbody v-for="(team, index) in paginatedTeams" :key="index">
             <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
               <td>
-                <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
+                <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" id="expand" class="expand-icon" @click="toggleRow(index)"></i>
               </td>
               <td>{{ startIndex + index }}</td>
               <td v-if="!team.editing">
@@ -170,21 +172,22 @@
                 <input type="text" v-model="team.editingteacherName" class="form-control editing-textbox" />
               </td>
               <td>
-                <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" >
+                <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" id="addUserButton" >
                   <b-icon icon="person-plus" ></b-icon>
                 </b-button>
                 <!-- View Icon -->
-                <b-button @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
+                <b-button @click="viewScore(team.id)" id="viewScore" variant="outline-primary" class="delete-button">
                   <b-icon icon="eye"></b-icon>
                 </b-button>
                 <!-- Edit Icon -->
-                <b-button @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
+                <b-button id="edit-button" @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
                   <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
                 <!-- Delete Icon -->
                 <b-button
                 class="delete-button"
+                id="delete-button"
                 variant="outline-primary"
                 @click="deleteTeam(startIndex + index-1 )"
                 >
@@ -407,17 +410,24 @@ export default {
       return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   },
     async loadTeam() {
+
+      let token='';
+
+      if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken";//for unit test
+      }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
+
       try {
           if (this.selectedCompetition === "Game Arena") {
             this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-          console.log('ga called')
           } else if (this.selectedCompetition === "Innovation Design Challenge") {
             this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
-            console.log('IDC called')
           }
           this.teams = this.teamsData.data.data;
         } catch (error) {
@@ -426,9 +436,15 @@ export default {
     },
 
     async fetchUsers(teamId,teamName) {
+       let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
       try {
         const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
@@ -442,9 +458,15 @@ export default {
       }
     },
     async viewScore(teamId) {
+      let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
       const requestBody = {
         id: teamId,
@@ -453,7 +475,6 @@ export default {
         const response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
         const teamObject = response.data.data
         this.presentationList = teamObject.presentationResponses
-        console.log("data:", this.presentationList);
 
         this.showHistoryModal = true; // Show the modal after fetching the users
       }
@@ -468,14 +489,22 @@ export default {
   },
 
     async toggleRow(index) {
+
     if (this.activeRow === index) {
       this.activeRow = null; // Collapse the row if it's already expanded
+
     } else {
       this.activeRow = index;
       const team = this.filteredTeams[index];
+      let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Vue.$keycloak.token}`
+          'Authorization': `Bearer ${token}`
         };
       try {
         // Make the API call here using the team ID as the request body
@@ -483,21 +512,16 @@ export default {
           id: team.id,
         };
 
-        // Make the HTTP PUT request to the API endpoint
-        const requestBodyJson = JSON.stringify(requestBody);
-        console.log('Request Body:', requestBodyJson);
         let  response
 
         if (this.selectedCompetition === "Game Arena") {
-          response = await axios.post(`${VIEW_GAME_TEAM_BASE_URL}`, requestBodyJson, { headers });
-          console.log('ga called')
+          response = await axios.post(`${VIEW_GAME_TEAM_BASE_URL}`, requestBody, { headers });
+
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-            response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`, requestBodyJson, { headers });
-            console.log('IDC called')
+            response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`, requestBody, { headers });
+
         }
         this.teamMembers = response.data.data;
-        // Handle the response, if needed
-        console.log('Response from server:', this.teamMembers);
 
         // Optional: Perform any additional actions, such as updating the UI.
       } catch (error) {
@@ -527,7 +551,9 @@ export default {
       // Method to toggle editing mode for a team
       async editTeam(index) {
         const team = this.filteredTeams[index];
+
         if (team.editing) {
+
           // Save the changes
           team.teamName = team.editingTeamName;
           team.ageGroup = team.editingAgeGroup;
@@ -541,14 +567,19 @@ export default {
           const requestBody = {
             id: team.id,
             teamName : team.teamName,
-            competitionChoice : team.competitionChoice,
             ageGroup : team.ageGroup,
           };
-
+          let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Vue.$keycloak.token}`
+            'Authorization': `Bearer ${token}`
           };
+
           try {
              if(this.selectedCompetition === "Game Arena") {
                 response = await axios.put(`${UPDATE_GAME_TEAM_BASE_URL}`, requestBody, { headers });
@@ -556,17 +587,11 @@ export default {
                 response = await axios.put(`${UPDATE_IDC_TEAM_BASE_URL}`, requestBody, { headers });
               }
 
-            // Handle the response, if needed
-            console.log('Response from server:', response.data);
-
-            // Close the modal after the request is successful
-            this.showAddMemberModal = false;
-
-            // Optional: Perform any additional actions, such as updating the UI.
           } catch (error) {
             // Handle errors, if any
             console.error('Error adding members to team:', error);
           }
+
         } else {
           // Enter editing mode
           team.editingTeamName = team.teamName;
@@ -575,16 +600,25 @@ export default {
           team.editingCompetitionChoice = team.competitionChoice;
           team.editingStatus = team.status;
           team.editing = true;
+
         }
       },
       // Method to delete a team
       async deleteTeam(index) {
+
+        let token = "";
+        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+          token = Vue.$keycloak.token;
+         } else {
+          token = "mockedToken";//for unit test
+        }
+
         const team = this.filteredTeams[index];
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
         };
-        const confirmation = await Swal.fire({
+      const confirmation = await Swal.fire({
         title: 'Are you sure?',
         text: 'You won\'t be able to revert this!',
         icon: 'warning',
@@ -604,8 +638,6 @@ export default {
           userIds:[]
         };
 
-        console.log('delete response', requestBody);
-
         try {
           if(this.selectedCompetition === "Game Arena") {
                 const response2 = await axios.put(`${ADD_MEMBER_IDC_TEAM_BASE_URL}`, requestBody2, { headers });
@@ -613,20 +645,18 @@ export default {
                 data: requestBody,
                 headers: headers
               });
-
-              }else if (this.selectedCompetition === "Innovation Design Challenge") {
+          }else if (this.selectedCompetition === "Innovation Design Challenge") {
                 const response2 = await axios.put(`${ADD_MEMBER_IDC_TEAM_BASE_URL}`, requestBody2, { headers });
                 const response = await axios.delete(`${DELETE_IDC_TEAM_BASE_URL}`, {
                 data: requestBody,
                 headers: headers
            });
-
            }
 
           // Show a success message
           Swal.fire({
             title: 'Deleted!',
-            text: 'The user has been deleted.',
+            text: 'The Team has been deleted.',
             icon: 'success'
           });
 
@@ -646,11 +676,11 @@ export default {
       const jsonPayload = {
         userIds: this.selectedUsers,
       };
-      console.log(jsonPayload)
     },
 
     async addMembersToTeam() {
     // Make sure currentTeamId and selectedUsers are defined
+
     if (!this.currentTeamId || this.selectedUsers.length === 0) {
       console.error('Team ID or selected users not available.');
       return;
@@ -662,18 +692,19 @@ export default {
       teamName : this.currentTeamName,
       userIds: this.selectedUsers,
     };
-
-    console.log('Request Payload:', requestBody);
+    let token = "";
+        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+          token = Vue.$keycloak.token;
+         } else {
+          token = "mockedToken";//for unit test
+        }
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      'Authorization': `Bearer ${token}`
     };
     try {
       // Make the HTTP POST request to the API endpoint
       const response = await axios.put(`${ADD_MEMBER_IDC_TEAM_BASE_URL}`, requestBody, { headers });
-
-      // Handle the response, if needed
-      console.log('Response from server:', response.data);
 
       // Close the modal after the request is successful
       this.showAddMemberModal = false;
