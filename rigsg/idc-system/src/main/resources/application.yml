@@ -32,3 +32,4 @@ keycloak:
   use-resource-role-mappings: false
   bearer-only: true
   cors: true
+  enabled: true
