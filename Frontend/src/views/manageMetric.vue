@@ -222,9 +222,17 @@ export default {
     },
   },
   async mounted() {
+
+    let token='';
+
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      'Authorization': `Bearer ${token}`
     };
     try {
       this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
