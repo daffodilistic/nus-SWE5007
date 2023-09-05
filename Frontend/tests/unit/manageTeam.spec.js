@@ -91,17 +91,23 @@ describe('manageTeam.vue', () => {
       data() {
         return {
           teams: MOCK_GET_ALL_IDC_TEAM.data, // Let the mock response handle the data
+          filteredCompetitionChoices:filteredCompetitionChoices
         };
       },
     });
 
-    await wrapper.vm.$nextTick();
+     expect(axios.get).toHaveBeenCalledWith(
+  GET_ALL_IDC_TEAM_BASE_URL,
+  {
+    headers: { Authorization: "Bearer mockedToken", "Content-Type": "application/json" },
+  }
+);
 
     const displayedRows = wrapper.findAll('tr').filter(row => row.classes('parent-row')).length;
 
     const teamsCount = MOCK_GET_ALL_IDC_TEAM.data.length;
 
-    expect(displayedRows/2).toBe(teamsCount);
+    expect(displayedRows/filteredCompetitionChoices.length).toBe(teamsCount);
 
   });
 });
@@ -216,8 +222,13 @@ describe('manageTeam.vue', () => {
 
   // Find the modal by its id
   const modal = wrapper.find('#showUserModal');
-  const allAxiosGetCalls = axios.get.mock.calls;
-  expect(allAxiosGetCalls[0][0]).toEqual(expect.stringContaining(GET_ALL_USER_INFO_BASE_URL));
+
+   expect(axios.get).toHaveBeenCalledWith(
+  GET_ALL_USER_INFO_BASE_URL,
+  {
+    headers: { Authorization: "Bearer mockedToken", "Content-Type": "application/json" },
+  }
+);
 
   // Within the modal, find all rows within the tbody
   const rows = modal.findAll('tbody tr');
