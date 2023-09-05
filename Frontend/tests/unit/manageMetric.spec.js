@@ -74,7 +74,12 @@ describe('manageMetric.vue', () => {
       },
     });
 
-    await wrapper.vm.$nextTick();
+    expect(axios.get).toHaveBeenCalledWith(
+  GET_ALL_IDC_METRIC_BASE_URL,
+  {
+    headers: { Authorization: "Bearer mockedToken", "Content-Type": "application/json" },
+  }
+);
 
     const displayedRows = wrapper.findAll('tr').filter(row => row.classes('parent-row')).length;
 
