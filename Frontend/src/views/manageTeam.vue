@@ -386,7 +386,6 @@ export default {
   },
   async mounted() {
 
-    console.log('mounted called')
     let token='';
 
           if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {

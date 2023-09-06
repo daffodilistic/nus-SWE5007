@@ -20,7 +20,7 @@
               <input type="file" name="file-upload" id="file-upload" @change="onFileChange" accept=".pdf,.doc,.docx,.xlsx,.csv" />
             </div>
             <br><br>
-            <b-button type="submit" @click="upload(team)" variant="outline-primary" class="delete-button">Upload</b-button>
+            <b-button @click="upload(team)" variant="outline-primary" class="delete-button">Upload</b-button>
           </form>
         </b-modal>
         <!-- show upload Modal END-->
@@ -170,6 +170,25 @@ export default {
       showUploadModal: false,
       presentationList: [],
       selectedFile: null, // Initialize the selectedFile variable
+      LocalTeam: {
+        id:"7c8f5f5b-e85e-4e66-a40f-bde7ff9db5ab",
+        isQualifiedPromo:true,
+        isQualifiedFinal: false,
+        isQualifiedFinalSecondStage: false,
+        userResponses: [
+          {
+            firstName: "John",
+            lastName: "Doe",
+            email: "john@example.com",
+            phone: "123-456-7890",
+            country: "USA",
+            state: "CA",
+            dateOfBirth: "1990-01-01",
+            schoolName: "Example School",
+            yearsOfExp: 5,
+          },
+          // Add more user objects as needed
+        ]}
     };
   },
   computed: {
@@ -195,8 +214,9 @@ export default {
       id: this.idcTeamId,
     };
     try {
-      //this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+      this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
      // this.team  = this.teamsData.data.data;
+       this.team  = this.LocalTeam;
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -337,7 +357,7 @@ export default {
 
           if (this.selectedCompetition === "Game Arena") {
             response = await axios.post(`${test}`, formData, { headers });
-
+            console.log('ga called');
           } else if (this.selectedCompetition === "Innovation Design Challenge") {
 
              if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
@@ -346,7 +366,7 @@ export default {
                   "Content-Type": "multipart/form-data",
                   "Authorization": `Bearer ${Vue.$keycloak.token}`
                 }});
-
+                console.log('IDC PRO called'+ response);
               } else if (team.isQualifiedPromo && team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
                 response = await axios.post(`${UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, {
                 headers: {
@@ -355,8 +375,9 @@ export default {
                 }});
               }
           }
+          // Handle the response, if needed
+          console.log('Response from server:', response.data);
         };
-
         // Read the file as an ArrayBuffer (binary data)
         reader.readAsArrayBuffer(this.selectedFile);
       } catch (error) {

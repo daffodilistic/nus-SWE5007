@@ -267,7 +267,7 @@ export default {
       this.teams = allTeams
       this.presentations = teams.presentationResponses
       this.totalRecords = this.teams.length;
-      console.log("presentations"+ this.teams)
+
 
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -300,11 +300,10 @@ export default {
           if (this.selectedCompetition === "Game Arena") {
             this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
             this.teams = this.teamsData.data.data;
-            console.log('ga called')
             this.teams = allTeams.filter((team) => team.isQualifiedForElimination);
           }else if (this.selectedCompetition === "Innovation Design Challenge") {
             this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
-            console.log('IDC called')
+
            this.teams = this.teamsData.data.data;
             //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
           }
@@ -380,8 +379,7 @@ export default {
             updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
             response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
           }
-          console.log('CalScore Response:', CalScoreResponse.data)
-          console.log('Qualify Response:', response.data);
+
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -397,11 +395,11 @@ export default {
           id: team.id,
           presentationRequestsList: presentationArray
         };
-        console.log(updateTeamRequestBody)
+
         try {
 
           const updateTeamResponse = await axios.put(`${updateTeamURL}`,updateTeamRequestBody, { headers });
-          console.log(updateTeamResponse.data)
+
           this.loadTeam();
         } catch (error) {
           console.error("Error updating team:", error);
@@ -436,7 +434,7 @@ export default {
             CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
           }
           this.calculatedScore = Math.round(CalScoreResponse.data.data);
-          console.log(calculatedScore)
+
         } catch (error) {
           console.error("Error fetching data:", error);
         }

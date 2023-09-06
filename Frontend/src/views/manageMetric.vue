@@ -237,7 +237,7 @@ export default {
     try {
       this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       this.metrics = this.metricsData.data.data;
-      console.log('Response from server:', this.metrics.data);
+
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching metrics:", error);
@@ -253,6 +253,7 @@ export default {
     }
   },
      async loadMetric() {
+
       let token = "";
           if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
             token = Vue.$keycloak.token;
@@ -351,7 +352,6 @@ export default {
                 metricWeight: metric.metricWeight
               };
 
-              console.log('create')
               // If the metric doesn't have an ID, create a new record using a POST request
               const response = await axios.post(`${url2}`, requestBody, { headers });
 
@@ -402,7 +402,6 @@ export default {
             id: metric.id,
           };
 
-        console.log('delete response', requestBody);
         try {
           if(this.selectedCompetition === "Game Arena") {
                 response = await axios.delete(`${DELETE_GAME_METRIC_BASE_URL}`, {
@@ -446,7 +445,6 @@ export default {
       const jsonPayload = {
         userIds: this.selectedUsers,
       };
-      console.log(jsonPayload)
     },
   },
 };
