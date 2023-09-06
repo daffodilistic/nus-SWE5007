@@ -562,6 +562,75 @@
 			"response": []
 		},
 		{
+			"name": "Assign score to a IDC team",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"60ac712e-75a0-4f33-b1c9-4a6e0e5a7920\",\n    \"presentationRequestsList\": [\n        {\n            \"score\": 11.11,\n            \"stage\": \"stage1\",\n            \"venue\": \"venue1\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcteam/assign-score",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcteam",
+						"assign-score"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "IDC team qualify for stages",
 			"request": {
 				"auth": {
