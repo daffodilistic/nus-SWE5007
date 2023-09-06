@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a2138f41-f812-425c-8e93-be79337cfb6a",
+		"_postman_id": "5b41af75-e8c1-4ef3-a0ab-6ad31e152685",
 		"name": "Project Capstone",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "3260616"
@@ -1539,13 +1539,19 @@
 				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"localFilePath\": \"D:\\\\java2\\\\MC_Invoice.pdf\",\n    \"idcTeamId\": \"136d0c4b-025f-4cbf-b80e-441f93fb3f44\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files",
+							"type": "file",
+							"src": "/D:/java2/MC_Invoice.pdf"
+						},
+						{
+							"key": "team",
+							"value": "60ac712e-75a0-4f33-b1c9-4a6e0e5a7920",
+							"type": "text"
 						}
-					}
+					]
 				},
 				"url": {
 					"raw": "http://localhost:8082/idcteam/upload-prim-file",
@@ -1608,13 +1614,19 @@
 				"method": "POST",
 				"header": [],
 				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"localFilePath\": \"D:\\\\java2\\\\cny.mp4\",\n    \"idcTeamId\": \"136d0c4b-025f-4cbf-b80e-441f93fb3f44\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files",
+							"type": "file",
+							"src": "/D:/java2/cny.mp4"
+						},
+						{
+							"key": "team",
+							"value": "60ac712e-75a0-4f33-b1c9-4a6e0e5a7920",
+							"type": "text"
 						}
-					}
+					]
 				},
 				"url": {
 					"raw": "http://localhost:8082/idcteam/upload-promo-file",
