@@ -55,6 +55,7 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                     .antMatchers("/**/create**", "/**/update**", "/**/delete**").hasRole("admin")
                     .antMatchers("/idcteam/qualify**").hasRole("judge")
                     .antMatchers("/idcteam/assign-user").hasRole("admin")
+                    .antMatchers("/idcteam/assign-score").hasRole("judge")
                     .antMatchers("/idcmetrics/calculate").hasRole("judge")
                     .antMatchers("/idcgroup/assign-team").hasRole("admin")
                     .anyRequest().denyAll();

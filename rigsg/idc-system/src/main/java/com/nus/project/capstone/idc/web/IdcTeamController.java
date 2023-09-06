@@ -203,4 +203,20 @@ public class IdcTeamController {
         }
     }
 
+    @PutMapping("/assign-score")
+    public ResponseEntity<GeneralMessageEntity> assignScore(@RequestBody IdcTeamRequests idcTeamRequests) {
+        if (idcTeamRequests.getPresentationRequestsList().size() != 1){
+            return genericFailureMessage();
+        } else if (idcTeamRequests.getIsQualifiedPromo() == null &&
+                idcTeamRequests.getIsQualifiedFinal() == null &&
+                idcTeamRequests.getIsQualifiedFinalSecondStage() == null &&
+                idcTeamRequests.getIdcGroupId() == null &&
+                idcTeamRequests.getAgeGroup() == null &&
+                idcTeamRequests.getRankFirstStage() == null &&
+                idcTeamRequests.getTeacherId() == null) {
+            return updateTeam(idcTeamRequests);
+        } else {
+            return genericFailureMessage();
+        }
+    }
 }
