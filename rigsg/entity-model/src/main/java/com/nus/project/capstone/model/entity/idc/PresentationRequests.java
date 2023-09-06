@@ -14,7 +14,7 @@ public class PresentationRequests {
 
     private UUID id;
     private String stage;
-    private Integer score;
+    private Float score;
     private String venue;
     private Instant dateTime;
 }
