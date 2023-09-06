@@ -210,7 +210,7 @@ describe('manageTeam.vue', () => {
       data() {
         return {
           teams: MOCK_GET_ALL_IDC_TEAM.data,
-          paginatedModalUserList: MOCK_GET_ALL_USER_INFO,
+          paginatedModalUserList: MOCK_GET_ALL_USER_INFO.data,
           selectedUsers: ['123','124'],
         };
       },
@@ -234,7 +234,7 @@ describe('manageTeam.vue', () => {
   const rows = modal.findAll('tbody tr');
 
   // Calculate the expected number of user rows
-  const expectedUserRows = MOCK_GET_ALL_USER_INFO.length;
+  const expectedUserRows = MOCK_GET_ALL_USER_INFO.data.length;
   // Assert that the displayed rows match the number of users
   expect(rows.length).toBe(expectedUserRows);
 
