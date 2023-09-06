@@ -3,7 +3,6 @@ package com.nus.project.capstone.idc.web;
 import com.nus.project.capstone.idc.service.GCPFileUploadService;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserResponse;
-import com.nus.project.capstone.model.entity.idc.FileUploadRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
@@ -15,11 +14,14 @@ import com.nus.project.capstone.model.persistence.idc.PresentationRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.nus.project.capstone.idc.service.GCPFileUploadService.PRIM_FILE_SUFFIX;
@@ -163,15 +165,18 @@ public class IdcTeamController {
                 .data(String.format("Delete success for %s", idcTeamRequests.getId())).build());
     }
 
-    @PostMapping("/upload-prim-file")
-    public ResponseEntity<GeneralMessageEntity> uploadPrimFile(@RequestBody FileUploadRequests fileUploadRequests) {
-        if (fileUploadRequests.getLocalFilePath().substring(fileUploadRequests.getLocalFilePath().length() - 4).equals(PRIM_FILE_SUFFIX)){
-            var teamId = idcTeamRepository.findById(fileUploadRequests.getIdcTeamId());
-            if(teamId.isEmpty()){
+    @PostMapping(value = "/upload-prim-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<GeneralMessageEntity> uploadPrimFile(@RequestParam("files") MultipartFile[] files,
+                                                               @RequestParam("team") UUID idc_team_id) {
+        MultipartFile file = files[0];
+        String fileName = file.getOriginalFilename();
+        if (fileName.substring(fileName.length() - 4).equals(PRIM_FILE_SUFFIX)) {
+            var teamId = idcTeamRepository.findById(idc_team_id);
+            if (teamId.isEmpty()) {
                 return ResponseEntity.ok(GeneralMessageEntity.builder()
-                        .data(String.format("Team ID %s cannot be found", fileUploadRequests.getIdcTeamId())).build());
+                        .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
-                return fileUploadService.uploadFileToGCP(fileUploadRequests.getLocalFilePath(), teamId.get().getTeamName());
+                return fileUploadService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
@@ -179,15 +184,18 @@ public class IdcTeamController {
         }
     }
 
-    @PostMapping("/upload-promo-file")
-    public ResponseEntity<GeneralMessageEntity> uploadPromoFile(@RequestBody FileUploadRequests fileUploadRequests) {
-        if (fileUploadRequests.getLocalFilePath().substring(fileUploadRequests.getLocalFilePath().length() - 4).equals(PROMO_FILE_SUFFIX)){
-            var teamId = idcTeamRepository.findById(fileUploadRequests.getIdcTeamId());
-            if(teamId.isEmpty()){
+    @PostMapping(value = "/upload-promo-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<GeneralMessageEntity> uploadPromoFile(@RequestParam("files") MultipartFile[] files,
+                                                                @RequestParam("team") UUID idc_team_id) {
+        MultipartFile file = files[0];
+        String fileName = file.getOriginalFilename();
+        if (fileName.substring(fileName.length() - 4).equals(PROMO_FILE_SUFFIX)) {
+            var teamId = idcTeamRepository.findById(idc_team_id);
+            if (teamId.isEmpty()) {
                 return ResponseEntity.ok(GeneralMessageEntity.builder()
-                        .data(String.format("Team ID %s cannot be found", fileUploadRequests.getIdcTeamId())).build());
+                        .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
-                return fileUploadService.uploadFileToGCP(fileUploadRequests.getLocalFilePath(), teamId.get().getTeamName());
+                return fileUploadService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
             return ResponseEntity.ok(GeneralMessageEntity.builder()

@@ -14,13 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 @Component
 public class GCPFileUploadService {
@@ -53,12 +51,13 @@ public class GCPFileUploadService {
 
     }
 
-    public ResponseEntity<GeneralMessageEntity> uploadFileToGCP(String uploadFilePath, String teamName){
+    public ResponseEntity<GeneralMessageEntity> uploadFileToGCP(MultipartFile file, String teamName){
 
         try{
-            byte[] fileData = FileUtils.readFileToByteArray(new File(uploadFilePath));
-            String contentType = Files.probeContentType(Paths.get(uploadFilePath));
-            String fileName = constructFileName(gcpDirectoryName, teamName, getRound(uploadFilePath));
+            Path filePath = new File(file.getOriginalFilename()).toPath();
+            byte[] fileData = FileUtils.readFileToByteArray(convertFile(file));
+            String contentType = Files.probeContentType(filePath);
+            String fileName = constructFileName(gcpDirectoryName, teamName, getRound(filePath.toString()));
             logger.info("Going to upload to [{}] with contentType [{}]", fileName, contentType);
 
             Blob blob = bucket.create(fileName, fileData, contentType);
@@ -98,4 +97,16 @@ public class GCPFileUploadService {
                     "Please upload only .pdf for preliminary round and .mp4 for promotional round");
         }
     }
+    private File convertFile(MultipartFile file) throws Exception {
+        try{
+            File convertedFile = new File(file.getOriginalFilename());
+            FileOutputStream outputStream = new FileOutputStream(convertedFile);
+            outputStream.write(file.getBytes());
+            outputStream.close();
+            return convertedFile;
+        }catch (Exception e){
+            throw new Exception("An error has occurred while converting the file");
+        }
+    }
+
 }

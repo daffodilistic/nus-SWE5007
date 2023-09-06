@@ -13,6 +13,10 @@ spring:
         credential: classpath:dev-bucket-credential.json
         id: idc-system-resources
         dirName: participants
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   datasource:
     username: prd-ric-app-user
     password: password
