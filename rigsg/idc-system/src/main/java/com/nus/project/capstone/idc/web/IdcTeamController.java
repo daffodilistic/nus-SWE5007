@@ -1,6 +1,6 @@
 package com.nus.project.capstone.idc.web;
 
-import com.nus.project.capstone.idc.service.GCPFileUploadService;
+import com.nus.project.capstone.idc.service.GCPFileService;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
@@ -14,6 +14,8 @@ import com.nus.project.capstone.model.persistence.idc.PresentationRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +26,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.nus.project.capstone.idc.service.GCPFileUploadService.PRIM_FILE_SUFFIX;
-import static com.nus.project.capstone.idc.service.GCPFileUploadService.PROMO_FILE_SUFFIX;
+import static com.nus.project.capstone.idc.service.GCPFileService.PRIM_FILE_SUFFIX;
+import static com.nus.project.capstone.idc.service.GCPFileService.PROMO_FILE_SUFFIX;
 import static com.nus.project.capstone.idc.web.Tools.genericFailureMessage;
 
 @Slf4j
@@ -36,16 +38,16 @@ public class IdcTeamController {
     private final IdcTeamRepository idcTeamRepository;
     private final UserRepository userRepository;
     private final PresentationRepository presentationRepository;
-    private final GCPFileUploadService fileUploadService;
+    private final GCPFileService fileService;
 
     @Autowired
     public IdcTeamController(IdcTeamRepository idcTeamRepository, UserRepository userRepository,
                              PresentationRepository presentationRepository,
-                             GCPFileUploadService fileUploadService) {
+                             GCPFileService fileService) {
         this.idcTeamRepository = idcTeamRepository;
         this.userRepository = userRepository;
         this.presentationRepository = presentationRepository;
-        this.fileUploadService = fileUploadService;
+        this.fileService = fileService;
     }
 
     @PostMapping("/create-team")
@@ -176,7 +178,7 @@ public class IdcTeamController {
                 return ResponseEntity.ok(GeneralMessageEntity.builder()
                         .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
-                return fileUploadService.uploadFileToGCP(files[0], teamId.get().getTeamName());
+                return fileService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
@@ -195,12 +197,30 @@ public class IdcTeamController {
                 return ResponseEntity.ok(GeneralMessageEntity.builder()
                         .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
-                return fileUploadService.uploadFileToGCP(files[0], teamId.get().getTeamName());
+                return fileService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
                     .data("Invalid file! must end with .mp4").build());
         }
+    }
+
+    @PostMapping(value = "/download-file", produces = "application/octet-stream")
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam("file") String fileName){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + fileName + "\"");
+        ByteArrayResource resource = fileService.downloadFileFromGCP(fileName);
+        return ResponseEntity.ok().
+                contentType(MediaType.APPLICATION_OCTET_STREAM).
+                headers(headers).body(resource);
+    }
+
+    @GetMapping("/view-all-participants-files")
+    public ResponseEntity<GeneralMessageEntity> getAllFiles() {
+        List<String> fileNames = fileService.getAllDownloadableFilesFromParticipants();
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(fileNames).build());
     }
 
     @PutMapping("/assign-score")

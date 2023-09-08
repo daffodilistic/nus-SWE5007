@@ -1711,6 +1711,143 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "View all participants files",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcteam/view-all-participants-files",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcteam",
+						"view-all-participants-files"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Download file",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8082/idcteam/download-file?file=participants/Team BCD-Promotional-1693974117222.mp4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"idcteam",
+						"download-file"
+					],
+					"query": [
+						{
+							"key": "file",
+							"value": "participants/Team BCD-Promotional-1693974117222.mp4"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
