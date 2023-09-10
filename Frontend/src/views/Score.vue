@@ -99,15 +99,14 @@
                   </td>
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
                       :rowspan="filteredMetricsForTeam(index).length">
-                    <b-button @click="previewScore(index)" variant="outline-primary" class="delete-button">
+                    <b-button id = "previewScore" @click="previewScore(index)" variant="outline-primary" class="delete-button">
                       <b-icon icon="calculator"></b-icon>
                     </b-button><br>
 
-                    <b-button @click="editMetric(index)" variant="outline-primary" class="delete-button">
+                    <b-button id="saveScore" @click="editMetric(index)" variant="outline-primary" class="delete-button">
                       <b-icon icon="save"></b-icon>
                     </b-button>
                   </td>
-
                 </tr>
               </tbody>
             </table>
@@ -222,9 +221,7 @@ export default {
           default:
             result = false;
         }
-
         return result;
-
       });
     },
 
@@ -243,8 +240,6 @@ export default {
     const query = this.searchQuery.trim().toLowerCase();
     return this.teams.filter((team) => team.teamName.toLowerCase().includes(query));
   },
-
-
     startIndex() {
       return (this.currentPage - 1) * this.itemsPerPage + 1;
     },
@@ -254,9 +249,15 @@ export default {
     },
   },
   async mounted() {
+     let token='';
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      'Authorization': `Bearer ${token}`
     };
     try {
       this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
@@ -267,12 +268,9 @@ export default {
       this.teams = allTeams
       this.presentations = teams.presentationResponses
       this.totalRecords = this.teams.length;
-
-
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-
   },
   methods: {
     getQualificationStatus(team) {
@@ -287,14 +285,19 @@ export default {
       } else {
         qualificationStatus = "Not Qualified";
       }
-
       return qualificationStatus;
     },
 
     async loadTeam() {
+       let token='';
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
       try {
           if (this.selectedCompetition === "Game Arena") {
@@ -314,9 +317,16 @@ export default {
     },
 
     async editMetric(index) {
+       let token='';
+
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
        const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
 
       // Loop through each metric and add the required data to the array
@@ -385,11 +395,13 @@ export default {
         }
 
         const presentationArray = [];
+
         const presentationObject = {
           score: Math.round(CalScoreResponse.data.data),
           stage: this.qualification,
           venue: 'some venue'
         };
+
         presentationArray.push(presentationObject)
         const updateTeamRequestBody = {
           id: team.id,
@@ -406,9 +418,16 @@ export default {
         }
     },
      async previewScore(index) {
+       let token='';
+
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
        const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
 
       // Loop through each metric and add the required data to the array
@@ -460,22 +479,35 @@ export default {
   },
 
   async toggleRow(index) {
+
   if (this.activeRow === index) {
     this.activeRow = null; // Collapse the row if it's already expanded
   } else {
     this.activeRow = index;
+
     const team = this.filteredTeamsByQualification[index];
+
+     let token='';
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      'Authorization': `Bearer ${token}`
     };
     try {
       if (this.selectedCompetition === "Game Arena") {
         this.metricData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`, { headers });
       } else if (this.selectedCompetition === "Innovation Design Challenge") {
+
         this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       }
+
       this.metrics = this.metricData.data.data;
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
