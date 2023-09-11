@@ -61,6 +61,42 @@
                 </table>
         </b-modal>
         <!-- show history Modal END-->
+
+         <!-- show download START-->
+       <b-modal
+          v-model="showDownloadModal"
+          modal-class="custom-modal"
+          title="Download File"
+          hide-footer
+        >
+            <!-- List of users to be displayed inside the modal -->
+            <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th>Filename</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="downloadFileList.length === 0">
+                      <tr>
+                        <td colspan="5"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                       <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
+                        <td>{{ file }} </td>
+                        <td> <b-button id = "downloadFile" @click="downloadFile(file)" variant="outline-primary" class="delete-button">
+                <b-icon icon="cloud-download"></b-icon>
+              </b-button></td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                  </tbody>
+                </table>
+        </b-modal>
+        <!-- show download Modal END-->
       <div class="form-container">
       <table>
             <tr>
@@ -89,7 +125,7 @@
               <b-button id = "viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button">
                 <b-icon icon="cloud-upload"></b-icon>
               </b-button>&nbsp;
-               <b-button id = "downloadFile" @click="downloadFile()" variant="outline-primary" class="delete-button">
+               <b-button id = "viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" class="delete-button">
                 <b-icon icon="cloud-download"></b-icon>
               </b-button>
             </div>
@@ -158,7 +194,7 @@
 
 <script>
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_PROMO_FILE_IDC_BASE_URL} from '@/api';
+import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL} from '@/api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -167,11 +203,13 @@ export default {
     return {
       competitionChoiceOptions: competitionChoiceOptions,
       selectedCompetition: "Innovation Design Challenge",
-      idcTeamId: "14a2413b-ff72-41ec-bd6c-c9273d9041fe",
+      idcTeamId: "ac71e3fe-8055-40a3-90aa-0b60c77abe50",
       team:'',
       showHistoryModal: false,
       showUploadModal: false,
+      showDownloadModal: false,
       presentationList: [],
+      downloadFileList: [],
       selectedFile: null, // Initialize the selectedFile variable
     };
   },
@@ -248,7 +286,44 @@ export default {
         console.error("Error fetching users:", error);
       }
     },
-    async viewUpload(teamId) {
+
+    async viewDownload(teamName) {
+       let token='';
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        const response = await axios.get(`${VIEW_ALL_FILES_BASE_URL}`, { headers });
+        const originalArray = response.data.data;
+        const prefix = teamName;
+
+        // Remove the "participants/" prefix from each item
+        const interimArray = originalArray.map((item) => {
+          // Use string manipulation to remove the prefix
+          return item.replace('participants/', '');
+        });
+
+        this.downloadFileList = interimArray.filter((item) => {
+        const parts = item.split('-');
+        if (parts.length > 1) {
+          // Check if the first part of the filename matches the prefix
+          return parts[0] === prefix;
+        }
+        return false;
+      });
+        this.showDownloadModal = true; // Show the modal after fetching the users
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    async viewUpload(team) {
       this.showUploadModal = true;
     },
     getQualificationStatus(team) {
@@ -292,6 +367,7 @@ export default {
         }
     },
     displayTitleText(team) {
+
       if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
         return "Please upload proposal";
       } else if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
@@ -327,7 +403,7 @@ export default {
       // You can perform any further processing with the selected file here
     },
     async upload(team) {
-
+      let token='';
       if (!this.selectedFile) {
         console.log("No file selected.");
         return;
@@ -370,14 +446,14 @@ export default {
           } else if (this.selectedCompetition === "Innovation Design Challenge") {
 
              if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-                 response = await axios.post(`${UPLOAD_PROMO_FILE_IDC_BASE_URL}`, formData, {
+                 response = await axios.post(`${UPLOAD_PROMO_FILE_IDC_BASE_URL}`, formData, { //video .mp4
                   headers: {
                   "Content-Type": "multipart/form-data",
                   "Authorization": `Bearer ${token}`
                 }});
 
               } else if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-                response = await axios.post(`${UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, {
+                response = await axios.post(`${UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, { //pdf
                 headers: {
                   "Content-Type": "multipart/form-data",
                   "Authorization": `Bearer ${token}`
@@ -458,27 +534,49 @@ export default {
     console.error('Error calling API:', error);
   }
 },
-downloadFile() {
-            axios({
-                url: 'http://localhost:8082/idcteam/download-file?file=participants/Team%20ABC-Promotional-1693974117222.mp4', // Download File URL Goes Here
-                method: 'POST',
-                responseType: 'blob',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': ' GET, PUT, POST, DELETE, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
-                    'Access-Control-Allow-Credentials': 'false',
-                    'Authorization': `Bearer ${Vue.$keycloak.token}`
-                },
-            }).then((res) => {
-                var FILE = window.URL.createObjectURL(new Blob([res.data]));
-                var docUrl = document.createElement('x');
-                docUrl.href = FILE;
-                docUrl.setAttribute('download', 'video.mp4');
-                document.body.appendChild(docUrl);
-                docUrl.click();
-            });
-        }
+    downloadFile(file) {
+      axios({
+  url: `${DOWNLOAD_FILE_IDC_BASE_URL}/${file}`,
+  method: 'POST',
+  responseType: 'blob',
+  headers: {
+    'Authorization': `Bearer ${Vue.$keycloak.token}`
+  },
+})
+.then((res) => {
+  // Get the file type (MIME type) from the response Blob
+  const fileType = res.data.type;
+
+  // Extract the filename from the URL or generate it dynamically
+  const urlParts = res.config.url.split('/');
+  const filename = urlParts[urlParts.length - 1];
+
+  // Create a Blob from the response data
+  const blob = new Blob([res.data], { type: fileType });
+
+  // Create a URL for the Blob
+  const url = window.URL.createObjectURL(blob);
+
+  // Create a link element
+  const link = document.createElement('a');
+  link.href = url;
+
+  // Set the download attribute to the extracted/generated filename
+  link.setAttribute('download', filename);
+
+  // Trigger the download
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(link);
+})
+.catch((error) => {
+  console.error('Error downloading file:', error);
+  // Handle the error here (e.g., show an error message to the user)
+});
+    }
   },
 };
 </script>
