@@ -47,11 +47,11 @@ public class IdcMetricsController {
     public ResponseEntity<GeneralMessageEntity> updateMetric(@RequestBody IdcMetricsRequests idcMetricsRequests) {
 
         if (idcMetricsRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("IDC metric id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("IDC metric id must be provided").build());
         }
 
         if (idcMetricsRepository.findById(idcMetricsRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("IDC metric %s is not found", idcMetricsRequests.getId())).build());
         }
 
@@ -82,7 +82,7 @@ public class IdcMetricsController {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
                     .data(score).build());
         } else {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data("ids or scores are missing. Skip calculation").build());
         }
     }

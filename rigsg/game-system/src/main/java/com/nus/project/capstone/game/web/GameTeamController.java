@@ -57,11 +57,11 @@ public class GameTeamController {
     public ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody GameTeamRequests updateGameTeamRequests) {
 
         if (updateGameTeamRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Game team id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("Game team id must be provided").build());
         }
 
         if (gameTeamRepository.findById(updateGameTeamRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("Game Team %s is not found", updateGameTeamRequests.getId())).build());
         }
 
