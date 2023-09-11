@@ -7,6 +7,7 @@ import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticatio
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @KeycloakConfiguration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@ConditionalOnProperty(name = "keycloak.enabled", havingValue = "true", matchIfMissing = true)
 class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     @Value("${spring.secured}")
@@ -44,7 +46,7 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        if(isSecurityEnabled){
+        if (isSecurityEnabled) {
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .csrf().disable()
@@ -53,6 +55,8 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                     .antMatchers("/**/create**", "/**/update**", "/**/delete**").hasRole("admin")
                     .antMatchers("/idcteam/qualify**").hasRole("judge")
                     .antMatchers("/idcteam/assign-user").hasRole("admin")
+                    .antMatchers("/idcteam/assign-score").hasRole("judge")
+                    .antMatchers("/idcteam/download-file").hasRole("judge")
                     .antMatchers("/idcmetrics/calculate").hasRole("judge")
                     .antMatchers("/idcgroup/assign-team").hasRole("admin")
                     .anyRequest().denyAll();

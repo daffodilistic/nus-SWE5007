@@ -24,7 +24,7 @@
     </div>
 
     <div class="add-button">
-      <b-button variant="outline-primary" size="lg" @click="addNewMetric"><b-icon icon="file-earmark-plus" ></b-icon>
+      <b-button variant="outline-primary" id = "addNewMetric" @click="addNewMetric"><b-icon icon="file-earmark-plus" ></b-icon>
       </b-button><br>
 
     </div><br>
@@ -85,13 +85,14 @@
 
           <td>
             <!-- Edit Icon -->
-            <b-button @click="editMetric(startIndex + index -1)" variant="outline-primary" class="delete-button">
+            <b-button id="edit-button" @click="editMetric(startIndex + index -1)" variant="outline-primary" class="delete-button">
               <span v-if="!metric.editing"><b-icon icon="pencil"></b-icon></span>
               <span v-else><b-icon icon="save"></b-icon></span>
             </b-button>
             <!-- Delete Icon -->
             <b-button
             class="delete-button"
+            id="delete-button"
             variant="outline-primary"
             @click="deleteMetric(startIndex + index -1)"
             >
@@ -192,6 +193,7 @@ export default {
       return this.metrics.filter((metric) => metric.metricName.toLowerCase().includes(query));
     },
     filteredCompetitionChoices() {
+
       return competitionChoiceOptions;
     },
     filteredMetricNameChoices() {
@@ -220,14 +222,22 @@ export default {
     },
   },
   async mounted() {
+
+    let token='';
+
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      'Authorization': `Bearer ${token}`
     };
     try {
       this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       this.metrics = this.metricsData.data.data;
-      console.log('Response from server:', this.metrics.data);
+
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching metrics:", error);
@@ -243,17 +253,22 @@ export default {
     }
   },
      async loadMetric() {
+
+      let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
           this.metricsData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`, { headers });
-        console.log('ga called')
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
           this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
-          console.log('IDC called')
         }
         this.metrics = this.metricsData.data.data;
       } catch (error) {
@@ -287,6 +302,7 @@ export default {
       // Method to toggle editing mode for a metric
       async editMetric(index) {
         const metric = this.filteredMetrics[index];
+
         if (metric.editing) {
           // Save the changes
           metric.metricName = metric.editingMetricName;
@@ -295,9 +311,17 @@ export default {
 
           metric.editing = false;
 
+          let token='';
+
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Vue.$keycloak.token}`
+            'Authorization': `Bearer ${token}`
           };
           try {
           let url = '';
@@ -306,9 +330,11 @@ export default {
               url = UPDATE_GAME_METRIC_BASE_URL;
               url2 = CREATE_GAME_METRIC_BASE_URL;
             } else if (this.selectedCompetition === "Innovation Design Challenge") {
+
              url = UPDATE_IDC_METRIC_BASE_URL;
              url2 = CREATE_IDC_METRIC_BASE_URL;
             }
+
             if (metric.id) {
               const requestBody = {
                 id:metric.id,
@@ -318,16 +344,16 @@ export default {
               };
               // If the metric has an ID, update the existing record using a PUT request
               const response = await axios.put(`${url}`, requestBody, { headers });
-              console.log('Response from server (update):', response.data);
+
             } else {
               const requestBody = {
                 stageName: this.stageName,
                 metricName: metric.metricName,
                 metricWeight: metric.metricWeight
               };
+
               // If the metric doesn't have an ID, create a new record using a POST request
               const response = await axios.post(`${url2}`, requestBody, { headers });
-              console.log('Response from server (create):', response.data);
 
               // Add the newly created metric to the beginning of the metrics array
               this.metrics.unshift(response.data.data);
@@ -350,9 +376,15 @@ export default {
       // Method to delete a metric
       async deleteMetric(index) {
         const metric = this.filteredMetrics[index];
+        let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
         };
 
         const confirmation = await Swal.fire({
@@ -370,10 +402,9 @@ export default {
             id: metric.id,
           };
 
-        console.log('delete response', requestBody);
         try {
           if(this.selectedCompetition === "Game Arena") {
-                response = await axios.delete(`${DELETE_IDC_METRIC_BASE_URL}`, {
+                response = await axios.delete(`${DELETE_GAME_METRIC_BASE_URL}`, {
                 data: requestBody,
                 headers: headers
                });
@@ -387,7 +418,7 @@ export default {
           // Show a success message
           Swal.fire({
             title: 'Deleted!',
-            text: 'The user has been deleted.',
+            text: 'The metric has been deleted.',
             icon: 'success'
           });
 
@@ -414,7 +445,6 @@ export default {
       const jsonPayload = {
         userIds: this.selectedUsers,
       };
-      console.log(jsonPayload)
     },
   },
 };

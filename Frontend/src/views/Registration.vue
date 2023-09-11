@@ -152,8 +152,6 @@ export default {
 
         // Call the create new user API
         const createUserResponse = await axios.post(`${CREATE_USER_INFO_BASE_URL}`, userData, { headers });
-        console.log('Member Registration successful:', createUserResponse.data);
-
         // Push the user ID into the userIDs array
         userIDs.push(createUserResponse.data.data.id);
       }
@@ -178,7 +176,6 @@ export default {
     try {
 
         const createTeamResponse = await axios.post(`${url}`, teamData, { headers });
-        console.log('Team registration successful:', createTeamResponse.data);
 
         const RegisterTeamData = {
           id: createTeamResponse.data.data,

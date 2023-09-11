@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "axios": "^1.4.0",
     "bootstrap": "^5.3.0",
     "bootstrap-vue": "^2.23.1",
     "cors": "^2.8.5",
@@ -21,12 +21,33 @@
     "vue-sweetalert2": "^5.0.5"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.22.10",
+    "@babel/preset-env": "^7.22.10",
+    "@vue/cli-plugin-unit-jest": "~5.0.0",
     "@vue/cli-service": "^5.0.1",
+    "@vue/test-utils": "^1.3.6",
+    "@vue/vue2-jest": "^27.0.0-alpha.2",
+    "axios": "^1.5.0",
+    "axios-mock-adapter": "^1.21.5",
     "axios-mock-server": "^0.19.1",
+    "babel-jest": "^27.0.6",
+    "esbuild": "^0.19.2",
+    "esbuild-jest": "^0.5.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.0.5",
     "vue-template-compiler": "^2.7.14"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ]
+  ],
+  "jest": {
+    "preset": "@vue/cli-plugin-unit-jest/presets/no-babel",
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "transform": {
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+    }
+  }
 }

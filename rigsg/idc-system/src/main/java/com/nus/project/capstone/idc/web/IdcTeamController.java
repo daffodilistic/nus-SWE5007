@@ -1,9 +1,8 @@
 package com.nus.project.capstone.idc.web;
 
-import com.nus.project.capstone.idc.service.GCPFileUploadService;
+import com.nus.project.capstone.idc.service.GCPFileService;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserResponse;
-import com.nus.project.capstone.model.entity.idc.FileUploadRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamResponse;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
@@ -15,15 +14,20 @@ import com.nus.project.capstone.model.persistence.idc.PresentationRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.nus.project.capstone.idc.service.GCPFileUploadService.PRIM_FILE_SUFFIX;
-import static com.nus.project.capstone.idc.service.GCPFileUploadService.PROMO_FILE_SUFFIX;
+import static com.nus.project.capstone.idc.service.GCPFileService.PRIM_FILE_SUFFIX;
+import static com.nus.project.capstone.idc.service.GCPFileService.PROMO_FILE_SUFFIX;
 import static com.nus.project.capstone.idc.web.Tools.genericFailureMessage;
 
 @Slf4j
@@ -34,16 +38,16 @@ public class IdcTeamController {
     private final IdcTeamRepository idcTeamRepository;
     private final UserRepository userRepository;
     private final PresentationRepository presentationRepository;
-    private final GCPFileUploadService fileUploadService;
+    private final GCPFileService fileService;
 
     @Autowired
     public IdcTeamController(IdcTeamRepository idcTeamRepository, UserRepository userRepository,
                              PresentationRepository presentationRepository,
-                             GCPFileUploadService fileUploadService) {
+                             GCPFileService fileService) {
         this.idcTeamRepository = idcTeamRepository;
         this.userRepository = userRepository;
         this.presentationRepository = presentationRepository;
-        this.fileUploadService = fileUploadService;
+        this.fileService = fileService;
     }
 
     @PostMapping("/create-team")
@@ -163,15 +167,18 @@ public class IdcTeamController {
                 .data(String.format("Delete success for %s", idcTeamRequests.getId())).build());
     }
 
-    @PostMapping("/upload-prim-file")
-    public ResponseEntity<GeneralMessageEntity> uploadPrimFile(@RequestBody FileUploadRequests fileUploadRequests) {
-        if (fileUploadRequests.getLocalFilePath().substring(fileUploadRequests.getLocalFilePath().length() - 4).equals(PRIM_FILE_SUFFIX)){
-            var teamId = idcTeamRepository.findById(fileUploadRequests.getIdcTeamId());
-            if(teamId.isEmpty()){
+    @PostMapping(value = "/upload-prim-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<GeneralMessageEntity> uploadPrimFile(@RequestParam("files") MultipartFile[] files,
+                                                               @RequestParam("team") UUID idc_team_id) {
+        MultipartFile file = files[0];
+        String fileName = file.getOriginalFilename();
+        if (fileName.substring(fileName.length() - 4).equals(PRIM_FILE_SUFFIX)) {
+            var teamId = idcTeamRepository.findById(idc_team_id);
+            if (teamId.isEmpty()) {
                 return ResponseEntity.ok(GeneralMessageEntity.builder()
-                        .data(String.format("Team ID %s cannot be found", fileUploadRequests.getIdcTeamId())).build());
+                        .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
-                return fileUploadService.uploadFileToGCP(fileUploadRequests.getLocalFilePath(), teamId.get().getTeamName());
+                return fileService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
@@ -179,15 +186,18 @@ public class IdcTeamController {
         }
     }
 
-    @PostMapping("/upload-promo-file")
-    public ResponseEntity<GeneralMessageEntity> uploadPromoFile(@RequestBody FileUploadRequests fileUploadRequests) {
-        if (fileUploadRequests.getLocalFilePath().substring(fileUploadRequests.getLocalFilePath().length() - 4).equals(PROMO_FILE_SUFFIX)){
-            var teamId = idcTeamRepository.findById(fileUploadRequests.getIdcTeamId());
-            if(teamId.isEmpty()){
+    @PostMapping(value = "/upload-promo-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<GeneralMessageEntity> uploadPromoFile(@RequestParam("files") MultipartFile[] files,
+                                                                @RequestParam("team") UUID idc_team_id) {
+        MultipartFile file = files[0];
+        String fileName = file.getOriginalFilename();
+        if (fileName.substring(fileName.length() - 4).equals(PROMO_FILE_SUFFIX)) {
+            var teamId = idcTeamRepository.findById(idc_team_id);
+            if (teamId.isEmpty()) {
                 return ResponseEntity.ok(GeneralMessageEntity.builder()
-                        .data(String.format("Team ID %s cannot be found", fileUploadRequests.getIdcTeamId())).build());
+                        .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
-                return fileUploadService.uploadFileToGCP(fileUploadRequests.getLocalFilePath(), teamId.get().getTeamName());
+                return fileService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
@@ -195,4 +205,38 @@ public class IdcTeamController {
         }
     }
 
+    @PostMapping(value = "/download-file", produces = "application/octet-stream")
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam("file") String fileName){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + fileName + "\"");
+        ByteArrayResource resource = fileService.downloadFileFromGCP(fileName);
+        return ResponseEntity.ok().
+                contentType(MediaType.APPLICATION_OCTET_STREAM).
+                headers(headers).body(resource);
+    }
+
+    @GetMapping("/view-all-participants-files")
+    public ResponseEntity<GeneralMessageEntity> getAllFiles() {
+        List<String> fileNames = fileService.getAllDownloadableFilesFromParticipants();
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(fileNames).build());
+    }
+
+    @PutMapping("/assign-score")
+    public ResponseEntity<GeneralMessageEntity> assignScore(@RequestBody IdcTeamRequests idcTeamRequests) {
+        if (idcTeamRequests.getPresentationRequestsList().size() != 1){
+            return genericFailureMessage();
+        } else if (idcTeamRequests.getIsQualifiedPromo() == null &&
+                idcTeamRequests.getIsQualifiedFinal() == null &&
+                idcTeamRequests.getIsQualifiedFinalSecondStage() == null &&
+                idcTeamRequests.getIdcGroupId() == null &&
+                idcTeamRequests.getAgeGroup() == null &&
+                idcTeamRequests.getRankFirstStage() == null &&
+                idcTeamRequests.getTeacherId() == null) {
+            return updateTeam(idcTeamRequests);
+        } else {
+            return genericFailureMessage();
+        }
+    }
 }

@@ -24,7 +24,7 @@
     </div>
 
     <div class="add-button">
-      <b-button variant="outline-primary" @click="addNewUser"><b-icon icon="person-plus" ></b-icon>
+      <b-button id="addNewuser" variant="outline-primary" @click="addNewUser"><b-icon icon="person-plus" ></b-icon>
       </b-button>
     </div><br>
     <table class="main-table">
@@ -165,12 +165,13 @@
 
           <td>
             <!-- Edit Icon -->
-            <b-button @click="editingUser(startIndex + index -1)" variant="outline-primary" class="delete-button">
+            <b-button id="edit-button" @click="editingUser(startIndex + index -1)" variant="outline-primary" class="delete-button">
               <span v-if="!user.editing"><b-icon icon="pencil"></b-icon></span>
               <span v-else><b-icon icon="save"></b-icon></span>
             </b-button>
             <!-- Delete Icon -->
             <b-button
+            id="deleteUser"
             class="delete-button"
             variant="outline-primary"
             @click="deleteUser(startIndex + index -1)"
@@ -306,14 +307,20 @@ export default {
     },
   },
   async mounted() {
+    let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      'Authorization': `Bearer ${token}`
     };
     try {
       this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
       this.users = this.usersData.data.data;
-      console.log('Response from server:', this.users.data);
+
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching users:", error);
@@ -329,17 +336,21 @@ export default {
     }
   },
      async loadUser() {
+      let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
           this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
-        console.log('ga called')
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
           this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
-          console.log('IDC called')
         }
         this.users = this.usersData.data.data;
       } catch (error) {
@@ -403,9 +414,9 @@ export default {
 
         if (selectedStateObject) {
           selectedStateName = selectedStateObject.name;
-          console.log('Selected Country Name:', selectedStateName);
+
         } else {
-          console.log('Selected country not found in options.');
+          console.log('Selected State not found in options.');
         }
         if (user.editing) {
           // Save the changes
@@ -421,10 +432,15 @@ export default {
           user.dateOfBirth = user.editingDateOfBirth;
 
           user.editing = false;
-
+          let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Vue.$keycloak.token}`
+            'Authorization': `Bearer ${token}`
           };
           try {
           let url = '';
@@ -452,7 +468,6 @@ export default {
                 dateOfBirth: user.dateOfBirth
               };
               const response = await axios.put(`${url}`, requestBody, { headers });
-              console.log('Response from server (update):', response.data);
             }
             // If the user doesn't have an ID, create a new record using a POST request
             else {
@@ -470,7 +485,6 @@ export default {
               };
 
               const response = await axios.post(`${url2}`, requestBody, { headers });
-              console.log('Response from server (create):', response.data);
 
               // Add the newly created user to the beginning of the users array
               this.users.unshift(response.data.data);
@@ -500,9 +514,15 @@ export default {
       // Method to delete a user
       async deleteUser(index) {
         const user = this.filteredUsers[index];
+        let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
         const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
         };
 
         const confirmation = await Swal.fire({
@@ -520,7 +540,6 @@ export default {
             id: user.id,
           };
 
-        console.log('delete response', requestBody);
         try {
             const response = await axios.delete(`${DELETE_USER_INFO_BASE_URL}`, {
           data: requestBody,

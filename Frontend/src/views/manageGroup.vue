@@ -336,7 +336,7 @@ export default {
     async editGroup(index) {
         const group = this.filteredGroups[index];
         if (group.editing) {
-          console.log(group.editing)
+
           // Save the changes
           group.groupName = group.editingGroupName;
 
@@ -362,14 +362,13 @@ export default {
               };
               // If the group has an ID, update the existing record using a PUT request
               const response = await axios.post(`${url}`, requestBody, { headers });
-              console.log('Response from server (update):', response.data);
+
             } else {
               const requestBody = {
                 groupName: group.groupName,
               };
               // If the group doesn't have an ID, create a new record using a POST request
               const response = await axios.post(`${url2}`, requestBody, { headers });
-              console.log('Response from server (create):', requestBody , response.data);
 
               // Add the newly created group to the beginning of the groups array
               this.groups.unshift(response.data.data);
@@ -408,10 +407,8 @@ export default {
       try {
           if (this.selectedCompetition === "Game Arena") {
             this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
-          console.log('ga called')
           } else if (this.selectedCompetition === "Innovation Design Challenge") {
             this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, { headers });
-            console.log('IDC called')
           }
           this.groups = this.groupsData.data.data;
         } catch (error) {
@@ -428,10 +425,8 @@ export default {
     try {
       if(this.selectedCompetition === "Game Arena") {
         response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-        console.log('ga called')
       }else if (this.selectedCompetition === "Innovation Design Challenge") {
         response = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
-        console.log('IDC called')
       }
         this.currentGroupId = groupId;
         this.teamList = response.data.data.filter((team) => team.isQualifiedFinal );
@@ -465,19 +460,15 @@ export default {
 
         // Make the HTTP PUT request to the API endpoint
         const requestBodyJson = JSON.stringify(requestBody);
-        console.log('Request Body:', requestBodyJson);
+
         let  response
 
         if (this.selectedCompetition === "Game Arena") {
           response = await axios.post(`${VIEW_GAME_GROUP_BASE_URL}`, requestBodyJson, { headers });
-          console.log('ga called')
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
             response = await axios.post(`${VIEW_IDC_GROUP_BASE_URL}`, requestBodyJson, { headers });
-            console.log('IDC called')
         }
         this.groupMembers = response.data.data;
-        // Handle the response, if needed
-        console.log('Response from server:', this.groupMembers);
 
         // Optional: Perform any additional actions, such as updating the UI.
       } catch (error) {
@@ -518,7 +509,6 @@ export default {
           teamIds:[]
         };
 
-        console.log('delete response', requestBody);
         try {
           if(this.selectedCompetition === "Game Arena") {
                 const response2 = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody2, { headers });
@@ -566,7 +556,6 @@ export default {
       const jsonPayload = {
         teamIds: this.selectedTeams,
       };
-      console.log(jsonPayload)
     },
 
     async addTeamsToGroup() {
@@ -581,14 +570,12 @@ export default {
       teamIds: this.selectedTeams,
     };
 
-    console.log('Request Payload:', requestBody);
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
       const response = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody, { headers });
-      console.log('Response from server:', response.data);
 
       // Close the modal after the request is successful
       this.showAddTeamModal = false;

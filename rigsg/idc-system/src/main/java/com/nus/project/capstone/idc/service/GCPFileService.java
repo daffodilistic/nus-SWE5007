@@ -1,5 +1,6 @@
 package com.nus.project.capstone.idc.service;
 
+import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
@@ -11,54 +12,51 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class GCPFileUploadService {
+public class GCPFileService {
 
-    private static final Logger logger = LogManager.getLogger(GCPFileUploadService.class);
+    private static final Logger logger = LogManager.getLogger(GCPFileService.class);
     private static final String PRIM = "Preliminary";
     public static final String PRIM_FILE_SUFFIX = ".pdf";
     private static final String PROMO = "Promotional";
     public static final String PROMO_FILE_SUFFIX = ".mp4";
     private final String gcpDirectoryName;
+    private final String gcpBucketId;
+    private final String gcpProjectId;
     private Bucket bucket;
+    private Storage storage;
 
     @Autowired
-    public GCPFileUploadService(
+    public GCPFileService(
             @Value("${spring.cloud.gcp.bucket.credential}") String gcpBucketCredential,
             @Value("${spring.cloud.gcp.project-id}") String gcpProjectId,
             @Value("${spring.cloud.gcp.bucket.id}") String gcpBucketId,
             @Value("${spring.cloud.gcp.bucket.dirName}") String gcpDirectoryName) {
-
         this.gcpDirectoryName = gcpDirectoryName;
-
-        try (InputStream inputStream = new FileInputStream(ResourceUtils.getFile(gcpBucketCredential))) {
-            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
-                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
-            Storage storage = options.getService();
-            bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
-        } catch (IOException ie) {
-            logger.error("Unable to load GCP Bucket credential at: [{}]", gcpBucketCredential);
-        }
-
+        this.gcpBucketId = gcpBucketId;
+        this.gcpProjectId = gcpProjectId;
+        loadGCPStorageAndBucket(gcpBucketCredential);
     }
 
-    public ResponseEntity<GeneralMessageEntity> uploadFileToGCP(String uploadFilePath, String teamName){
+    public ResponseEntity<GeneralMessageEntity> uploadFileToGCP(MultipartFile file, String teamName){
 
         try{
-            byte[] fileData = FileUtils.readFileToByteArray(new File(uploadFilePath));
-            String contentType = Files.probeContentType(Paths.get(uploadFilePath));
-            String fileName = constructFileName(gcpDirectoryName, teamName, getRound(uploadFilePath));
+            Path filePath = new File(file.getOriginalFilename()).toPath();
+            byte[] fileData = FileUtils.readFileToByteArray(convertFile(file));
+            String contentType = Files.probeContentType(filePath);
+            String fileName = constructFileName(gcpDirectoryName, teamName, getRound(filePath.toString()));
             logger.info("Going to upload to [{}] with contentType [{}]", fileName, contentType);
 
             Blob blob = bucket.create(fileName, fileData, contentType);
@@ -73,6 +71,22 @@ public class GCPFileUploadService {
             return ResponseEntity.ok(GeneralMessageEntity.builder()
                     .data(e.getMessage()).build());
         }
+    }
+
+    public List<String> getAllDownloadableFilesFromParticipants(){
+        List<String> fileNames = new ArrayList<>();
+        Page<Blob> blobs = bucket.list(Storage.BlobListOption.prefix(gcpDirectoryName));
+        for (Blob blob : blobs.iterateAll()) {
+            if (!blob.isDirectory()) {
+                fileNames.add(blob.getName());
+            }
+        }
+        return fileNames;
+    }
+
+    public ByteArrayResource downloadFileFromGCP(String fileName){
+        Blob blob = storage.get(gcpBucketId, fileName);
+        return new ByteArrayResource(blob.getContent());
     }
 
     private String constructFileName(String gcpDirectoryName,
@@ -96,6 +110,28 @@ public class GCPFileUploadService {
         } else {
             throw new Exception("Invalid file type uploaded! " +
                     "Please upload only .pdf for preliminary round and .mp4 for promotional round");
+        }
+    }
+    private File convertFile(MultipartFile file) throws Exception {
+        try{
+            File convertedFile = new File(file.getOriginalFilename());
+            FileOutputStream outputStream = new FileOutputStream(convertedFile);
+            outputStream.write(file.getBytes());
+            outputStream.close();
+            return convertedFile;
+        }catch (Exception e){
+            throw new Exception("An error has occurred while converting the file");
+        }
+    }
+
+    private void loadGCPStorageAndBucket(String gcpBucketCredential){
+        try (InputStream inputStream = new FileInputStream(ResourceUtils.getFile(gcpBucketCredential))) {
+            StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                    .setCredentials(GoogleCredentials.fromStream(inputStream)).build();
+            storage = options.getService();
+            bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
+        } catch (IOException ie) {
+            logger.error("Unable to load GCP Bucket credential at: [{}]", gcpBucketCredential);
         }
     }
 }

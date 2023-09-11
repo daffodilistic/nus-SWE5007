@@ -20,7 +20,7 @@ public class PresentationJpaEntities {
     @Column(nullable = false, name = "presentation_id")
     private UUID id;
     private String stage;
-    private Integer score;
+    private Float score;
     private String venue;
     private Instant datetime;
 
