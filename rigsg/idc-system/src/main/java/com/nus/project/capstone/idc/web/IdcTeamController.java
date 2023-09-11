@@ -108,11 +108,12 @@ public class IdcTeamController {
     private ResponseEntity<GeneralMessageEntity> updateTeam(IdcTeamRequests updateIdcTeamRequests) {
 
         if (updateIdcTeamRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Idc team id must be provided").build());
+            return ResponseEntity.badRequest()
+                    .body(GeneralMessageEntity.builder().data("Idc team id must be provided").build());
         }
 
         if (idcTeamRepository.findById(updateIdcTeamRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("IDC Team %s is not found", updateIdcTeamRequests.getId())).build());
         }
 
@@ -175,13 +176,13 @@ public class IdcTeamController {
         if (fileName.substring(fileName.length() - 4).equals(PRIM_FILE_SUFFIX)) {
             var teamId = idcTeamRepository.findById(idc_team_id);
             if (teamId.isEmpty()) {
-                return ResponseEntity.ok(GeneralMessageEntity.builder()
+                return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                         .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
                 return fileService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data("Invalid file! must end with .pdf").build());
         }
     }
@@ -194,19 +195,19 @@ public class IdcTeamController {
         if (fileName.substring(fileName.length() - 4).equals(PROMO_FILE_SUFFIX)) {
             var teamId = idcTeamRepository.findById(idc_team_id);
             if (teamId.isEmpty()) {
-                return ResponseEntity.ok(GeneralMessageEntity.builder()
+                return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                         .data(String.format("Team ID %s cannot be found", idc_team_id)).build());
             } else {
                 return fileService.uploadFileToGCP(files[0], teamId.get().getTeamName());
             }
         } else {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data("Invalid file! must end with .mp4").build());
         }
     }
 
     @PostMapping(value = "/download-file", produces = "application/octet-stream")
-    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam("file") String fileName){
+    public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam("file") String fileName) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + fileName + "\"");
@@ -225,7 +226,7 @@ public class IdcTeamController {
 
     @PutMapping("/assign-score")
     public ResponseEntity<GeneralMessageEntity> assignScore(@RequestBody IdcTeamRequests idcTeamRequests) {
-        if (idcTeamRequests.getPresentationRequestsList().size() != 1){
+        if (idcTeamRequests.getPresentationRequestsList().size() != 1) {
             return genericFailureMessage();
         } else if (idcTeamRequests.getIsQualifiedPromo() == null &&
                 idcTeamRequests.getIsQualifiedFinal() == null &&

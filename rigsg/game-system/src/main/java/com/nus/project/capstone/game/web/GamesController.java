@@ -35,13 +35,13 @@ public class GamesController {
     public ResponseEntity<GeneralMessageEntity> createGames(@RequestBody GamesRequests g) {
 
         if (g.getGameTeamIdHost() == null || g.getGameTeamIdOppo() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("A id & B id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("A id & B id must be provided").build());
         }
 
         val a = gameTeamRepository.findById(UUID.fromString(g.getGameTeamIdHost()));
-        if (a.isEmpty()) return ResponseEntity.ok(GeneralMessageEntity.builder().data("Team A not found").build());
+        if (a.isEmpty()) return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("Team A not found").build());
         val b = gameTeamRepository.findById(UUID.fromString(g.getGameTeamIdOppo()));
-        if (b.isEmpty()) return ResponseEntity.ok(GeneralMessageEntity.builder().data("Team A not found").build());
+        if (b.isEmpty()) return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("Team A not found").build());
 
         val gamesJpa = GamesJpaEntities.toJpaEntity(g);
         gamesJpa.setGamesTeam(new ArrayList<>());
@@ -57,11 +57,11 @@ public class GamesController {
     public ResponseEntity<GeneralMessageEntity> updateGame(@RequestBody GamesRequests updateGamesRequests) {
 
         if (updateGamesRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Game id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("Game id must be provided").build());
         }
 
         if (gamesRepository.findById(updateGamesRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("Game %s is not found", updateGamesRequests.getId())).build());
         }
 
@@ -77,7 +77,7 @@ public class GamesController {
 
         val game = gamesRepository.findById(g.getId());
         return game.map(gamesJpaEntities -> ResponseEntity.ok(GeneralMessageEntity.builder()
-                .data(GamesResponse.toGamesResponse(gamesJpaEntities)).build())).orElseGet(() -> ResponseEntity.ok(GeneralMessageEntity.builder().data("No game found").build()));
+                .data(GamesResponse.toGamesResponse(gamesJpaEntities)).build())).orElseGet(() -> ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("No game found").build()));
     }
 
     @GetMapping("/games")
