@@ -4,14 +4,15 @@ spring:
   cloud:
     gcp:
       sql:
-        database-name: ric-database
-        instance-connection-name: shaped-splicer-397009:asia-southeast1:prd-ric-database
-      credentials:
-        location: classpath:prod-sql-credential.json
-      project-id: shaped-splicer-397009
+        enabled: false
+  sql:
+    init:
+      platform: postgres
   datasource:
-    username: prd-ric-app-user
-    password: password
+    url: jdbc:postgresql://10.21.176.3:5432/ric-database
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driverClassName: org.postgresql.Driver
     hikari:
       minimum-idle: 5
   jpa:

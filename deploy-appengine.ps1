@@ -4,6 +4,8 @@ param (
 $env:APP_ENGINE_PROJECT = "shaped-splicer-397009"
 #$env:PROJECT_NAME = "demo"
 $env:PROJECT_NAME = "info-collection-system"
+$env:POSTGRESQL_USERNAME = "prd-ric-app-user"
+$env:POSTGRESQL_PASSWORD = "password"
 $env:PORT = 8080
 Set-Location rigsg
 if ($applicationYml -ne "") {
