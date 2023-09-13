@@ -17,3 +17,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  secured: true
+
+keycloak:
+  auth-server-url: https://keycloak.ric-robotics.xyz
+  principal-attribute: idc-system
+  realm: ricsg
+  resource: ricsg
+  public-client: true
+  use-resource-role-mappings: false
+  bearer-only: true
+  cors: true
+  enabled: true
