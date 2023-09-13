@@ -43,7 +43,7 @@ public class GameTeamController {
                 .data(team.getId()).build());
     }
 
-    @GetMapping("/view-team")
+    @PostMapping("/view-team")
     public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody GameTeamRequests g) {
 
         val o = gameTeamRepository.findById(g.getId());

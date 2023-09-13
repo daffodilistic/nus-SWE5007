@@ -133,7 +133,7 @@ public class GamesController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(g.getId()).build());
     }
 
-    @GetMapping("/view-game")
+    @PostMapping("/view-game")
     public ResponseEntity<GeneralMessageEntity> readGames(@RequestBody GamesRequests g) {
 
         val game = gamesRepository.findById(g.getId());
