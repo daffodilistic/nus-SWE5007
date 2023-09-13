@@ -84,11 +84,11 @@ public class UserInfoController {
     public ResponseEntity<GeneralMessageEntity> updateUser(@RequestBody UserRequests updateUserRequests) {
 
         if (updateUserRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("User id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("User id must be provided").build());
         }
 
         if (userRepository.findById(updateUserRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("User %s is not found", updateUserRequests.getId())).build());
         }
 

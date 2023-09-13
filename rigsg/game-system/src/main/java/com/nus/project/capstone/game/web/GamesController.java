@@ -118,11 +118,11 @@ public class GamesController {
     private ResponseEntity<GeneralMessageEntity> updateGame(@RequestBody GamesRequests updateGamesRequests) {
 
         if (updateGamesRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Game id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("Game id must be provided").build());
         }
 
         if (gamesRepository.findById(updateGamesRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("Game %s is not found", updateGamesRequests.getId())).build());
         }
 
@@ -138,7 +138,7 @@ public class GamesController {
 
         val game = gamesRepository.findById(g.getId());
         return game.map(gamesJpaEntities -> ResponseEntity.ok(GeneralMessageEntity.builder()
-                .data(GamesResponse.toGamesResponse(gamesJpaEntities)).build())).orElseGet(() -> ResponseEntity.ok(GeneralMessageEntity.builder().data("No game found").build()));
+                .data(GamesResponse.toGamesResponse(gamesJpaEntities)).build())).orElseGet(() -> ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("No game found").build()));
     }
 
     @GetMapping("/view-all-games")

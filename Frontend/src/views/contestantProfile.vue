@@ -20,7 +20,7 @@
               <input type="file" name="file-upload" id="file-upload" @change="onFileChange" accept=".pdf,.doc,.docx,.xlsx,.csv" />
             </div>
             <br><br>
-            <b-button type="submit" @click="upload(team)" variant="outline-primary" class="delete-button">Upload</b-button>
+            <b-button @click="upload(team)" variant="outline-primary" class="delete-button">Upload</b-button>
           </form>
         </b-modal>
         <!-- show upload Modal END-->
@@ -61,6 +61,42 @@
                 </table>
         </b-modal>
         <!-- show history Modal END-->
+
+         <!-- show download START-->
+       <b-modal
+          v-model="showDownloadModal"
+          modal-class="custom-modal"
+          title="Download File"
+          hide-footer
+        >
+            <!-- List of users to be displayed inside the modal -->
+            <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th>Filename</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="downloadFileList.length === 0">
+                      <tr>
+                        <td colspan="5"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                       <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
+                        <td>{{ file }} </td>
+                        <td> <b-button id = "downloadFile" @click="downloadFile(file)" variant="outline-primary" class="delete-button">
+                <b-icon icon="cloud-download"></b-icon>
+              </b-button></td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                  </tbody>
+                </table>
+        </b-modal>
+        <!-- show download Modal END-->
       <div class="form-container">
       <table>
             <tr>
@@ -83,11 +119,14 @@
               <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
               <label class="label-color">Team Qualification :</label>
               {{ getQualificationStatus(team) }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <b-button @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
+              <b-button id = "viewScore" @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
                 <b-icon icon="eye"></b-icon>
               </b-button>&nbsp;
-              <b-button @click="viewUpload(team)" variant="outline-primary" class="delete-button">
+              <b-button id = "viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button">
                 <b-icon icon="cloud-upload"></b-icon>
+              </b-button>&nbsp;
+               <b-button id = "viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" class="delete-button">
+                <b-icon icon="cloud-download"></b-icon>
               </b-button>
             </div>
 
@@ -155,7 +194,7 @@
 
 <script>
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL} from '@/api';
+import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL} from '@/api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -164,11 +203,13 @@ export default {
     return {
       competitionChoiceOptions: competitionChoiceOptions,
       selectedCompetition: "Innovation Design Challenge",
-      idcTeamId: "7c8f5f5b-e85e-4e66-a40f-bde7ff9db5ab",
+      idcTeamId: "ac71e3fe-8055-40a3-90aa-0b60c77abe50",
       team:'',
       showHistoryModal: false,
       showUploadModal: false,
+      showDownloadModal: false,
       presentationList: [],
+      downloadFileList: [],
       selectedFile: null, // Initialize the selectedFile variable
     };
   },
@@ -187,20 +228,28 @@ export default {
   },
   },
    async mounted() {
+     let token='';
+     if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      'Authorization': `Bearer ${token}`
     };
     const requestBody = {
       id: this.idcTeamId,
     };
+
     try {
-      //this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
-     // this.team  = this.teamsData.data.data;
+      this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+     this.team  = this.teamsData.data.data;
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   },
+
   methods: {
     formatDateTime(dateTime) {
       const date = new Date(dateTime);
@@ -214,9 +263,15 @@ export default {
       return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   },
     async viewScore(teamId) {
+       let token='';
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
       const requestBody = {
         id: teamId,
@@ -231,7 +286,44 @@ export default {
         console.error("Error fetching users:", error);
       }
     },
-    async viewUpload(teamId) {
+
+    async viewDownload(teamName) {
+       let token='';
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        const response = await axios.get(`${VIEW_ALL_FILES_BASE_URL}`, { headers });
+        const originalArray = response.data.data;
+        const prefix = teamName;
+
+        // Remove the "participants/" prefix from each item
+        const interimArray = originalArray.map((item) => {
+          // Use string manipulation to remove the prefix
+          return item.replace('participants/', '');
+        });
+
+        this.downloadFileList = interimArray.filter((item) => {
+        const parts = item.split('-');
+        if (parts.length > 1) {
+          // Check if the first part of the filename matches the prefix
+          return parts[0] === prefix;
+        }
+        return false;
+      });
+        this.showDownloadModal = true; // Show the modal after fetching the users
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    async viewUpload(team) {
       this.showUploadModal = true;
     },
     getQualificationStatus(team) {
@@ -250,9 +342,15 @@ export default {
       return qualificationStatus;
     },
     async loadTeam() {
+       let token='';
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
       const requestBody = {
         id: this.idcTeamId,
@@ -269,26 +367,29 @@ export default {
         }
     },
     displayTitleText(team) {
-      if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+
+      if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
         return "Please upload proposal";
-      } else if (team.isQualifiedPromo && team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+      } else if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
         return "Please upload video";
       }
     },
 
     displayGuideline(team) {
-      if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+      if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
         return `
           <span style="font-size: 14px; color: #333;">Guidelines:<br>
           a) The writing is concise, easy to understand, and demonstrates good choice of words.<br>
-          b) The proposal demonstrates the efforts that the students have put in to understand the user story.</span>`;
-      } else if (team.isQualifiedPromo && team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+          b) The proposal demonstrates the efforts that the students have put in to understand the user story.<br>
+          c) Max file size of 20MB.</span>`;
+      } else if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
          return `
           <span style="font-size: 14px; color: #333;">Guidelines:<br>
           a) Background Summary: The video should concisely describe the user story and the robotics idea.<br>
           b) Design idea: The participant should explain the theory and knowledge behind the design.<br>
           c) Functionality: The video should explain the functionality of the robot, how it is implemented and why it performs the use case.<br>
-          d) Presentation: The presentation should be logical, fluent and easy to understand. The presenter should appear decently, and the video should be smooth and good in quality.</span>`;
+          d) Presentation: The presentation should be logical, fluent and easy to understand. The presenter should appear decently, and the video should be smooth and good in quality.<br>
+          e) Max file size of 20MB.</span>`;
       }
     },
 
@@ -302,21 +403,25 @@ export default {
       // You can perform any further processing with the selected file here
     },
     async upload(team) {
-
+      let token='';
       if (!this.selectedFile) {
         console.log("No file selected.");
         return;
       }
-
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
       const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        'Authorization': `Bearer ${token}`
       };
 
       const formData = new FormData();
-      formData.append("file", this.selectedFile);
+      formData.append("files", this.selectedFile);
       formData.append("localFilePath", this.selectedFile.name);
-      formData.append("idcTeamId", team.id);
+      formData.append("team", team.id);
 
       try {
         const requestBody = {
@@ -341,17 +446,17 @@ export default {
           } else if (this.selectedCompetition === "Innovation Design Challenge") {
 
              if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-                 response = await axios.post(`${UPLOAD_PROMO_FILE_IDC_BASE_URL}`, formData, {
+                 response = await axios.post(`${UPLOAD_PROMO_FILE_IDC_BASE_URL}`, formData, { //video .mp4
                   headers: {
                   "Content-Type": "multipart/form-data",
-                  "Authorization": `Bearer ${Vue.$keycloak.token}`
+                  "Authorization": `Bearer ${token}`
                 }});
 
-              } else if (team.isQualifiedPromo && team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-                response = await axios.post(`${UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, {
+              } else if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+                response = await axios.post(`${UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, { //pdf
                 headers: {
                   "Content-Type": "multipart/form-data",
-                  "Authorization": `Bearer ${Vue.$keycloak.token}`
+                  "Authorization": `Bearer ${token}`
                 }});
               }
           }
@@ -359,10 +464,118 @@ export default {
 
         // Read the file as an ArrayBuffer (binary data)
         reader.readAsArrayBuffer(this.selectedFile);
+
+         // Show a success message to the user using VueSweetalert2
+        this.$swal({
+          title: 'Success!',
+          text: 'Upload successful!',
+          icon: 'success',
+          timer: 2000, // Display the success message for 2 seconds
+        });
+
+        this.showUploadModal = false;
       } catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
       }
+    },
+    async download(team) {
+  const headers = {
+    'Authorization': `Bearer ${Vue.$keycloak.token}`
+  };
+
+  try {
+    let response;
+
+    if (this.selectedCompetition === "Game Arena") {
+      // Replace 'test' with the appropriate URL for Game Arena download
+      response = await axios.post('YOUR_GAME_ARENA_DOWNLOAD_URL', {
+        headers,
+        responseType: 'blob', // To indicate a binary response
+      });
+    } else if (this.selectedCompetition === "Innovation Design Challenge") {
+      const fileName = '1693974117222.mp4';
+
+      if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+        // Construct the URL for downloading the promotional file
+        const promoFileURL = `${DOWNLOAD_PROMO_FILE_IDC_BASE_URL}/${team.teamName}-Promotional-${fileName}`;
+
+        response = await axios.post(promoFileURL, {
+          headers,
+          responseType: 'blob',
+        });
+      } else if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
+        // If you want to upload a file, you should use a POST request, not here.
+        // You can add the file upload logic separately.
+        console.log('Upload logic goes here');
+        return;
+      }
+    }
+
+    // Check if the response contains a valid file
+    if (response && response.status === 200) {
+      const blob = response.data;
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a link element to trigger the download
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'downloaded-file.mp4'; // Set the desired file name
+      document.body.appendChild(a);
+
+      // Trigger the download and cleanup
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
+  } catch (error) {
+    // Handle errors, if any
+    console.error('Error calling API:', error);
+  }
+},
+    downloadFile(file) {
+      axios({
+  url: `${DOWNLOAD_FILE_IDC_BASE_URL}/${file}`,
+  method: 'POST',
+  responseType: 'blob',
+  headers: {
+    'Authorization': `Bearer ${Vue.$keycloak.token}`
+  },
+})
+.then((res) => {
+  // Get the file type (MIME type) from the response Blob
+  const fileType = res.data.type;
+
+  // Extract the filename from the URL or generate it dynamically
+  const urlParts = res.config.url.split('/');
+  const filename = urlParts[urlParts.length - 1];
+
+  // Create a Blob from the response data
+  const blob = new Blob([res.data], { type: fileType });
+
+  // Create a URL for the Blob
+  const url = window.URL.createObjectURL(blob);
+
+  // Create a link element
+  const link = document.createElement('a');
+  link.href = url;
+
+  // Set the download attribute to the extracted/generated filename
+  link.setAttribute('download', filename);
+
+  // Trigger the download
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(link);
+})
+.catch((error) => {
+  console.error('Error downloading file:', error);
+  // Handle the error here (e.g., show an error message to the user)
+});
     }
   },
 };
