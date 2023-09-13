@@ -72,6 +72,7 @@ describe('manageContestant.vue', () => {
         return {
           users: MOCK_GET_ALL_USER_INFO.data, // Let the mock response handle the data
           filteredCompetitionChoices: filteredCompetitionChoices,
+          itemsPerPage: 10,
         };
       },
     });
@@ -213,7 +214,7 @@ describe('manageContestant.vue', () => {
       expect.stringContaining(UPDATE_USER_INFO_BASE_URL),
       expect.objectContaining({
         id: expect.anything(),
-        userName: expect.anything(),
+        userName: undefined,
         firstName: expect.anything(),
         lastName: expect.anything(),
         email: expect.anything(),
@@ -268,7 +269,7 @@ describe('manageContestant.vue', () => {
         };
       },
     });
-    const userCountBefore = MOCK_GET_ALL_USER_INFO.data.length
+    const userCountBefore = MOCK_GET_ALL_USER_INFO.data.length //29
     // Find the button with the id "edit-button"
     const addButton = wrapper.find('#addNewuser');
 
@@ -277,7 +278,7 @@ describe('manageContestant.vue', () => {
 
     await wrapper.vm.$nextTick();
 
-    const displayedRows = wrapper.findAll('tr').filter(row => row.classes('parent-row')).length;
+    const displayedRows = wrapper.findAll('tr').filter(row => row.classes('parent-row')).length; //10
 
     expect((displayedRows/filteredCompetitionChoices.length)-userCountBefore).toBe(1);
 

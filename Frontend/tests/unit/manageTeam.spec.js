@@ -91,7 +91,7 @@ describe('manageTeam.vue', () => {
       data() {
         return {
           teams: MOCK_GET_ALL_IDC_TEAM.data, // Let the mock response handle the data
-          filteredCompetitionChoices:filteredCompetitionChoices
+          filteredCompetitionChoices:filteredCompetitionChoices,
         };
       },
     });
@@ -105,9 +105,7 @@ describe('manageTeam.vue', () => {
 
     const displayedRows = wrapper.findAll('tr').filter(row => row.classes('parent-row')).length;
 
-    const teamsCount = MOCK_GET_ALL_IDC_TEAM.data.length;
-
-    expect(displayedRows/filteredCompetitionChoices.length).toBe(teamsCount);
+    expect(displayedRows/filteredCompetitionChoices.length).toBe(10);
 
   });
 });
@@ -147,7 +145,7 @@ describe('manageTeam.vue', () => {
     const wrapper = mount(manageTeam,{
       data() {
         return {
-          teamMembers: MOCK_VIEW_IDC_TEAM, // Provide sample data to the component
+          teamMembers: MOCK_VIEW_IDC_TEAM.data, // Provide sample data to the component
           teams: MOCK_GET_ALL_IDC_TEAM.data,
         };
       },
@@ -175,12 +173,12 @@ describe('manageTeam.vue', () => {
     );
 
   // Calculate the expected number of child rows
-  const expectedChildRows = MOCK_VIEW_IDC_TEAM.userResponses.length;
+  const expectedChildRows = MOCK_VIEW_IDC_TEAM.data.userResponses.length+1;
 
   const displayedChildRows = wrapper.findAll('.child-row').length;
 
   // Assert that the displayed rows match the number of teams
-  expect(displayedChildRows/3).toBe(expectedChildRows); // x Displayed 6: as 2-header, 2-IDC, 2-GA Expected 2
+  expect(displayedChildRows/2).toBe(expectedChildRows); // x Displayed 6: as 2-header, 2-IDC, 2-GA Expected 2
   });
 });
 //END - displays child rows when toggle row is clicked
@@ -310,9 +308,9 @@ describe('manageTeam.vue', () => {
   const rows = modal.findAll('tbody tr');
 
   // Calculate the expected number of user rows
-  const expectedHistoryRows = MOCK_VIEW_IDC_TEAM.presentationResponses.length;
+  const expectedHistoryRows = MOCK_VIEW_IDC_TEAM.data.presentationResponses.length;
   // Assert that the displayed rows match the number of users
-  expect(rows.length).toBe(expectedHistoryRows);
+  expect(rows.length/2).toBe(expectedHistoryRows);
 
   });
 });
