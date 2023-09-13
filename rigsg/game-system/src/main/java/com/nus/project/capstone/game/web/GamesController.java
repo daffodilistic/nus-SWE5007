@@ -31,7 +31,7 @@ public class GamesController {
         this.gamesRepository = gamesRepository;
     }
 
-    @PostMapping("/game")
+    @PostMapping("/create-game")
     public ResponseEntity<GeneralMessageEntity> createGames(@RequestBody GamesRequests g) {
 
         if (g.getGameTeamIdHost() == null || g.getGameTeamIdOppo() == null) {
@@ -53,7 +53,7 @@ public class GamesController {
                 .data(game.getId()).build());
     }
 
-    @PutMapping("/game")
+    @PutMapping("/update-game")
     public ResponseEntity<GeneralMessageEntity> updateGame(@RequestBody GamesRequests updateGamesRequests) {
 
         if (updateGamesRequests.getId() == null) {
@@ -72,7 +72,7 @@ public class GamesController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(g.getId()).build());
     }
 
-    @GetMapping("/game")
+    @GetMapping("/view-game")
     public ResponseEntity<GeneralMessageEntity> readGames(@RequestBody GamesRequests g) {
 
         val game = gamesRepository.findById(g.getId());
@@ -80,7 +80,7 @@ public class GamesController {
                 .data(GamesResponse.toGamesResponse(gamesJpaEntities)).build())).orElseGet(() -> ResponseEntity.ok(GeneralMessageEntity.builder().data("No game found").build()));
     }
 
-    @GetMapping("/games")
+    @GetMapping("/view-allgames")
     public ResponseEntity<GeneralMessageEntity> getAllGames() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(gamesRepository.findAll().stream()
