@@ -16,7 +16,7 @@ public class GameTeamResponse {
 
     private UUID id;
     private List<UserResponse> userResponses;
-    private String name;
+    private String teamName;
     private String ageGroup;
     private Integer qualificationRoundScore;
     private Integer qualificationRoundPoint;
@@ -26,7 +26,7 @@ public class GameTeamResponse {
     public static GameTeamResponse toGameTeamResponse(GameTeamJpaEntities g) {
         return GameTeamResponse.builder()
                 .id(g.getId())
-                .name(g.getTeamName())
+                .teamName(g.getTeamName())
                 .ageGroup(g.getAgeGroup())
                 .qualificationRoundScore(g.getQualificationRoundScore())
                 .qualificationRoundPoint(g.getQualificationRoundPoint())
