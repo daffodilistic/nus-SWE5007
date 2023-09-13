@@ -62,7 +62,7 @@ public class GameTeamController {
         return updateTeam(updateGameTeamRequests);
     }
 
-    public ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody GameTeamRequests updateGameTeamRequests) {
+    private ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody GameTeamRequests updateGameTeamRequests) {
 
         if (updateGameTeamRequests.getId() == null) {
             return ResponseEntity.ok(GeneralMessageEntity.builder().data("Game team id must be provided").build());
