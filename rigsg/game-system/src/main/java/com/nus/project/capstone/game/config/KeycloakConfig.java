@@ -51,6 +51,10 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                     .and()
                     .csrf().disable()
                     .authorizeRequests()
+                    .antMatchers("/**/view**").hasAnyRole("participant", "judge")
+                    .antMatchers("/games/create-team", "/games/update-team", "/**/delete**").hasRole("admin")
+                    .antMatchers("/games/create-game", "/games/update-ongoing-status", "/games/update-scores").hasRole("judge")
+                    .antMatchers("/games/update-game").hasRole("admin")
                     .anyRequest().denyAll();
         } else {
             logger.info("Keycloak Auth is NOT turned on !!");
