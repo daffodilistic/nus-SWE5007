@@ -30,9 +30,7 @@ public class UserJpaEntities {
     private String schoolName;
     private Integer yearsOfExp;
 
-    @ManyToOne(fetch = FetchType.EAGER
-//            , cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
-    )
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idc_team_id", referencedColumnName = "idc_team_id")
     private IdcTeamJpaEntities idcTeam;
 
