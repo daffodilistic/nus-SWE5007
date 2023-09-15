@@ -44,15 +44,18 @@ public class GameGroupController {
 
         var groupEntity = group.get();
         var gameTeamIds = gameGroupRequests.getGameTeamIds();
-        if (!gameTeamIds.isEmpty()) {
-            gameTeamIds.forEach(teamId -> {
-                var gameTeam = gameTeamRepository.findById(teamId).get();
-                gameTeam.setGameGroup(groupEntity);
-                groupEntity.addToGameTeams(gameTeam);
-                gameTeamRepository.save(gameTeam);
-            });
-            gameGroupRepository.save(groupEntity);
-        }
+        var allGameTeamIds = gameTeamRepository.findAll();
+
+        allGameTeamIds.forEach(t -> {
+            if (gameTeamIds.contains(t.getId())){
+                groupEntity.addToGameTeams(t);
+            } else {
+                groupEntity.removeGameTeams(t);
+            }
+            gameTeamRepository.save(t);
+        });
+        gameGroupRepository.save(groupEntity);
+
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(String.format("Updated Group %s", gameGroupRequests.getId())).build());
     }

@@ -32,6 +32,11 @@ public class GameGroupJpaEntities {
         gameTeams.add(team);
     }
 
+    public void removeGameTeams(GameTeamJpaEntities team) {
+        team.setGameGroup(null);
+        gameTeams.remove(team);
+    }
+
     public static GameGroupJpaEntities toJpaEntity(GameGroupRequests g) {
         return GameGroupJpaEntities.builder()
                 .id(UUID.randomUUID())
