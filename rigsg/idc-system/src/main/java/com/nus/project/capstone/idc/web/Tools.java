@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 public class Tools {
 
    public static ResponseEntity<GeneralMessageEntity> genericFailureMessage(){
-        return ResponseEntity.ok(GeneralMessageEntity.builder()
+        return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                 .data("Update failed. Request contains other illegal params. Pls check.").build());
     }
 }

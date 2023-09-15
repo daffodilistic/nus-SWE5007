@@ -1,5 +1,6 @@
 package com.nus.project.capstone.model.persistence.game;
 
+import com.nus.project.capstone.model.entity.game.GameGroupRequests;
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,6 +30,12 @@ public class GameGroupJpaEntities {
     public void addToGameTeams(GameTeamJpaEntities team) {
         team.setGameGroup(this);
         gameTeams.add(team);
+    }
+
+    public static GameGroupJpaEntities toJpaEntity(GameGroupRequests g) {
+        return GameGroupJpaEntities.builder()
+                .id(UUID.randomUUID())
+                .build();
     }
 
 }

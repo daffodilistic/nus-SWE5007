@@ -8,6 +8,8 @@ import lombok.Data;
 import java.util.List;
 import java.util.UUID;
 
+import static com.nus.project.capstone.model.entity.game.GameTeamResponse.toGameTeamResponse;
+
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,6 +25,7 @@ public class GameGroupResponse {
                 .id(g.getId())
                 .gameTeamIdFirst(g.getGameTeamIdFirst())
                 .gameTeamIdSecond(g.getGameTeamIdSecond())
+                .gameTeamResponses(g.getGameTeams().stream().map(t -> toGameTeamResponse(t)).toList())
                 .build();
     }
 }
