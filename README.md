@@ -54,5 +54,5 @@ The following Github Secrets are required:
 ## Google App Engine setup
 1. App Engine Admin API needs to be enabled in the Google Cloud Console, under
 the menu option "APIs and services".
-1. Ensure that the correct default service account used for App Engine is set 
+2. Ensure that the correct default service account used for App Engine is set 
 in App Engine -> Settings.

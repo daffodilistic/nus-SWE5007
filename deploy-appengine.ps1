@@ -16,4 +16,7 @@ if ($applicationYml -ne "") {
 }
 .\mvnw.cmd install
 # NOTE server port specified via CLI takes precedence over application.yml
-.\mvnw.cmd --projects $env:PROJECT_NAME --also-make clean package spring-boot:repackage appengine:deploy -D server.port=$env:PORT -D skipTests=true -D app.deploy.projectId=$env:APP_ENGINE_PROJECT -D app.deploy.version=test-v1
+.\mvnw.cmd --projects $env:PROJECT_NAME --also-make clean package spring-boot:repackage appengine:deploy `
+    -D skipTests=true `
+    -D app.deploy.projectId=$env:APP_ENGINE_PROJECT `
+    -D app.deploy.version=test-v6
