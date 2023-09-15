@@ -3,6 +3,7 @@ package com.nus.project.capstone.model.persistence.game;
 import com.nus.project.capstone.model.entity.game.GameTeamRequests;
 import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
+import com.nus.project.capstone.model.persistence.idc.IdcGroupJpaEntities;
 import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.*;
 
@@ -29,11 +30,17 @@ public class GameTeamJpaEntities {
     private Integer qualificationRoundPoint;
     private Integer qualificationRoundNumMatchesPlayed;
     private Boolean isQualifiedForElimination;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "gameTeam")
     private List<UserJpaEntities> users;
 
     @ManyToMany(mappedBy = "gamesTeam")
     private List<GamesJpaEntities> games = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "game_group_id", referencedColumnName = "game_group_id")
+    private GameGroupJpaEntities gameGroup;
+
     public void addToUsers(UserJpaEntities user) {
         user.setGameTeam(this);
         users.add(user);
