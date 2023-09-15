@@ -2337,6 +2337,216 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get all game groups",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "marcus",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/games/view-all-groups",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"games",
+						"view-all-groups"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/games/create-group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"games",
+						"create-group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assign game team to a game group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"4f868dab-4917-43b9-9dc1-97aa4bd5c15b\",\n    \"gameTeamIds\": [\"bcfcea02-b949-47a0-bad4-e69a8ac3e1c9\"]\n}\n\n// id here is the game group id",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/games/assign-team",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"games",
+						"assign-team"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
