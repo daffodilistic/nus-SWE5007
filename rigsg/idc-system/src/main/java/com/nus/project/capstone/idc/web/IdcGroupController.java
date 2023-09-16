@@ -81,7 +81,7 @@ public class IdcGroupController {
         group = group.updateJpaEntity(updateIdcGroupRequests);
 
         if (updateIdcGroupRequests.getTeamIds() != null) {
-            val originalTeamsInGroup = idcTeamRepository.findAllById(updateIdcGroupRequests.getTeamIds());
+            val originalTeamsInGroup = idcTeamRepository.findAll();
             originalTeamsInGroup.forEach(t -> {
                 t.setIdcGroup(null);
                 idcTeamRepository.save(t);
