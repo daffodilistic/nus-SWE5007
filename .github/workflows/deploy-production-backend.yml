@@ -8,7 +8,7 @@ jobs:
   deploy:
     strategy:
       matrix:
-        services: [demo, info-collection-system]
+        services: [demo, info-collection-system, game-system, idc-system]
     continue-on-error: true
     permissions:
       contents: "read"
