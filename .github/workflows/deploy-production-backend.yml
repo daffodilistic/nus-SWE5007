@@ -8,7 +8,7 @@ jobs:
   deploy:
     strategy:
       matrix:
-        services: [ demo, info-collection-system ]
+        services: [demo, info-collection-system]
     continue-on-error: true
     permissions:
       contents: "read"
@@ -23,6 +23,9 @@ jobs:
         with:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "17"
+        env: # Or as an environment variable
+          POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_USERNAME }}
+          POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD }}
       - run: |
           sudo apt-get install -y moreutils
           echo "Using GCP-specific application.yml"
@@ -38,7 +41,7 @@ jobs:
           echo "Creating github_actions.json"
           cd ${{ github.workspace }}
           echo ${{ secrets.GCP_CREDENTIALS_JSON }} | base64 --decode > github_actions.json
-          
+
       - name: Build Spring Boot application and deploy to App Engine
         run: |
           cd ${{ github.workspace }}/rigsg
