@@ -1,0 +1,20 @@
+spring:
+  autoconfigure:
+    exclude:
+      # Security
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.FallbackWebSecurityAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration
+      # JDBC/DataSource
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      # Keycloak
+      - org.keycloak.adapters.springboot.KeycloakAutoConfiguration
+  cloud:
+    gcp:
+      sql:
+        enabled: false
+      core:
+        enabled: false
