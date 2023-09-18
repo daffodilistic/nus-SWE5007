@@ -24,6 +24,7 @@ jobs:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "17"
       - run: |
+          apt-get install moreutils
           echo "Using GCP-specific application.yml"
           cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/resources
           rm application.yml
