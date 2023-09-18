@@ -32,14 +32,18 @@ public class GameTeamController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/team")
+    @PostMapping("/create-team")
     public ResponseEntity<GeneralMessageEntity> createTeam(@RequestBody GameTeamRequests g) {
+        // force set default again
+        g.setQualificationRoundNumMatchesPlayed(0);
+        g.setIsQualifiedForElimination(false);
+
         var team = gameTeamRepository.save(GameTeamJpaEntities.toJpaEntity(g));
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(team.getId()).build());
     }
 
-    @GetMapping("/team")
+    @PostMapping("/view-team")
     public ResponseEntity<GeneralMessageEntity> readTeam(@RequestBody GameTeamRequests g) {
 
         val o = gameTeamRepository.findById(g.getId());
@@ -53,15 +57,19 @@ public class GameTeamController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(i).build());
     }
 
-    @PutMapping("/team")
-    public ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody GameTeamRequests updateGameTeamRequests) {
+    @PutMapping("/update-team")
+    public ResponseEntity<GeneralMessageEntity> updateTeamInterface(@RequestBody GameTeamRequests updateGameTeamRequests){
+        return updateTeam(updateGameTeamRequests);
+    }
+
+    private ResponseEntity<GeneralMessageEntity> updateTeam(@RequestBody GameTeamRequests updateGameTeamRequests) {
 
         if (updateGameTeamRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Game team id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("Game team id must be provided").build());
         }
 
         if (gameTeamRepository.findById(updateGameTeamRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("Game Team %s is not found", updateGameTeamRequests.getId())).build());
         }
 
@@ -84,7 +92,7 @@ public class GameTeamController {
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(t.getId()).build());
     }
 
-    @GetMapping("/teams")
+    @GetMapping("/view-all-teams")
     public ResponseEntity<GeneralMessageEntity> getAllUsers() {
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(gameTeamRepository.findAll().stream()

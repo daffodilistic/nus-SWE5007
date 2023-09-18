@@ -69,11 +69,11 @@ public class IdcGroupController {
     private ResponseEntity<GeneralMessageEntity> updateGroup(@RequestBody IdcGroupRequests updateIdcGroupRequests) {
 
         if (updateIdcGroupRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("Idc group id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("Idc group id must be provided").build());
         }
 
         if (idcGroupRepository.findById(updateIdcGroupRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("IDC Group %s is not found", updateIdcGroupRequests.getId())).build());
         }
 
@@ -81,7 +81,7 @@ public class IdcGroupController {
         group = group.updateJpaEntity(updateIdcGroupRequests);
 
         if (updateIdcGroupRequests.getTeamIds() != null) {
-            val originalTeamsInGroup = idcTeamRepository.findAllById(updateIdcGroupRequests.getTeamIds());
+            val originalTeamsInGroup = idcTeamRepository.findAll();
             originalTeamsInGroup.forEach(t -> {
                 t.setIdcGroup(null);
                 idcTeamRepository.save(t);

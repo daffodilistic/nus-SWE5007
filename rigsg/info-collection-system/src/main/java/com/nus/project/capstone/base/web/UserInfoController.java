@@ -67,15 +67,28 @@ public class UserInfoController {
                 .data(o.map(UserResponse::toUserResponse).orElse(null)).build());
     }
 
+    @PostMapping("/view-user-email")
+    public ResponseEntity<GeneralMessageEntity> readUserUsingEmail(@RequestBody UserRequests userRequests) {
+        if (userRequests.getEmail() == null) {
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data("User email must be provided").build());
+        }
+        val users = userRepository.findAll();
+        List<UserJpaEntities> matchedUser = users.stream().filter(u -> u.getEmail().equals(userRequests.getEmail())).toList();
+        if(matchedUser.size() != 1){
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data(String.format("No user email %s found in our database!", userRequests.getEmail())).build());
+        }
+        return ResponseEntity.ok(GeneralMessageEntity.builder().data(matchedUser.get(0).getId()).build());
+    }
+
     @PutMapping("/update-user")
     public ResponseEntity<GeneralMessageEntity> updateUser(@RequestBody UserRequests updateUserRequests) {
 
         if (updateUserRequests.getId() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("User id must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("User id must be provided").build());
         }
 
         if (userRepository.findById(updateUserRequests.getId()).isEmpty()) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder()
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
                     .data(String.format("User %s is not found", updateUserRequests.getId())).build());
         }
 
