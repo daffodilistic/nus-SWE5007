@@ -31,7 +31,7 @@ jobs:
           mv application_gcp.yml application.yml
           echo "Setting app_version and envsubst-ing app.yaml"
           cd ${{ github.workspace }}/rigsg
-          APP_VERSION=$(echo ${GITHUB_REF:10}--$(git rev-parse --short HEAD) | tr . -)
+          APP_VERSION=$(echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT)
           echo "app_version=$APP_VERSION" >> $GITHUB_ENV
           cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/appengine
           envsubst < app.yaml | sponge app.yaml
