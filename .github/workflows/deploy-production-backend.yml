@@ -18,15 +18,17 @@ jobs:
       - name: Checkout
         uses: "actions/checkout@v3"
 
-      - name: Setup build environment and settings
+      - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "17"
+
+      - name: Setup build environment and settings
         env: # Or as an environment variable
           POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_USERNAME }}
           POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD }}
-      - run: |
+        run: |
           sudo apt-get install -y moreutils
           echo "Using GCP-specific application.yml"
           cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/resources
