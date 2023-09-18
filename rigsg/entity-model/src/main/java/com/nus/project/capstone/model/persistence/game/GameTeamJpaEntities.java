@@ -1,10 +1,7 @@
 package com.nus.project.capstone.model.persistence.game;
 
 import com.nus.project.capstone.model.entity.game.GameTeamRequests;
-import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
-import com.nus.project.capstone.model.persistence.idc.IdcGroupJpaEntities;
-import com.nus.project.capstone.model.persistence.idc.IdcTeamJpaEntities;
 import lombok.*;
 
 import javax.persistence.*;
@@ -74,5 +71,16 @@ public class GameTeamJpaEntities {
                         ? this.getIsQualifiedForElimination()
                         : u.getIsQualifiedForElimination())
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "GameTeamJpaEntities{" +
+                "id=" + id +
+                ", teamName='" + teamName + '\'' +
+                ", ageGroup='" + ageGroup + '\'' +
+                ", qualificationRoundScore=" + qualificationRoundScore +
+                ", qualificationRoundPoint=" + qualificationRoundPoint +
+                '}';
     }
 }
