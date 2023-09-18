@@ -9,5 +9,5 @@ automatic_scaling:
   min_num_instances: 1
   max_num_instances: 1
 env_variables:
-  POSTGRESQL_USERNAME: "postgres"
-  POSTGRESQL_PASSWORD: "password"
+  POSTGRESQL_USERNAME: $POSTGRESQL_USERNAME
+  POSTGRESQL_PASSWORD: $POSTGRESQL_PASSWORD

@@ -1,9 +1,8 @@
 name: Deploy Backend to Production
 on:
   push:
-    tags:
-      - v0.*
-      - v1.*
+    branches:
+      - production/backend
 
 jobs:
   deploy:
@@ -25,14 +24,25 @@ jobs:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "17"
       - run: |
+          echo "Using GCP-specific application.yml"
           cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/resources
           rm application.yml
-          mv application_docker.yml application.yml
+          mv application_gcp.yml application.yml
+          echo "Setting app_version and envsubst-ing app.yaml"
           cd ${{ github.workspace }}/rigsg
           APP_VERSION=$(echo ${GITHUB_REF:10}--$(git rev-parse --short HEAD) | tr . -)
           echo "app_version=$APP_VERSION" >> $GITHUB_ENV
-
+          cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/appengine
+          envsubst < app.yaml | sponge app.yaml
+          echo "Creating github_actions.json"
+          cd ${{ github.workspace }}
+          echo ${{ secrets.GCP_CREDENTIALS_JSON }} | base64 --decode > github_actions.json
+          
       - name: Build Spring Boot application and deploy to App Engine
         run: |
           cd ${{ github.workspace }}/rigsg
-          ./mvnw --projects info-collection-system --also-make clean package spring-boot:repackage appengine:deploy -D server.port=8080 -D skipTests=true -D app.deploy.projectId=sapient-symbol-388402 -D app.deploy.version=${{ env.app_version }}
+          ./mvnw --projects ${{ matrix.services }} --also-make clean package spring-boot:repackage appengine:deploy \
+          -D server.port=8080 \
+          -D skipTests=true \
+          -D app.deploy.projectId=shaped-splicer-397009 \
+          -D app.deploy.version=${{ env.app_version }}
