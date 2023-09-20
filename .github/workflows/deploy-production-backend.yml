@@ -6,6 +6,9 @@ on:
 
 jobs:
   deploy:
+    concurrency:
+      group: "deploy-${{ matrix.services }}-${{ github.sha }}"
+      cancel-in-progress: true
     strategy:
       matrix:
         services: [demo, info-collection-system, game-system, idc-system]
