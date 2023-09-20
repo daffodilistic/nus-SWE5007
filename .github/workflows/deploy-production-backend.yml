@@ -6,10 +6,8 @@ on:
 
 jobs:
   deploy:
-    concurrency:
-      group: "deploy-${{ matrix.services }}-${{ github.sha }}"
-      cancel-in-progress: true
     strategy:
+      max-parallel: 1
       matrix:
         services: [demo, info-collection-system, game-system, idc-system]
     continue-on-error: true
