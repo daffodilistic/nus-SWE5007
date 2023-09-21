@@ -2,74 +2,7 @@
   <b-tabs >
     <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadTeam()">
       <div>
-        <!-- Add Member Modal START-->
-        <b-modal
-          v-model="showAddMemberModal"
-          modal-class="modal-lg"
-          hide-footer
-          id="showUserModal"
-        >
-        <!-- Search bar for filtering users -->
-        <div class="search-container">
-            <p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p>&nbsp;&nbsp;
-            <input
-              type="text"
-              v-model="searchQueryModal"
-              placeholder="Search User Name"
-              class="search-box"
-            >
-          </div>
-          <p class="pagination-info">
-            Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }}
-            to {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
-            of {{ totalRecordsModal }} records
-          </p>
-
-          <div class="pagination">
-            <button @click="gotoPageModal(currentPageModal - 1)" :disabled="currentPageModal === 1" class="page-button">
-              <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i>
-            </button>
-            <span>Page {{ currentPageModal }} of {{ totalPagesModal }}</span>
-            <button @click="gotoPageModal(currentPageModal + 1)" :disabled="currentPageModal === totalPagesModal" class="page-button">
-              <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i>
-            </button>
-          </div><br>
-            <!-- List of users to be displayed inside the modal -->
-            <table class="modal-table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Select</th>
-                      <th>User Name</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(user, userIndex) in paginatedModalUserList" :key="user.id">
-                      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                      <td>
-                      <input
-                        type="checkbox"
-                        :checked="selectedUsers.includes(user.id)"
-                        @change="toggleUserSelection(user.id)"
-                      />
-                    </td>
-                      <!--<td>{{ userIndex + 1 }}</td>-->
-                      <td>{{ user.userName }}</td>
-                      <td>{{ user.firstName }}</td>
-                      <td>{{ user.lastName }}</td>
-                    </tr>
-
-                  </tbody>
-                </table>
-                <div class="text-center">
-                  <button id = "addMembersToTeam" @click="addMembersToTeam" class="add-member-button">Save</button>
-                </div>
-        </b-modal>
-        <!-- Add Member Modal END-->
-
-         <!-- show history Modal START-->
+         <!-- show IDC history Modal START-->
         <b-modal
           v-model="showHistoryModal"
           id="showHistoryModal"
@@ -83,7 +16,6 @@
                     <tr>
                       <th>S/No</th>
                       <th>Stage</th>
-                      <th>Venue</th>
                       <th>Score</th>
                       <th>Date / Time</th>
                     </tr>
@@ -100,7 +32,6 @@
 
                         <td>{{ presentationIndex + 1 }}</td>
                         <td>{{ presentation.stage }}</td>
-                        <td>{{ presentation.venue }}</td>
                         <td>{{ presentation.score }} / 100</td>
                         <td>{{ formatDateTime(presentation.dateTime) }}</td>
                       </tr>
@@ -111,7 +42,51 @@
                 </table>
 
         </b-modal>
-        <!-- show history Modal END-->
+        <!-- show IDC history Modal END-->
+        <!-- show GA history Modal START-->
+        <b-modal
+          v-model="showGAHistoryModal"
+          id="showGAHistoryModal"
+          modal-class="modal-lg"
+          title="Competition Score"
+          hide-footer
+        >
+            <!-- List of users to be displayed inside the modal -->
+            <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th>Qualification Stage</th>
+                    </tr>
+                    <tr>
+                      <th>&nbsp;</th>
+                    </tr>
+                    <tr>
+                      <th class="center-align">Team Name</th>
+                      <th class="center-align">Match Played</th>
+                      <th class="center-align">Total credits scored</th>
+                      <th class="center-align">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="gameTeamList.length === 0">
+                      <tr>
+                        <td colspan="10" class="centered-cell"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                      <tr v-for="(gameTeam, gameTeamIndex) in gameTeamList" :key="gameTeam.id">
+                        <td class="center-align">{{ gameTeam.teamName }}</td>
+                        <td class="center-align">{{ gameTeam.qualificationRoundNumMatchesPlayed }}</td>
+                        <td class="center-align">{{ gameTeam.qualificationRoundScore }}</td>
+                        <td class="center-align">{{ gameTeam.qualificationRoundPoint }}</td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+
+        </b-modal>
+        <!-- show GA history Modal END-->
         <br><br>
         <div class="search-container">
           <table>
@@ -176,7 +151,10 @@
                   <b-icon icon="person-plus" ></b-icon>
                 </b-button>
                 <!-- View Icon -->
-                <b-button @click="viewScore(team.id)" id="viewScore" variant="outline-primary" class="delete-button">
+                <b-button @click="viewScore(team.id)" id="viewScore" variant="outline-primary" class="delete-button" v-if="selectedCompetition === 'Innovation Design Challenge'">
+                  <b-icon icon="eye"></b-icon>
+                </b-button>
+                <b-button @click="viewGAScore(team)" id="viewGAScore" variant="outline-primary" class="delete-button" v-if="selectedCompetition === 'Game Arena'">
                   <b-icon icon="eye"></b-icon>
                 </b-button>
                 <!-- Edit Icon -->
@@ -260,7 +238,7 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
-import { DELETE_IDC_TEAM_BASE_URL, ADD_MEMBER_IDC_TEAM_BASE_URL,ADD_MEMBER_GAME_TEAM_BASE_URL,UPDATE_GAME_TEAM_BASE_URL,UPDATE_IDC_TEAM_BASE_URL,VIEW_GAME_TEAM_BASE_URL,VIEW_IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL } from '@/api';
+import { DELETE_IDC_TEAM_BASE_URL, ADD_MEMBER_IDC_TEAM_BASE_URL,ADD_MEMBER_GAME_TEAM_BASE_URL,UPDATE_GAME_TEAM_BASE_URL,UPDATE_IDC_TEAM_BASE_URL,VIEW_GAME_TEAM_BASE_URL,VIEW_IDC_TEAM_BASE_URL, GET_ALL_USER_INFO_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL } from '@/api';
 import Swal from 'sweetalert2';
 import Vue from 'vue'
 
@@ -294,11 +272,12 @@ export default {
       itemsPerPage: 10, // Number of teams per page
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
-      showAddMemberModal: false,
       showHistoryModal: false,
+      showGAHistoryModal: false,
       userList: [],
       presentationList: [],
       teamMembers:[],
+      gameTeamList: [],
     };
   },
   computed: {
@@ -490,6 +469,49 @@ export default {
         console.error("Error fetching users:", error);
       }
     },
+
+    async viewGAScore(teamObj) {
+      let groupID = ''
+      let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      console.log('teamObj',teamObj.id,teamObj.teamName)
+      try {
+        const response = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
+        const teamObject = response.data.data
+        console.log('teamObject BEFORE',teamObject)
+
+        for (const group of teamObject) {
+          const teamId = group.id;
+          console.log('group object',group);
+          console.log('group id',group.id);
+
+          for (const team of group.gameTeamResponses) {
+            const teamId = team.id;
+            if(teamObj.id === team.id){
+               groupID = group.id;
+               console.log('team found in group', groupID)
+            }
+          }
+        }
+
+        let groupObj = teamObject.filter(team => team.id === groupID);
+        this.gameTeamList = groupObj[0].gameTeamResponses
+        console.log('teamObject AFTER',this.gameTeamList)
+
+        this.showGAHistoryModal = true; // Show the modal after fetching the users
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
     gotoPageModal(page) {
     if (page >= 1 && page <= this.totalPagesModal) {
       this.currentPageModal = page;
@@ -648,8 +670,8 @@ export default {
 
         try {
           if(this.selectedCompetition === "Game Arena") {
-                const response2 = await axios.put(`${ADD_MEMBER_IDC_TEAM_BASE_URL}`, requestBody2, { headers });
-                const response = await axios.delete(`${DELETE_IDC_TEAM_BASE_URL}`, {
+                const response2 = await axios.put(``, requestBody2, { headers });
+                const response = await axios.delete(``, {
                 data: requestBody,
                 headers: headers
               });
@@ -955,6 +977,9 @@ input.form-control.editing-textbox {
 }
 
 .centered-cell {
+  text-align: center;
+}
+.center-align {
   text-align: center;
 }
 </style>
