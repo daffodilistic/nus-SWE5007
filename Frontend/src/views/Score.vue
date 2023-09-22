@@ -1,6 +1,5 @@
 <template>
-  <b-tabs >
-    <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadTeam()">
+
   <div>
     <br><br>
     <div class="search-container">
@@ -48,13 +47,10 @@
           <td v-if="team.presentationResponses.length === 0">
             Not Scored
           </td>
-          <td v-for="(response, index) in team.presentationResponses" :key="index">
+          <td v-else v-for="(response, index) in team.presentationResponses" :key="index">
             <span v-if="response.stage === getQualificationStatus(team)"
                   :class="{'green-score': response.score > 50, 'red-score': response.score <= 50}">
               {{ response.score }}
-            </span>
-            <span v-else>
-              Not Scored
             </span>
           </td>
           <td>
@@ -70,10 +66,18 @@
                   <th></th>
                   <th>Metric Name</th>
                   <th>Metric Weightage</th>
-                  <th>Score <br>(out of 100)</th>
-                  <th>Qualification</th>
-                  <th>Preview Score</th>
-                  <th>Action</th>
+                  <th>
+                    <span class="step-text">Step 1:</span> <br> <span class="grey-font">Enter Score <br>(out of 100)</span>
+                  </th>
+                  <th>
+                    <span class="step-text">Step 2:</span> <br> <span class="grey-font"> Preview Score</span>
+                  </th>
+                  <th>
+                    <span class="step-text">Step 3:</span> <br> <span class="grey-font"> Update Qualification</span>
+                  </th>
+                  <th>
+                    <span class="step-text">Step 4:</span> <br> <span class="grey-font"> Submit</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -82,7 +86,14 @@
                   <td>{{ metric.metricName }}</td>
                   <td>{{ metric.metricWeight * 100 +"%" }}</td>
                   <td><input type="number" v-model="metric.enteredScore" class="form-control" :min="0"></td>
-
+                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
+                      :rowspan="filteredMetricsForTeam(index).length"
+                      class="score-cell">
+                       <b-button id = "previewScore" @click="previewScore(index)" variant="outline-primary" class="delete-button">
+                      <b-icon icon="calculator"></b-icon>
+                    </b-button>
+                    <div class="score">{{  calculatedScore }}</div>
+                  </td>
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
                       :rowspan="filteredMetricsForTeam(index).length">
                   <div class="form-group select">
@@ -92,16 +103,9 @@
                     </select>
                   </div>
                   </td>
-                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
-                      :rowspan="filteredMetricsForTeam(index).length"
-                      class="score-cell">
-                    <div class="score">{{  calculatedScore }}</div>
-                  </td>
+
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
                       :rowspan="filteredMetricsForTeam(index).length">
-                    <b-button id = "previewScore" @click="previewScore(index)" variant="outline-primary" class="delete-button">
-                      <b-icon icon="calculator"></b-icon>
-                    </b-button><br>
 
                     <b-button id="saveScore" @click="editMetric(index)" variant="outline-primary" class="delete-button">
                       <b-icon icon="save"></b-icon>
@@ -122,13 +126,12 @@
       </div>
     </div>
   </div>
-      </b-tab>
-    </b-tabs>
+
 </template>
 
 <script>
 import axios from "axios";
-import { CALCULATE_IDC_SCORE_BASE_URL,UPDATE_IDC_TEAM_BASE_URL, QUALIFY_GAME_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,GET_ALL_GAME_METRIC_BASE_URL } from '@/api';
+import { CALCULATE_IDC_SCORE_BASE_URL,UPDATE_IDC_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_IDC_TEAM_BASE_URL } from '@/api';
 import { competitionChoiceOptions,stageNameOptions } from "../dropdownOptions";
 import Vue from 'vue'
 
@@ -151,7 +154,6 @@ export default {
     return {
       calculatedScore: null,
       qualification: "",
-      selectedCompetition: "Innovation Design Challenge",
       metricRequestBody: [],
       totalRecords: 0,
       selectedQualification: '',
@@ -172,12 +174,9 @@ export default {
       return stageNameOptions;
     },
     filteredQualificationOptions() {
-    if (this.selectedCompetition === "Game Arena") {
-      return this.stageNameOptions.filter(option => option.competitionId === '2');
-    } else if (this.selectedCompetition === "Innovation Design Challenge") {
+
       return this.stageNameOptions.filter(option => option.competitionId === '1');
-    }
-    return [];
+
     },
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
@@ -300,16 +299,13 @@ export default {
         'Authorization': `Bearer ${token}`
       };
       try {
-          if (this.selectedCompetition === "Game Arena") {
-            this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-            this.teams = this.teamsData.data.data;
-            this.teams = allTeams.filter((team) => team.isQualifiedForElimination);
-          }else if (this.selectedCompetition === "Innovation Design Challenge") {
+
             this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
 
            this.teams = this.teamsData.data.data;
+            console.log('this.teams',this.teams);
             //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
-          }
+
           this.totalRecords = this.teams.length;
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -370,15 +366,7 @@ export default {
       let CalScoreResponse = '';
       let updateTeamURL='';
       try {
-          if (this.selectedCompetition === "Game Arena") {
-            requestBody = {
-              id: team.id,
-            };
-            CalScoreResponse = await axios.post(`${GET_ALL_GAME_TEAM_BASE_URL}`,this.metricRequestBody, { headers });
-            updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
-            response = await axios.put(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
 
-          }else if (this.selectedCompetition === "Innovation Design Challenge") {
             requestBody = {
               id: team.id,
               isQualifiedPromo : qualifiedPromo,
@@ -388,8 +376,6 @@ export default {
             CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
             updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
             response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
-          }
-
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -447,11 +433,8 @@ export default {
 
       let CalScoreResponse = '';
       try {
-          if (this.selectedCompetition === "Game Arena") {
-            CalScoreResponse = await axios.post(`${GET_ALL_GAME_TEAM_BASE_URL}`,this.metricRequestBody, { headers });
-          }else if (this.selectedCompetition === "Innovation Design Challenge") {
             CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
-          }
+
           this.calculatedScore = Math.round(CalScoreResponse.data.data);
 
         } catch (error) {
@@ -483,6 +466,7 @@ export default {
   if (this.activeRow === index) {
     this.activeRow = null; // Collapse the row if it's already expanded
   } else {
+    this.calculatedScore = null
     this.activeRow = index;
 
     const team = this.filteredTeamsByQualification[index];
@@ -499,13 +483,8 @@ export default {
       'Authorization': `Bearer ${token}`
     };
     try {
-      if (this.selectedCompetition === "Game Arena") {
-        this.metricData = await axios.get(`${GET_ALL_GAME_METRIC_BASE_URL}`, { headers });
-      } else if (this.selectedCompetition === "Innovation Design Challenge") {
 
-        this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
-      }
-
+      this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
       this.metrics = this.metricData.data.data;
 
     } catch (error) {
@@ -525,6 +504,14 @@ export default {
 </script>
 
 <style scoped>
+
+.step-text {
+  color: black; /* Change the color to your desired color */
+}
+
+.grey-font {
+  color: grey;
+}
 .green-score {
   color: green;
 }

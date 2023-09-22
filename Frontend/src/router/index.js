@@ -74,10 +74,25 @@ const routes = [
     }
   },
   {
+    path: '/scoreGA',
+    name: 'ScoreGA',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/ScoreGA.vue')
+    }
+  },
+  {
     path: '/manageGroup',
     name: 'ManageGroup',
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/manageGroup.vue')
+    }
+  }
+  ,
+  {
+    path: '/upload',
+    name: 'upload',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/Upload.vue')
     }
   }
 ]

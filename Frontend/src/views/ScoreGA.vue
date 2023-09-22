@@ -1,6 +1,4 @@
 <template>
-  <b-tabs >
-    <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadGroup()">
       <div>
         <!-- Add Member Modal -->
         <b-modal
@@ -39,8 +37,6 @@
                     <tr>
                       <th>Select</th>
                       <th>Team Name</th>
-                      <!--<th>Age Group</th>-->
-                     <!-- <th>Qualification Status</th>-->
                     </tr>
                   </thead>
                   <tbody>
@@ -55,17 +51,12 @@
                     </td>
                       <!--<td>{{ userIndex + 1 }}</td>-->
                       <td>{{ team.teamName }}</td>
-                      <!--<td>{{ team.ageGroup }}</td>-->
-                      <!--<td>Final 1st Stage</td>-->
                     </tr>
                     <tr></tr>
                   </tbody>
                 </table>
-                <div class="text-center">
-                  <button @click="addTeamsToGroup" class="add-member-button">Save</button>
-                </div>
         </b-modal>
-        <br><br>
+
         <!--END OF MODAL-->
         <div class="search-container">
           <table>
@@ -74,10 +65,6 @@
               <td><input type="text" v-model="searchQuery" placeholder="Search group Name" class="search-box"></td>
             </tr>
           </table>
-        </div>
-         <div class="add-button">
-          <b-button variant="outline-primary" size="lg" @click="addNewGroup"><b-icon icon="file-earmark-plus" ></b-icon>
-          </b-button><br>
         </div>
         <div v-if="groups && groups.length > 0">
         <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
@@ -112,21 +99,16 @@
                 <input type="text" v-model="group.editingGroupName" class="form-control editing-textbox" />
               </td>
               <td>
-                <b-button variant="outline-primary" @click="fetchTeams(group.id,group.groupName)" >
-                  <b-icon icon="person-plus" ></b-icon>
-                </b-button>
                 <!-- Edit Icon -->
                 <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button">
                   <span v-if="!group.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
-                <!-- Delete Icon -->
-                <b-button
-                class="delete-button"
-                variant="outline-primary"
-                @click="deleteGroup(startIndex + index -1)"
-                >
-                  <b-icon icon="trash"></b-icon>
+                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button">
+                 <b-icon icon="table"></b-icon>
+                </b-button>
+                <b-button @click="createGame(startIndex + index -1)" variant="outline-primary" class="delete-button">
+                 <b-icon icon="collection-play"></b-icon>
                 </b-button>
               </td>
             </tr>
@@ -136,24 +118,76 @@
                 <table class="team-table">
                   <thead>
                     <tr>
-                      <th></th>
                       <th>No.</th>
                       <th>Team Name</th>
-                      <th>Age Group</th>
-                       <!--<th>Qualification Status</th>-->
+                      <th>Team Score</th>
+                      <th>Game Status</th>
+                      <th>Game Outcome</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-if="groupMembers.idcTeamResponses.length === 0">
-                      <td colspan="11"  style="color: red;">0 team in the group</td>
-                    </tr>
-                    <tr v-else v-for="(team, userIndex) in groupMembers.idcTeamResponses" :key="userIndex" class="child-row">
-                      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                      <td> {{ userIndex + 1 }} </td>
-                      <td> {{ team.teamName }} </td>
-                      <td> {{ ageGroupTextMap[team.ageGroup] }} </td>
-                      <!--<td> Final 1st Stage </td>-->
-                    </tr>
+                     <template v-for="(group, groupIndex) in groupedData">
+                      <tr v-for="(item, rowIndex) in group" :key="`row-${groupIndex}-${rowIndex}`">
+                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ item.id }}</td>
+                        <td>{{ item.teamId }}</td>
+
+                        <td v-if="rowIndex === 0 && item.gameStatus!=='done'"><input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
+                        <td v-else-if ="rowIndex === 0 && item.gameStatus==='done'">{{ item.hostScore }}</td>
+                        <td v-if="rowIndex === 1 && item.gameStatus!=='done'"><input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
+                        <td v-else-if ="rowIndex === 1 && item.gameStatus==='done'">{{ item.oppoScore }}</td>
+
+                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ gameStatusTextMap[item.gameStatus] }}</td>
+                        <td v-if="rowIndex === 0">
+                          <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
+                          >
+                            <i class="fas fa-trophy gold-trophy"></i> Win
+                          </span>
+                          <span v-else-if="item.gameOutcome === 'lose' && item.gameStatus==='done'">
+                            Lose
+                          </span>
+                          <span v-else>
+                            Not Scored
+                          </span>
+                        </td>
+                        <td v-if="rowIndex === 1">
+                          <span v-if="item.gameOutcome === 'lose' && item.gameStatus==='done'"
+                          >
+                            <i class="fas fa-trophy gold-trophy"></i> Win
+                          </span>
+                          <span v-else-if="item.gameOutcome === 'win' && item.gameStatus==='done'">
+                            Lose
+                          </span>
+                          <span v-else>
+                            Not Scored
+                          </span>
+                        </td>
+                        <td
+                          v-if="rowIndex === 0 && item.gameStatus === 'pending'"
+                          :rowspan="group.length"
+                        >
+                           <b-button @click="startGame(item.id)" variant="outline-primary" class="delete-button">
+                            <b-icon icon="play-circle"></b-icon>&nbsp;Start
+                            </b-button>
+                        </td>
+
+                        <td
+                          v-if="rowIndex === 0 && item.gameStatus == 'ongoing'"
+                          :rowspan="group.length"
+                        >
+                           <b-button @click="submitScore(item.id,group)" variant="outline-primary" class="delete-button">
+                            <b-icon icon="save"></b-icon>&nbsp;Score
+                            </b-button>
+                        </td>
+                        <td
+                          v-if="rowIndex === 0 && item.gameStatus == 'done'"
+                          :rowspan="group.length"
+                        >
+                          &nbsp;
+                        </td>
+
+                      </tr>
+                    </template>
                   </tbody>
                 </table>
               </td>
@@ -177,15 +211,13 @@
           </div>
         </div>
       </div>
-    </b-tab>
-  </b-tabs>
 </template>
 
 
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
-import { DELETE_IDC_GROUP_BASE_URL, CREATE_IDC_GROUP_BASE_URL,UPDATE_IDC_GROUP_BASE_URL,VIEW_GAME_GROUP_BASE_URL,VIEW_IDC_GROUP_BASE_URL,GET_ALL_IDC_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,ADD_TEAM_IDC_GROUP_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,ADD_TEAM_GAME_GROUP_BASE_URL} from '@/api';
+import { VIEW_GAME_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,CREATE_GAME_BASE_URL,GET_ALL_GAMES_BASE_URL,UPDATE_GAME_ONGOING_STATUS_BASE_URL,UPDATE_GAME_SCORE_BASE_URL} from '@/api';
 import Swal from 'sweetalert2';
 import Vue from 'vue'
 
@@ -206,7 +238,6 @@ export default {
 
   data() {
     return {
-      selectedCompetition: "Innovation Design Challenge",
       currentPageModal: 1,
       itemsPerPageModal: 10,
       currentGroupId: "",
@@ -223,15 +254,34 @@ export default {
       showAddTeamModal: false,
       teamList: [],
       groupMembers:[],
-      newChildRow: {
-        teamName: "",
-        ageGroup: "",
-      },
+      objectsWithIdAndTeamArray : []
     };
   },
   computed: {
+    gameStatusTextMap() {
+    // Define a mapping of age group values to their corresponding text
+    const gameStatusMap = {
+      'pending': 'Not Yet Started',
+      'ongoing': 'In-Progress',
+      'done': 'Completed',
+      // Add more entries as needed for other age groups
+    };
+    return gameStatusMap;
+  },
+
+     groupedData() {
+      const grouped = {};
+      this.objectsWithIdAndTeamArray.forEach((item) => {
+        const id = item.id;
+        if (!grouped[id]) {
+          grouped[id] = [];
+        }
+        grouped[id].push(item);
+      });
+
+      return Object.values(grouped);
+    },
     totalRecordsModal() {
-      console.log('length',this.filteredModalTeamList.length)
       return this.filteredModalTeamList.length;
 
     },
@@ -302,7 +352,6 @@ export default {
     return this.filteredModalTeamList.slice(startIndex, endIndex);
   },
   totalPagesModal() {
-    console.log(this.filteredModalTeamList.length / this.itemsPerPageModal)
     return Math.ceil(this.filteredModalTeamList.length / this.itemsPerPageModal);
   },
   ageGroupTextMap() {
@@ -321,7 +370,7 @@ export default {
       'Authorization': `Bearer ${Vue.$keycloak.token}`
     };
     try {
-      this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, { headers });
+      this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
       this.groups = this.groupsData.data.data;
     } catch (error) {
       // Handle any errors that might occur during the request
@@ -329,6 +378,96 @@ export default {
     }
   },
   methods: {
+    async submitScore(groupId,groupObj) {
+      const confirmation = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, Submit Score!'
+      });
+      if (confirmation.isConfirmed) {
+      let requestBody={};
+       for (let i = 0; i < groupObj.length; i++) {
+          for (let j = i + 1; j < groupObj.length; j++) {
+
+        requestBody = {
+          id: groupId,
+          gameTeamIdHost: groupObj[i].teamId,
+          gameTeamIdOppo: groupObj[j].teamId,
+          gameScoreHost: groupObj[i].enteredScore,
+          gameScoreOppo: groupObj[j].enteredScore,
+        };
+       }}
+
+      console.log('requestBody',requestBody)
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
+        };
+      try {
+       const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
+      }
+      catch (error) {
+        // Handle errors, if any
+        console.error('Error calling API:', error);
+      }}
+  },
+
+    async startGame(groupId) {
+
+      const requestBody = {
+        id:groupId
+      };
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
+        };
+      try {
+       const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
+      }
+
+      catch (error) {
+        // Handle errors, if any
+        console.error('Error calling API:', error);
+      }
+  },
+    async createGame(index) {
+      const group = this.filteredGroups[index];
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      };
+      const teams = group.gameTeamResponses; // Assuming your group object has a 'teams' property containing an array of teams
+
+    // Loop through each team in the group
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        // Create a matchup object with two teams
+        const requestBody = {
+          gameTeamIdHost: teams[i].id,
+          gameTeamIdOppo: teams[j].id,
+        };
+
+        try {
+          // If the group has an ID, update the existing record using a PUT request
+          const response = await axios.post(`${CREATE_GAME_BASE_URL}`, requestBody, { headers });
+
+           Swal.fire({
+            title: 'Game Set!',
+            text: 'Matches for all teams are created successfully.',
+            icon: 'success'
+          });
+        }
+        catch (error) {
+        // Handle errors, if any
+          console.error('Error saving group:', error);
+        }
+        }
+      }
+    },
     async editGroup(index) {
         const group = this.filteredGroups[index];
         if (group.editing) {
@@ -343,28 +482,20 @@ export default {
             'Authorization': `Bearer ${Vue.$keycloak.token}`
           };
           try {
-          let url = '';
-          let url2 = '';
-            if (this.selectedCompetition === "Game Arena") {
-              url = UPDATE_GAME_METRIC_BASE_URL;
-              url2 = CREATE_GAME_METRIC_BASE_URL;
-            } else if (this.selectedCompetition === "Innovation Design Challenge") {
-             url = UPDATE_IDC_GROUP_BASE_URL;
-             url2 = CREATE_IDC_GROUP_BASE_URL;
-            }
+
             if (group.id) {
               const requestBody = {
                 groupName: group.groupName,
               };
               // If the group has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${url}`, requestBody, { headers });
+              const response = await axios.post(`${UPDATE_GAME_METRIC_BASE_URL}`, requestBody, { headers });
 
             } else {
               const requestBody = {
                 groupName: group.groupName,
               };
               // If the group doesn't have an ID, create a new record using a POST request
-              const response = await axios.post(`${url2}`, requestBody, { headers });
+              const response = await axios.post(`${CREATE_GAME_METRIC_BASE_URL}`, requestBody, { headers });
 
               // Add the newly created group to the beginning of the groups array
               this.groups.unshift(response.data.data);
@@ -382,30 +513,15 @@ export default {
           group.editing = true;
         }
       },
-    async addNewGroup() {
-      // Create a new group object and add it to the beginning of the groups array
-      const newGroup = {
-        groupName: "",
-        editing: true, // Set editing to true to enable editing mode for the new group
-        editingGroupName: "",
-      };
 
-      this.groups.unshift(newGroup);
-
-      // Update the currentPage to 1 to ensure the newly added group appears on the first page
-      this.currentPage = 1;
-    },
     async loadGroup() {
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
-          if (this.selectedCompetition === "Game Arena") {
-            this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
-          } else if (this.selectedCompetition === "Innovation Design Challenge") {
-            this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, { headers });
-          }
+
+          this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
           this.groups = this.groupsData.data.data;
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -419,13 +535,10 @@ export default {
       };
     let response = '';
     try {
-      if(this.selectedCompetition === "Game Arena") {
+
         response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-         this.currentGroupName = '';
-      }else if (this.selectedCompetition === "Innovation Design Challenge") {
-        response = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
-         this.currentGroupName = groupName;
-      }
+        this.currentGroupName = '';
+
         this.teamList = response.data.data
         this.currentGroupId = groupId;
         //this.teamList = response.data.data.filter((team) => team.isQualifiedFinal );
@@ -442,6 +555,7 @@ export default {
   },
 
     async toggleRow(index) {
+    this.objectsWithIdAndTeamArray = []
     if (this.activeRow === index) {
       this.activeRow = null; // Collapse the row if it's already expanded
     } else {
@@ -452,29 +566,44 @@ export default {
           'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
       try {
-        // Make the API call here using the group ID as the request body
-        const requestBody = {
-          id: group.id,
-        };
+        const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, { headers });
 
-        // Make the HTTP PUT request to the API endpoint
-        const requestBodyJson = JSON.stringify(requestBody);
-
-        let  response
-
-        if (this.selectedCompetition === "Game Arena") {
-          response = await axios.post(`${VIEW_GAME_GROUP_BASE_URL}`, requestBodyJson, { headers });
-        } else if (this.selectedCompetition === "Innovation Design Challenge") {
-            response = await axios.post(`${VIEW_IDC_GROUP_BASE_URL}`, requestBodyJson, { headers });
-        }
         this.groupMembers = response.data.data;
 
-        // Optional: Perform any additional actions, such as updating the UI.
+        // Iterate through the data objects
+        for (const item of this.groupMembers) {
+          // Create a teamArray for each data object
+         // const teamArray = [item.gameTeamIdHost, item.gameTeamIdOppo];
+
+          // Create an object with "id" and associated teamArray
+          const objectWithIdAndHostArray = {
+            id: item.id,
+            teamId: item.gameTeamIdHost,
+            gameStatus : item.gameStatus,
+            gameOutcome : item.gameOutcome,
+            hostScore: item.gameScoreHost
+          };
+
+          const objectWithIdAndOppoArray = {
+            id: item.id,
+            teamId: item.gameTeamIdOppo,
+            gameStatus : item.gameStatus,
+            gameOutcome : item.gameOutcome,
+            oppoScore: item.gameScoreOppo
+          };
+
+          // Push the object into the array
+          this.objectsWithIdAndTeamArray.push(objectWithIdAndHostArray);
+          this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
+        }
+
+        //console.log('objectsWithIdAndTeamArray',this.objectsWithIdAndTeamArray)
+        const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
+        console.log(jsonArray);
       } catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
       }
-
     }
   },
       gotoPage(page) {
@@ -483,69 +612,6 @@ export default {
         }
       },
 
-      async deleteGroup(index) {
-        const group = this.filteredGroups[index];
-        const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
-        };
-        const confirmation = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'You won\'t be able to revert this!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-      });
-
-      if (confirmation.isConfirmed) {
-        const requestBody = {
-          id: group.id,
-        };
-        const requestBody2 = {
-          id: group.id,
-          teamIds:[]
-        };
-
-        try {
-          if(this.selectedCompetition === "Game Arena") {
-                const response2 = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody2, { headers });
-                const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
-                data: requestBody,
-                headers: headers
-              });
-              }else if (this.selectedCompetition === "Innovation Design Challenge") {
-                const response2 = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody2, { headers });
-                const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
-                data: requestBody,
-                headers: headers
-           });
-           }
-
-          // Show a success message
-          Swal.fire({
-            title: 'Deleted!',
-            text: 'The user has been deleted.',
-            icon: 'success'
-          });
-
-          this.loadGroup();
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-      },
-      // Method to add a new child row
-      addChildRow(teamIndex) {
-        const group = this.filteredGroups[teamIndex];
-        group.idcTeamResponses.push({ ...this.newChildRow });
-        // Set the initial country and state values for the new child row
-        const newUserIndex = group.idcTeamResponses.length - 1;
-        const newUser = group.idcTeamResponses[newUserIndex];
-        newUser.country = null;
-        newUser.statesOptions = [];
-      },
       toggleTeamSelection(groupId) {
       if (this.selectedTeams.includes(groupId)) {
         this.selectedTeams = this.selectedTeams.filter((selectedUserId) => selectedUserId !== groupId);
@@ -556,40 +622,6 @@ export default {
         teamIds: this.selectedTeams,
       };
     },
-
-    async addTeamsToGroup() {
-
-    if (!this.currentGroupId || this.selectedTeams.length === 0) {
-      console.error('group ID or selected users not available.');
-      return;
-    }
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
-    };
-    try {
-
-      if(this.selectedCompetition === "Game Arena") {
-        const requestBody = {
-          id: this.currentGroupId,
-          gameTeamIds: this.selectedTeams,
-        };
-        const response = await axios.put(`${ADD_TEAM_GAME_GROUP_BASE_URL}`, requestBody, { headers });
-      }else if (this.selectedCompetition === "Innovation Design Challenge") {
-        const requestBody = {
-          id: this.currentGroupId,
-          teamIds: this.selectedTeams,
-        };
-        const response = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody, { headers });
-      }
-
-      // Close the modal after the request is successful
-      this.showAddTeamModal = false;
-      this.selectedTeams = [];
-    } catch (error) {
-      console.error('Error adding members to group:', error);
-    }
-  },
   },
 };
 </script>
@@ -738,7 +770,7 @@ padding: 8px;
 /* Styles for the text box in editing mode */
 input.form-control.editing-textbox {
   font-size: 14px;
-  min-width: 100px;
+  min-width: 50px;
 }
 
 /* Modal Styles */
@@ -824,6 +856,7 @@ input.form-control.editing-textbox {
   margin-top: 10px;
   margin-right: 27px;
 }
-
-
+.gold-trophy {
+  color: gold; /* Apply gold color to the trophy icon */
+}
 </style>

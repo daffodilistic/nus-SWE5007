@@ -23,6 +23,7 @@
         <module>idc-system</module>
         <module>game-system</module>
         <module>entity-model</module>
+        <module>demo</module>
     </modules>
 
     <properties>
@@ -119,6 +120,9 @@
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>appengine-maven-plugin</artifactId>
                 <version>2.4.4</version>
+                <configuration>
+                    <serviceAccountKeyFile>${basedir}/../../github_actions.json</serviceAccountKeyFile>
+                </configuration>
             </plugin>
         </plugins>
     </build>

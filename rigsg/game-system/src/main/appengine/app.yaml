@@ -1,7 +1,6 @@
 runtime: java
 env: flex
-# entrypoint: java -Xmx128m -jar info.jar
-service: info
+service: game
 runtime_config:
     operating_system: "ubuntu22"
     runtime_version: "17"

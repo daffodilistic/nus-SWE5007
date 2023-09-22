@@ -27,7 +27,7 @@ run this command `npm run serve`
 6. Compiles and minifies for production
 run this command `npm run build'
 
-## Docker Setup
+## Local Development & Docker Setup
 Backend services are built via `docker build` and run via `docker run`.
 The `docker-compose.yml` file is used to orchestrate the services.
 Note that the JAR file is built during the GitHub Actions workflow.
@@ -38,3 +38,26 @@ To run the services locally for development use, use the following command:
 ```shell
 docker compose up --remove-orphans
 ```
+
+## CI/CD Settings and Deployment Setup
+### Deployment Instructions
+1. Ensure that Cloud SQL instance is running before deploying the application.
+2. Push/merge branches to `production/backend` or `production/frontend`
+
+### Github Actions setup
+The Github Actions workflow builds the JAR file and directly deploys the
+application to Google App Engine. The workflow is triggered on every tag pushed
+to the repository.
+
+See the workflow YAML files defined in the `.github/workflows` folder for
+details.
+
+The following Github Secrets are required:
+- `POSTGRESQL_USERNAME`: The username for the Postgres database
+- `POSTGRESQL_PASSWORD`: The password for the Postgres database
+- `GCP_CREDENTIALS_JSON`: Base64 encoded version of the JSON credentials file
+### Google App Engine setup
+1. App Engine Admin API needs to be enabled in the Google Cloud Console, under
+the menu option "APIs and services".
+2. Ensure that the correct default service account used for App Engine is set 
+in App Engine -> Settings.

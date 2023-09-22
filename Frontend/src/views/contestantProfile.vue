@@ -1,7 +1,7 @@
 <template>
   <b-tabs >
      <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadTeam()">
-    <br><br>
+    <br>
      <!-- show upload START-->
         <b-modal
           v-model="showUploadModal"
@@ -97,8 +97,27 @@
                 </table>
         </b-modal>
         <!-- show download Modal END-->
+        <div style="text-align: right;">
+          <b-button id="viewScore" @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
+            <b-icon icon="archive"></b-icon>&nbsp;Score History
+          </b-button>&nbsp;
+          <b-button id="viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button">
+            <b-icon icon="cloud-upload"></b-icon>&nbsp;Upload File
+          </b-button>&nbsp;
+          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" class="delete-button">
+            <b-icon icon="folder2-open"></b-icon>&nbsp;View Submission
+          </b-button>&nbsp;
+           <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button">
+            <b-icon icon="book"></b-icon>&nbsp;Game Manual
+          </b-button>&nbsp;
+            <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button">
+            <b-icon icon="table"></b-icon>&nbsp;Time Table
+          </b-button>
+        </div>
       <div class="form-container">
       <table>
+      <tr>&nbsp;</tr>
+      <tr>&nbsp;</tr>
             <tr>
           <td>
             <div class="form-group">
@@ -119,19 +138,13 @@
               <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
               <label class="label-color">Team Qualification :</label>
               {{ getQualificationStatus(team) }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <b-button id = "viewScore" @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
-                <b-icon icon="eye"></b-icon>
-              </b-button>&nbsp;
-              <b-button id = "viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button">
-                <b-icon icon="cloud-upload"></b-icon>
-              </b-button>&nbsp;
-               <b-button id = "viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" class="delete-button">
-                <b-icon icon="cloud-download"></b-icon>
-              </b-button>
+
             </div>
 
           </td>
         </tr>
+
+
         <tr>&nbsp;</tr>
         <!--
         <tr>
@@ -369,9 +382,9 @@ export default {
     displayTitleText(team) {
 
       if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-        return "Please upload proposal";
+        return "Please Upload Proposal";
       } else if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-        return "Please upload video";
+        return "Please Upload Video";
       }
     },
 
@@ -479,61 +492,7 @@ export default {
         console.error('Error calling API:', error);
       }
     },
-    async download(team) {
-  const headers = {
-    'Authorization': `Bearer ${Vue.$keycloak.token}`
-  };
 
-  try {
-    let response;
-
-    if (this.selectedCompetition === "Game Arena") {
-      // Replace 'test' with the appropriate URL for Game Arena download
-      response = await axios.post('YOUR_GAME_ARENA_DOWNLOAD_URL', {
-        headers,
-        responseType: 'blob', // To indicate a binary response
-      });
-    } else if (this.selectedCompetition === "Innovation Design Challenge") {
-      const fileName = '1693974117222.mp4';
-
-      if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-        // Construct the URL for downloading the promotional file
-        const promoFileURL = `${DOWNLOAD_PROMO_FILE_IDC_BASE_URL}/${team.teamName}-Promotional-${fileName}`;
-
-        response = await axios.post(promoFileURL, {
-          headers,
-          responseType: 'blob',
-        });
-      } else if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-        // If you want to upload a file, you should use a POST request, not here.
-        // You can add the file upload logic separately.
-        console.log('Upload logic goes here');
-        return;
-      }
-    }
-
-    // Check if the response contains a valid file
-    if (response && response.status === 200) {
-      const blob = response.data;
-      const url = window.URL.createObjectURL(blob);
-
-      // Create a link element to trigger the download
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'downloaded-file.mp4'; // Set the desired file name
-      document.body.appendChild(a);
-
-      // Trigger the download and cleanup
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    }
-  } catch (error) {
-    // Handle errors, if any
-    console.error('Error calling API:', error);
-  }
-},
     downloadFile(file) {
       axios({
   url: `${DOWNLOAD_FILE_IDC_BASE_URL}/${file}`,
