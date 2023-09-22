@@ -1,8 +1,8 @@
-name: Deploy Backend to Production
+name: Deploy to App Engine (Production)
 on:
   push:
     branches:
-      - production/backend
+      - production/backend/app-engine
 
 jobs:
   deploy:
