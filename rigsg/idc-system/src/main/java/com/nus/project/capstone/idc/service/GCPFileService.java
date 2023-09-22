@@ -1,30 +1,39 @@
 package com.nus.project.capstone.idc.service;
 
-import com.google.api.gax.paging.Page;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.api.gax.paging.Page;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.spring.core.DefaultGcpProjectIdProvider;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.common.base.Strings;
+import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 
 @Component
+@Import(DefaultGcpProjectIdProvider.class)
 public class GCPFileService {
 
     private static final Logger logger = LogManager.getLogger(GCPFileService.class);
@@ -41,13 +50,26 @@ public class GCPFileService {
     @Autowired
     public GCPFileService(
             @Value("${spring.cloud.gcp.bucket.credential}") String gcpBucketCredential,
+            // @Value("${spring.cloud.gcp.credentials.encoded-key}") String gcpCredential,
             @Value("${spring.cloud.gcp.project-id}") String gcpProjectId,
             @Value("${spring.cloud.gcp.bucket.id}") String gcpBucketId,
             @Value("${spring.cloud.gcp.bucket.dirName}") String gcpDirectoryName) {
         this.gcpDirectoryName = gcpDirectoryName;
         this.gcpBucketId = gcpBucketId;
         this.gcpProjectId = gcpProjectId;
-        loadGCPStorageAndBucket(gcpBucketCredential);
+        if (!Strings.isNullOrEmpty(gcpBucketCredential)) {
+            loadGCPStorageAndBucket(gcpBucketCredential);
+        } else {
+            try {
+            StorageOptions options = StorageOptions.newBuilder().build();
+            storage = options.getService();
+            bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
+            } catch (Exception e) {
+                logger.warn("[GCPFileService] WARNING: Unable to auto-configure GCP Bucket credential!");
+                logger.error(e.getMessage());
+            }
+        }
+        
     }
 
     public ResponseEntity<GeneralMessageEntity> uploadFileToGCP(MultipartFile file, String teamName){
@@ -131,7 +153,7 @@ public class GCPFileService {
             storage = options.getService();
             bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
         } catch (IOException ie) {
-            logger.error("Unable to load GCP Bucket credential at: [{}]", gcpBucketCredential);
+            logger.warn("Unable to load GCP Bucket credential at: [{}]", gcpBucketCredential);
         }
     }
 }
