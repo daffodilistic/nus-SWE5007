@@ -41,7 +41,7 @@
 	</dependencyManagement>
 
 	<build>
-		<!-- <finalName>demo</finalName> -->
+		<finalName>demo</finalName>
 	</build>
 
 </project>
