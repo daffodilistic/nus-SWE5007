@@ -1430,7 +1430,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"d961b8c1-e4fd-4465-a6f0-c674188a1705\",\n    \"teamIds\": [\"a52e5593-ba2e-410b-ae66-725f8f0f48ee\"]\n}\n\n// id here is the group id",
+					"raw": "{\n    \"id\": \"34b722b9-5c73-4fe1-81fc-14121b54a76a\",\n    \"teamIds\": [\"60ac712e-75a0-4f33-b1c9-4a6e0e5a7920\"]\n}\n\n// id here is the group id",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2106,7 +2106,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"gameTeamIdHost\": \"cf8c1eb3-caf1-4f88-b495-19fd6cfb51c3\",\n    \"gameTeamIdOppo\": \"f613ef3d-3d2b-4a1c-95fa-4e95ddb6d8f0\"\n}",
+					"raw": "{\n    \"gameTeamIdHost\": \"b729cb19-dddc-4c16-bda7-61f0e374ee9c\",\n    \"gameTeamIdOppo\": \"c32c690d-82ff-45c5-a28c-097e17df552a\",\n    \"venue\": \"LT27\",\n    \"datetime\": \"2023-09-22T10:15:30Z\",\n    \"stage\": \"quali\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2526,7 +2526,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"4f868dab-4917-43b9-9dc1-97aa4bd5c15b\",\n    \"gameTeamIds\": [\"bcfcea02-b949-47a0-bad4-e69a8ac3e1c9\"]\n}\n\n// id here is the game group id",
+					"raw": "{\n    \"id\": \"4f868dab-4917-43b9-9dc1-97aa4bd5c15b\",\n    \"gameTeamIds\": [\"c32c690d-82ff-45c5-a28c-097e17df552a\", \"bcfcea02-b949-47a0-bad4-e69a8ac3e1c9\", \"f0396ce5-7b7c-42ba-adf8-a3238d3a3874\", \"b729cb19-dddc-4c16-bda7-61f0e374ee9c\"]\n}\n\n// id here is the game group id",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2543,6 +2543,213 @@
 					"path": [
 						"games",
 						"assign-team"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check group qualification status",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"4f868dab-4917-43b9-9dc1-97aa4bd5c15b\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/games/check-qualification-status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"games",
+						"check-qualification-status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update game team (DO NOT use unless for testing)",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{                   \n    \"id\": \"f0396ce5-7b7c-42ba-adf8-a3238d3a3874\",\n    \"teamName\": \"Team8\",\n    \"ageGroup\": \"open\",\n    \"qualificationRoundScore\": 2,\n    \"qualificationRoundPoint\": 9,\n    \"qualificationRoundNumMatchesPlayed\": 3,\n    \"isQualifiedForElimination\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/games/update-team",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"games",
+						"update-team"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Qualify Group",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"4f868dab-4917-43b9-9dc1-97aa4bd5c15b\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/games/qualify-group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"games",
+						"qualify-group"
 					]
 				}
 			},
