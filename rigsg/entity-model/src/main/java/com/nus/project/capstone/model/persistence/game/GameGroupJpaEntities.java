@@ -43,4 +43,13 @@ public class GameGroupJpaEntities {
                 .build();
     }
 
+    @Override
+    public String toString() {
+        return "GameGroupJpaEntities{" +
+                "id=" + id +
+                ", gameTeamIdFirst=" + gameTeamIdFirst +
+                ", gameTeamIdSecond=" + gameTeamIdSecond +
+                ", gameTeams=" + gameTeams +
+                '}';
+    }
 }
