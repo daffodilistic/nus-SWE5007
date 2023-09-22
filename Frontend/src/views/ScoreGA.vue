@@ -118,26 +118,26 @@
                 <table class="team-table">
                   <thead>
                     <tr>
-                      <th>No.</th>
-                      <th>Team Name</th>
+                      <th>Matchup</th>
+                      <th class="longer-td">Team Name</th>
                       <th>Team Score</th>
-                      <th>Game Status</th>
                       <th>Game Outcome</th>
+                      <th>Game Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                      <template v-for="(group, groupIndex) in groupedData">
                       <tr v-for="(item, rowIndex) in group" :key="`row-${groupIndex}-${rowIndex}`">
-                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ item.id }}</td>
-                        <td>{{ item.teamId }}</td>
+                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ groupIndex+1}}</td>
+                        <td class="longer-td">{{ item.teamName  }}</td>
 
                         <td v-if="rowIndex === 0 && item.gameStatus!=='done'"><input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
                         <td v-else-if ="rowIndex === 0 && item.gameStatus==='done'">{{ item.hostScore }}</td>
                         <td v-if="rowIndex === 1 && item.gameStatus!=='done'"><input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
                         <td v-else-if ="rowIndex === 1 && item.gameStatus==='done'">{{ item.oppoScore }}</td>
 
-                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ gameStatusTextMap[item.gameStatus] }}</td>
+
                         <td v-if="rowIndex === 0">
                           <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
                           >
@@ -162,6 +162,7 @@
                             Not Scored
                           </span>
                         </td>
+                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ gameStatusTextMap[item.gameStatus] }}</td>
                         <td
                           v-if="rowIndex === 0 && item.gameStatus === 'pending'"
                           :rowspan="group.length"
@@ -258,6 +259,7 @@ export default {
     };
   },
   computed: {
+
     gameStatusTextMap() {
     // Define a mapping of age group values to their corresponding text
     const gameStatusMap = {
@@ -365,6 +367,9 @@ export default {
   },
   },
   async mounted() {
+    this.fetchTeams();
+
+
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${Vue.$keycloak.token}`
@@ -402,7 +407,6 @@ export default {
         };
        }}
 
-      console.log('requestBody',requestBody)
       const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${Vue.$keycloak.token}`
@@ -435,6 +439,18 @@ export default {
       }
   },
     async createGame(index) {
+
+      const confirmation = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Matchups will be created for all teams!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, create matchups!'
+      });
+
+      if (confirmation.isConfirmed) {
       const group = this.filteredGroups[index];
       const headers = {
         'Content-Type': 'application/json',
@@ -457,62 +473,17 @@ export default {
 
            Swal.fire({
             title: 'Game Set!',
-            text: 'Matches for all teams are created successfully.',
+            text: 'Matchups for all teams are created successfully.',
             icon: 'success'
           });
         }
         catch (error) {
         // Handle errors, if any
           console.error('Error saving group:', error);
-        }
+        }}
         }
       }
     },
-    async editGroup(index) {
-        const group = this.filteredGroups[index];
-        if (group.editing) {
-
-          // Save the changes
-          group.groupName = group.editingGroupName;
-
-          group.editing = false;
-
-          const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Vue.$keycloak.token}`
-          };
-          try {
-
-            if (group.id) {
-              const requestBody = {
-                groupName: group.groupName,
-              };
-              // If the group has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${UPDATE_GAME_METRIC_BASE_URL}`, requestBody, { headers });
-
-            } else {
-              const requestBody = {
-                groupName: group.groupName,
-              };
-              // If the group doesn't have an ID, create a new record using a POST request
-              const response = await axios.post(`${CREATE_GAME_METRIC_BASE_URL}`, requestBody, { headers });
-
-              // Add the newly created group to the beginning of the groups array
-              this.groups.unshift(response.data.data);
-              url ='';
-            }
-            this.loadGroup();
-            // Optional: Perform any additional actions, such as updating the UI.
-          } catch (error) {
-            // Handle errors, if any
-            console.error('Error saving group:', error);
-          }
-        } else {
-          // Enter editing mode
-          group.editingGroupName = group.groupName;
-          group.editing = true;
-        }
-      },
 
     async loadGroup() {
       const headers = {
@@ -528,22 +499,16 @@ export default {
         }
     },
 
-    async fetchTeams(groupId,groupName) {
+    async fetchTeams() {
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
     let response = '';
     try {
-
         response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-        this.currentGroupName = '';
-
         this.teamList = response.data.data
-        this.currentGroupId = groupId;
-        //this.teamList = response.data.data.filter((team) => team.isQualifiedFinal );
 
-        this.showAddTeamModal = true; // Show the modal after fetching the users
       }catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -572,16 +537,19 @@ export default {
 
         // Iterate through the data objects
         for (const item of this.groupMembers) {
-          // Create a teamArray for each data object
-         // const teamArray = [item.gameTeamIdHost, item.gameTeamIdOppo];
-
           // Create an object with "id" and associated teamArray
+
+          const gameTeamIdHost = this.teamList.find(team => team.id === item.gameTeamIdHost);
+
+          const gameScoreOppo = this.teamList.find(team => team.id === item.gameTeamIdOppo);
+
           const objectWithIdAndHostArray = {
             id: item.id,
             teamId: item.gameTeamIdHost,
             gameStatus : item.gameStatus,
             gameOutcome : item.gameOutcome,
-            hostScore: item.gameScoreHost
+            hostScore: item.gameScoreHost,
+            teamName : gameTeamIdHost.teamName
           };
 
           const objectWithIdAndOppoArray = {
@@ -589,17 +557,15 @@ export default {
             teamId: item.gameTeamIdOppo,
             gameStatus : item.gameStatus,
             gameOutcome : item.gameOutcome,
-            oppoScore: item.gameScoreOppo
+            oppoScore: item.gameScoreOppo,
+            teamName : gameScoreOppo.teamName
           };
-
-          // Push the object into the array
           this.objectsWithIdAndTeamArray.push(objectWithIdAndHostArray);
           this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
         }
-
-        //console.log('objectsWithIdAndTeamArray',this.objectsWithIdAndTeamArray)
         const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
-        console.log(jsonArray);
+        console.log(jsonArray)
+
       } catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
@@ -859,4 +825,17 @@ input.form-control.editing-textbox {
 .gold-trophy {
   color: gold; /* Apply gold color to the trophy icon */
 }
+
+.longer-td {
+  width: 140px; /* Adjust the width as needed */
+}
+
+.row-even {
+  background-color: #f0f0f0; /* Even row color */
+}
+
+.row-odd {
+  background-color: #ffffff; /* Odd row color */
+}
+
 </style>
