@@ -5,6 +5,7 @@ import com.nus.project.capstone.model.persistence.game.GamesJpaEntities;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -19,6 +20,9 @@ public class GamesResponse {
     private Integer gameScoreOppo;
     private String gameStatus;
     private String gameOutcome;
+    private String venue;
+    private Instant datetime;
+    private String stage;
 
     public static GamesResponse toGamesResponse(GamesJpaEntities g) {
         return GamesResponse.builder()
@@ -29,6 +33,9 @@ public class GamesResponse {
                 .gameScoreOppo(g.getGameScoreOppo())
                 .gameStatus(g.getGameStatus())
                 .gameOutcome(g.getGameOutcome())
+                .venue(g.getVenue())
+                .datetime(g.getDatetime())
+                .stage(g.getStage())
                 .build();
     }
 }

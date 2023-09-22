@@ -4,6 +4,7 @@ import com.nus.project.capstone.model.entity.game.GamesRequests;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,9 @@ public class GamesJpaEntities {
     private Integer gameScoreOppo;
     private String gameStatus;
     private String gameOutcome;
+    private String venue;
+    private Instant datetime;
+    private String stage;
 
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
@@ -62,6 +66,9 @@ public class GamesJpaEntities {
                 .gameScoreOppo(g.getGameScoreOppo())
                 .gameStatus(g.getGameStatus())
                 .gameOutcome(g.getGameOutcome())
+                .venue(g.getVenue())
+                .datetime(g.getDatetime())
+                .stage(g.getStage())
                 .build();
     }
 
@@ -74,6 +81,9 @@ public class GamesJpaEntities {
                 .gameScoreOppo(u.getGameScoreOppo() == null ? this.getGameScoreOppo() : u.getGameScoreOppo())
                 .gameStatus(u.getGameStatus() == null ? this.getGameStatus() : u.getGameStatus())
                 .gameOutcome(u.getGameOutcome() == null ? this.getGameOutcome() : u.getGameOutcome())
+                .venue(u.getVenue() == null ? this.getVenue() : u.getVenue())
+                .datetime(u.getDatetime() == null ? this.getDatetime() : u.getDatetime())
+                .stage(u.getStage() == null ? this.getStage() : u.getStage())
                 .build();
     }
 }
