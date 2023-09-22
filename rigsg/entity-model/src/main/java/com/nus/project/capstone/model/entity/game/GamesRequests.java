@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -18,4 +19,8 @@ public class GamesRequests {
     private Integer gameScoreOppo;
     private String gameStatus;
     private String gameOutcome;
+    private String venue;
+    private Instant datetime;
+    private String stage;
+
 }
