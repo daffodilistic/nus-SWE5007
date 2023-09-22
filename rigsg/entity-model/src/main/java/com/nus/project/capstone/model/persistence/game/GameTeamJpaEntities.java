@@ -79,8 +79,10 @@ public class GameTeamJpaEntities {
                 "id=" + id +
                 ", teamName='" + teamName + '\'' +
                 ", ageGroup='" + ageGroup + '\'' +
-                ", qualificationRoundScore=" + qualificationRoundScore +
-                ", qualificationRoundPoint=" + qualificationRoundPoint +
+                ", score=" + qualificationRoundScore +
+                ", point=" + qualificationRoundPoint +
+                ", numPlayed=" + qualificationRoundNumMatchesPlayed +
+                ", isQualified=" + isQualifiedForElimination +
                 '}';
     }
 }
