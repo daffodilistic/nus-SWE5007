@@ -2,6 +2,73 @@
   <b-tabs >
     <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadTeam()">
       <div>
+        <!-- Add Member Modal START-->
+        <b-modal
+          v-model="showAddMemberModal"
+          modal-class="modal-lg"
+          hide-footer
+          id="showUserModal"
+        >
+        <!-- Search bar for filtering users -->
+        <div class="search-container">
+            <p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p>&nbsp;&nbsp;
+            <input
+              type="text"
+              v-model="searchQueryModal"
+              placeholder="Search User Name"
+              class="search-box"
+            >
+          </div>
+          <p class="pagination-info">
+            Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }}
+            to {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
+            of {{ totalRecordsModal }} records
+          </p>
+          <div class="pagination">
+            <button @click="gotoPageModal(currentPageModal - 1)" :disabled="currentPageModal === 1" class="page-button">
+              <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i>
+            </button>
+            <span>Page {{ currentPageModal }} of {{ totalPagesModal }}</span>
+            <button @click="gotoPageModal(currentPageModal + 1)" :disabled="currentPageModal === totalPagesModal" class="page-button">
+              <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i>
+            </button>
+          </div><br>
+            <!-- List of users to be displayed inside the modal -->
+            <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Select</th>
+                      <th>User Name</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(user, userIndex) in paginatedModalUserList" :key="user.id">
+                      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                      <td>
+                      <input
+                        type="checkbox"
+                        :checked="selectedUsers.includes(user.id)"
+                        @change="toggleUserSelection(user.id)"
+                      />
+                    </td>
+                      <!--<td>{{ userIndex + 1 }}</td>-->
+                      <td>{{ user.userName }}</td>
+                      <td>{{ user.firstName }}</td>
+                      <td>{{ user.lastName }}</td>
+                    </tr>
+                    <tr></tr>
+
+                  </tbody>
+                </table>
+                <div class="text-center">
+                  <button @click="addMembersToTeam" class="add-member-button">Save</button>
+                  <button id = "addMembersToTeam" @click="addMembersToTeam" class="add-member-button">Save</button>
+                </div>
+        </b-modal>
+        <!-- Add Member Modal END-->
          <!-- show IDC history Modal START-->
         <b-modal
           v-model="showHistoryModal"
@@ -490,14 +557,11 @@ export default {
 
         for (const group of teamObject) {
           const teamId = group.id;
-          console.log('group object',group);
-          console.log('group id',group.id);
 
           for (const team of group.gameTeamResponses) {
             const teamId = team.id;
             if(teamObj.id === team.id){
                groupID = group.id;
-               console.log('team found in group', groupID)
             }
           }
         }

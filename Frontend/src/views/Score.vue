@@ -1,7 +1,41 @@
 <template>
 
   <div>
-    <br><br>
+      <!-- show download START-->
+       <b-modal
+          v-model="showDownloadModal"
+          modal-class="custom-modal"
+          title="Download File"
+          hide-footer
+        >
+            <!-- List of users to be displayed inside the modal -->
+            <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th>Filename</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="downloadFileList.length === 0">
+                      <tr>
+                        <td colspan="5"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                       <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
+                        <td>{{ file }} </td>
+                        <td> <b-button id = "downloadFile" @click="downloadFile(file)" variant="outline-primary" class="delete-button">
+                <b-icon icon="cloud-download"></b-icon>
+              </b-button></td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                  </tbody>
+                </table>
+        </b-modal>
+        <!-- show download Modal END-->
     <div class="search-container">
       <table>
         <tr>
@@ -32,6 +66,7 @@
           <th>Teacher Name</th>
           <th>Score</th>
           <th>Qualification Status</th>
+          <th>Action</th>
         </tr>
       </thead>
 
@@ -56,6 +91,11 @@
           <td>
             {{getQualificationStatus(team) }}
           </td>
+          <td>
+          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary">
+            <b-icon icon="folder2-open"></b-icon>
+          </b-button>
+           </td>
         </tr>
     <!-- Child rows for metrics -->
     <tr v-if="activeRow === index " class="child-row">
@@ -78,6 +118,7 @@
                   <th>
                     <span class="step-text">Step 4:</span> <br> <span class="grey-font"> Submit</span>
                   </th>
+
                 </tr>
               </thead>
               <tbody>
@@ -131,11 +172,12 @@
 
 <script>
 import axios from "axios";
-import { CALCULATE_IDC_SCORE_BASE_URL,UPDATE_IDC_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_IDC_TEAM_BASE_URL } from '@/api';
+import { CALCULATE_IDC_SCORE_BASE_URL,UPDATE_IDC_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_IDC_TEAM_BASE_URL,VIEW_ALL_FILES_BASE_URL } from '@/api';
 import { competitionChoiceOptions,stageNameOptions } from "../dropdownOptions";
 import Vue from 'vue'
 
 export default {
+  name: 'Page1',
   head() {
     return {
       link: [
@@ -165,6 +207,8 @@ export default {
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       metrics: [],
+      showDownloadModal: false,
+      downloadFileList: [],
 
     };
   },
@@ -214,7 +258,7 @@ export default {
           case "Final 2nd Stage":
             result = team.isQualifiedFinalSecondStage;
             break;
-          case "Not Qualified":
+          case "Preliminary Round":
             result = !team.isQualifiedPromo;
             break;
           default:
@@ -272,6 +316,45 @@ export default {
     }
   },
   methods: {
+    async viewDownload(teamName) {
+       let token='';
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        const response = await axios.get(`${VIEW_ALL_FILES_BASE_URL}`, { headers });
+        const originalArray = response.data.data;
+        const prefix = teamName;
+
+        // Remove the "participants/" prefix from each item
+        const interimArray = originalArray.map((item) => {
+          // Use string manipulation to remove the prefix
+          return item.replace('participants/', '');
+        });
+
+        this.downloadFileList = interimArray.filter((item) => {
+        const parts = item.split('-');
+        if (parts.length > 1) {
+          // Check if the first part of the filename matches the prefix
+          return parts[0] === prefix;
+        }
+        return false;
+      });
+        this.showDownloadModal = true; // Show the modal after fetching the users
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    goToTab(route) {
+      this.$router.push(route);
+    },
     getQualificationStatus(team) {
       let qualificationStatus;
 
@@ -282,7 +365,7 @@ export default {
       } else if (team.isQualifiedPromo) {
         qualificationStatus = "Promotional Round";
       } else {
-        qualificationStatus = "Not Qualified";
+        qualificationStatus = "Preliminary Round";
       }
       return qualificationStatus;
     },
@@ -450,7 +533,9 @@ export default {
       const team = this.filteredTeamsByQualification[teamIndex];
       const qualification = team.isQualifiedFinalSecondStage ? "Final 2nd Stage" :
                          team.isQualifiedFinal ? "Final 1st Stage" :
-                         team.isQualifiedPromo ? "Promotional Round" : null;
+                         team.isQualifiedPromo ? "Promotional Round" :
+                        !team.isQualifiedPromo ? "Preliminary Round" :
+                         null;
 
       if (!qualification) {
         // If the team doesn't have any of the specified qualifications, return an empty array
@@ -619,6 +704,7 @@ export default {
   margin-right: 10px; /* Add some spacing between the icon and text */
   font-size: 16px;
   color: rgb(65, 127, 202); /* Set the color to blue (#3498db) */
+  height: 40px;
 }
 
 .main-table th:first-child,

@@ -128,7 +128,12 @@
                   </thead>
                   <tbody>
                      <template v-for="(group, groupIndex) in groupedData">
-                      <tr v-for="(item, rowIndex) in group" :key="`row-${groupIndex}-${rowIndex}`">
+                      <tr v-for="(item, rowIndex) in group" :key="`row-${groupIndex}-${rowIndex}`" :class="{
+                        'table-row': true,
+                        'row-even': groupIndex % 2 === 0,
+                        'row-odd': groupIndex % 2 !== 0,
+                        'no-bottom-border': groupIndex === 0 && rowIndex === group.length - 1,
+                      }">
                         <td v-if="rowIndex === 0" :rowspan="group.length">{{ groupIndex+1}}</td>
                         <td class="longer-td">{{ item.teamName  }}</td>
 
@@ -597,12 +602,10 @@ export default {
 .main-table {
 
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: none;
-  border-radius: 15px;
-  overflow: hidden;
-  font-size: 22px;
+  border-collapse: collapse;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .main-table th,
