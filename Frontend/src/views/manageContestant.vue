@@ -24,7 +24,7 @@
     </div>
 
     <div class="add-button">
-      <b-button id="addNewuser" variant="outline-primary" @click="addNewUser"><b-icon icon="person-plus" ></b-icon>
+      <b-button id="addNewuser" variant="outline-primary" @click="addNewUser"><b-icon icon="person-plus" v-b-tooltip.hover="'Click to create new user'"></b-icon>
       </b-button>
     </div><br>
     <table class="main-table">
@@ -165,7 +165,7 @@
 
           <td>
             <!-- Edit Icon -->
-            <b-button id="edit-button" @click="editingUser(startIndex + index -1)" variant="outline-primary" class="delete-button">
+            <b-button id="edit-button" @click="editingUser(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit user particulars'">
               <span v-if="!user.editing"><b-icon icon="pencil"></b-icon></span>
               <span v-else><b-icon icon="save"></b-icon></span>
             </b-button>
@@ -174,7 +174,7 @@
             id="deleteUser"
             class="delete-button"
             variant="outline-primary"
-            @click="deleteUser(startIndex + index -1)"
+            @click="deleteUser(startIndex + index -1)" v-b-tooltip.hover="'Click to delete user'"
             >
               <b-icon icon="trash"></b-icon>
             </b-button>

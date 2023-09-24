@@ -62,7 +62,7 @@
                   </tbody>
                 </table>
                 <div class="text-center">
-                  <button @click="addTeamsToGroup" class="add-member-button">Save</button>
+                  <button @click="addTeamsToGroup" class="add-member-button" v-b-tooltip.hover="'Click to save entry'">Save</button>
                 </div>
         </b-modal>
         <br><br>
@@ -76,7 +76,7 @@
           </table>
         </div>
          <div class="add-button">
-          <b-button variant="outline-primary" size="lg" @click="addNewGroup"><b-icon icon="file-earmark-plus" ></b-icon>
+          <b-button variant="outline-primary" size="lg" @click="addNewGroup"><b-icon icon="file-earmark-plus" v-b-tooltip.hover="'Click to create new group'"></b-icon>
           </b-button><br>
         </div>
         <div v-if="groups && groups.length > 0">
@@ -112,11 +112,11 @@
                 <input type="text" v-model="group.editingGroupName" class="form-control editing-textbox" />
               </td>
               <td>
-                <b-button variant="outline-primary" @click="fetchTeams(group.id,group.groupName)" >
+                <b-button variant="outline-primary" @click="fetchTeams(group.id,group.groupName)" v-b-tooltip.hover="'Click to add / remove teams from group'">
                   <b-icon icon="person-plus" ></b-icon>
                 </b-button>
                 <!-- Edit Icon -->
-                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button">
+                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit group details'">
                   <span v-if="!group.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
@@ -124,7 +124,7 @@
                 <b-button
                 class="delete-button"
                 variant="outline-primary"
-                @click="deleteGroup(startIndex + index -1)"
+                @click="deleteGroup(startIndex + index -1)" v-b-tooltip.hover="'Click to delete group'"
                 >
                   <b-icon icon="trash"></b-icon>
                 </b-button>

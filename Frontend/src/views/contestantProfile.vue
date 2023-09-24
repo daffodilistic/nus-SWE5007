@@ -98,20 +98,20 @@
         </b-modal>
         <!-- show download Modal END-->
         <div style="text-align: right;">
-          <b-button id="viewScore" @click="viewScore(team.id)" variant="outline-primary" class="delete-button">
-            <b-icon icon="archive"></b-icon>&nbsp;Score History
+          <b-button id="viewScore" @click="viewScore(team.id)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to view score history'">
+            <b-icon icon="archive"></b-icon>
           </b-button>&nbsp;
-          <b-button id="viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button">
-            <b-icon icon="cloud-upload"></b-icon>&nbsp;Upload File
+          <b-button id="viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to upload submission'">
+            <b-icon icon="cloud-upload"></b-icon>
           </b-button>&nbsp;
-          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" class="delete-button">
-            <b-icon icon="folder2-open"></b-icon>&nbsp;View Submission
+          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to view submission history'">
+            <b-icon icon="folder2-open"></b-icon>
           </b-button>&nbsp;
-           <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button">
-            <b-icon icon="book"></b-icon>&nbsp;Game Manual
+           <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to download Game Manual'">
+            <b-icon icon="book"></b-icon>
           </b-button>&nbsp;
-            <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button">
-            <b-icon icon="table"></b-icon>&nbsp;Time Table
+            <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to download Time Table'">
+            <b-icon icon="table"></b-icon>
           </b-button>
         </div>
       <div class="form-container">

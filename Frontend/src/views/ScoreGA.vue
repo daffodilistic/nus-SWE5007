@@ -1,63 +1,49 @@
 <template>
       <div>
-        <!-- Add Member Modal -->
+        <!-- show GA history Modal START-->
         <b-modal
-          v-model="showAddTeamModal"
-          modal-class="custom-modal"
+          v-model="showGAHistoryModal"
+          id="showGAHistoryModal"
+          modal-class="modal-lg"
+          title="Competition Score"
           hide-footer
         >
-        <!-- Search bar for filtering users -->
-        <div class="search-container">
-            <p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p>&nbsp;&nbsp;
-            <input
-              type="text"
-              v-model="searchQueryModal"
-              placeholder="Search team Name"
-              class="search-box"
-            >
-          </div>
-          <p>
-            Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }}
-            to {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
-            of {{ totalRecordsModal }} records
-          </p>
-
-          <div class="pagination">
-            <button @click="gotoPageModal(currentPageModal - 1)" :disabled="currentPageModal === 1" class="page-button">
-              <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i>
-            </button>
-            <span>Page {{ currentPageModal }} of {{ totalPagesModal }}</span>
-            <button @click="gotoPageModal(currentPageModal + 1)" :disabled="currentPageModal === totalPagesModal" class="page-button">
-              <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i>
-            </button>
-          </div><br>
             <!-- List of users to be displayed inside the modal -->
             <table class="modal-table">
                   <thead>
                     <tr>
-                      <th>Select</th>
-                      <th>Team Name</th>
+                      <th>Qualification Stage</th>
+                    </tr>
+                    <tr>
+                      <th>&nbsp;</th>
+                    </tr>
+                    <tr>
+                      <th class="center-align">Team Name</th>
+                      <th class="center-align">Match Played</th>
+                      <th class="center-align">Total Credits</th>
+                      <th class="center-align">Points</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(team, userIndex) in paginatedModalTeamList" :key="team.id">
-
-                      <td>
-                      <input
-                        type="checkbox"
-                        :checked="selectedTeams.includes(team.id)"
-                        @change="toggleTeamSelection(team.id)"
-                      />
-                    </td>
-                      <!--<td>{{ userIndex + 1 }}</td>-->
-                      <td>{{ team.teamName }}</td>
-                    </tr>
-                    <tr></tr>
+                    <template v-if="gameTeamList.length === 0">
+                      <tr>
+                        <td colspan="10" class="centered-cell"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                      <tr v-for="(gameTeam, gameTeamIndex) in gameTeamList" :key="gameTeam.id">
+                        <td class="center-align">{{ gameTeam.teamName }}</td>
+                        <td class="center-align">{{ gameTeam.qualificationRoundNumMatchesPlayed }}</td>
+                        <td class="center-align">{{ gameTeam.qualificationRoundScore }}</td>
+                        <td class="center-align">{{ gameTeam.qualificationRoundPoint }}</td>
+                      </tr>
+                    </template>
                   </tbody>
                 </table>
-        </b-modal>
 
-        <!--END OF MODAL-->
+        </b-modal>
+        <!-- show GA history Modal END-->
         <div class="search-container">
           <table>
             <tr>
@@ -93,23 +79,26 @@
               </td>
               <td>{{ startIndex + index }}</td>
               <td v-if="!group.editing">
-                {{ group.groupName }}
+                {{ group.id}}
               </td>
               <td v-else>
                 <input type="text" v-model="group.editingGroupName" class="form-control editing-textbox" />
               </td>
               <td>
                 <!-- Edit Icon -->
-                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button">
+                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit group name'">
                   <span v-if="!group.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
-                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button">
-                 <b-icon icon="table"></b-icon>
+                <b-button @click="viewGAScore(group)" id="viewGAScore" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to view scores of all teams in the group'">
+                  <b-icon icon="eye"></b-icon>
                 </b-button>
-                <b-button @click="createGame(startIndex + index -1)" variant="outline-primary" class="delete-button">
+                <b-button @click="createGame(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to create matchups for all teams in the group'">
                  <b-icon icon="collection-play"></b-icon>
                 </b-button>
+                <b-button @click="qualifyTeam(group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to qualify group'">
+                 <b-icon icon="star"></b-icon>
+                 </b-button>
               </td>
             </tr>
             <!-- Child rows -->
@@ -172,7 +161,7 @@
                           v-if="rowIndex === 0 && item.gameStatus === 'pending'"
                           :rowspan="group.length"
                         >
-                           <b-button @click="startGame(item.id)" variant="outline-primary" class="delete-button">
+                           <b-button @click="startGame(item.id)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
                             <b-icon icon="play-circle"></b-icon>&nbsp;Start
                             </b-button>
                         </td>
@@ -181,7 +170,7 @@
                           v-if="rowIndex === 0 && item.gameStatus == 'ongoing'"
                           :rowspan="group.length"
                         >
-                           <b-button @click="submitScore(item.id,group)" variant="outline-primary" class="delete-button">
+                           <b-button @click="submitScore(item.id,group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
                             <b-icon icon="save"></b-icon>&nbsp;Score
                             </b-button>
                         </td>
@@ -223,7 +212,7 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
-import { VIEW_GAME_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,CREATE_GAME_BASE_URL,GET_ALL_GAMES_BASE_URL,UPDATE_GAME_ONGOING_STATUS_BASE_URL,UPDATE_GAME_SCORE_BASE_URL} from '@/api';
+import { VIEW_GAME_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,CREATE_GAME_BASE_URL,GET_ALL_GAMES_BASE_URL,UPDATE_GAME_ONGOING_STATUS_BASE_URL,UPDATE_GAME_SCORE_BASE_URL,CHECK_GAME_QUALIFICATION_STATUS_BASE_URL,QUALIFY_GAME_TEAM_BASE_URL} from '@/api';
 import Swal from 'sweetalert2';
 import Vue from 'vue'
 
@@ -260,7 +249,9 @@ export default {
       showAddTeamModal: false,
       teamList: [],
       groupMembers:[],
-      objectsWithIdAndTeamArray : []
+      objectsWithIdAndTeamArray : [],
+      gameTeamList: [],
+      showGAHistoryModal: false,
     };
   },
   computed: {
@@ -443,6 +434,49 @@ export default {
         console.error('Error calling API:', error);
       }
   },
+
+   async qualifyTeam(group) {
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      }
+      const requestBody = {
+          id: group.id,
+        };
+      try {
+          // If the group has an ID, update the existing record using a PUT request
+          const response = await axios.post(`${CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`, requestBody, { headers });
+          console.log('response',response.data.data)
+
+          if(response.data.data='Group ',group.id,' is ready for qualification'){
+            console.log('successsssfuuuulllll')
+            const response = await axios.post(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
+            console.log('response',response.data.data)
+          }
+        }
+        catch (error) {
+        // Handle errors, if any
+          console.error('Error saving group:', error);
+          if (error.response) {
+      // Access and read the response data
+            const responseData = error.response.data;
+            console.error('Response data from 400 error:', responseData);
+
+            // Show a pop-up notification with the error message and response data using SweetAlert2
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred while saving the group.',
+              html: `Response data: ${JSON.stringify(responseData.data, null, 2)}`,
+            });
+          } else {
+            // Handle other types of errors (e.g., network errors)
+            console.error('Network error or other type of error:', error.message);
+          }
+        }
+    },
+
     async createGame(index) {
 
       const confirmation = await Swal.fire({
@@ -569,8 +603,6 @@ export default {
           this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
         }
         const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
-        console.log(jsonArray)
-
       } catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
@@ -583,15 +615,14 @@ export default {
         }
       },
 
-      toggleTeamSelection(groupId) {
-      if (this.selectedTeams.includes(groupId)) {
-        this.selectedTeams = this.selectedTeams.filter((selectedUserId) => selectedUserId !== groupId);
-      } else {
-        this.selectedTeams.push(groupId);
-      }
-      const jsonPayload = {
-        teamIds: this.selectedTeams,
-      };
+    async viewGAScore(groupObj) {
+
+        let groupFilteredObj = this.groups.filter(team => team.id === groupObj.id);
+        this.gameTeamList = groupFilteredObj[0].gameTeamResponses
+        console.log('teamObject AFTER',this.gameTeamList)
+
+        this.showGAHistoryModal = true; // Show the modal after fetching the users
+
     },
   },
 };
@@ -742,39 +773,10 @@ input.form-control.editing-textbox {
   min-width: 50px;
 }
 
-/* Modal Styles */
-.custom-modal .modal-dialog  {
-    max-width: 1300px; /* Set the max width of the modal */
-    text-align: center;
-  }
-
-/* Center the modal title */
-.custom-modal .modal-header {
-  text-align: center;
-}
-
 .modal-table {
   width: 100%; /* Set the table width to take full width of the modal */
   /* Optionally, you can set a max-width for the table if needed */
   /* max-width: 800px; */
-}
-
-.add-member-button {
-  padding: 10px 20px;
-  background-color: #5DADE2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-
-}
-
-.text-center {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
   text-align: center;
 }
 

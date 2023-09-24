@@ -24,7 +24,7 @@
     </div>
 
     <div class="add-button">
-      <b-button variant="outline-primary" id = "addNewMetric" @click="addNewMetric"><b-icon icon="file-earmark-plus" ></b-icon>
+      <b-button variant="outline-primary" id = "addNewMetric" @click="addNewMetric"><b-icon icon="file-earmark-plus" v-b-tooltip.hover="'Click to create metric'"></b-icon>
       </b-button><br>
 
     </div><br>
@@ -85,7 +85,7 @@
 
           <td>
             <!-- Edit Icon -->
-            <b-button id="edit-button" @click="editMetric(startIndex + index -1)" variant="outline-primary" class="delete-button">
+            <b-button id="edit-button" @click="editMetric(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit metric'">
               <span v-if="!metric.editing"><b-icon icon="pencil"></b-icon></span>
               <span v-else><b-icon icon="save"></b-icon></span>
             </b-button>
@@ -94,7 +94,7 @@
             class="delete-button"
             id="delete-button"
             variant="outline-primary"
-            @click="deleteMetric(startIndex + index -1)"
+            @click="deleteMetric(startIndex + index -1)" v-b-tooltip.hover="'Click to delete metric'"
             >
               <b-icon icon="trash"></b-icon>
             </b-button>

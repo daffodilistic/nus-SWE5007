@@ -92,7 +92,7 @@
             {{getQualificationStatus(team) }}
           </td>
           <td>
-          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary">
+          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" v-b-tooltip.hover="'Click to view team submission'">
             <b-icon icon="folder2-open"></b-icon>
           </b-button>
            </td>
@@ -130,7 +130,7 @@
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
                       :rowspan="filteredMetricsForTeam(index).length"
                       class="score-cell">
-                       <b-button id = "previewScore" @click="previewScore(index)" variant="outline-primary" class="delete-button">
+                       <b-button id = "previewScore" @click="previewScore(index)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to preview score'">
                       <b-icon icon="calculator"></b-icon>
                     </b-button>
                     <div class="score">{{  calculatedScore }}</div>
@@ -148,7 +148,7 @@
                   <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
                       :rowspan="filteredMetricsForTeam(index).length">
 
-                    <b-button id="saveScore" @click="editMetric(index)" variant="outline-primary" class="delete-button">
+                    <b-button id="saveScore" @click="editMetric(index)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score and qualification for this team'">
                       <b-icon icon="save"></b-icon>
                     </b-button>
                   </td>

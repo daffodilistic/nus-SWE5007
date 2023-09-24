@@ -64,8 +64,8 @@
                   </tbody>
                 </table>
                 <div class="text-center">
-                  <button @click="addMembersToTeam" class="add-member-button">Save</button>
-                  <button id = "addMembersToTeam" @click="addMembersToTeam" class="add-member-button">Save</button>
+
+                  <button id = "addMembersToTeam" @click="addMembersToTeam" class="add-member-button" v-b-tooltip.hover="'Click to save your entry'">Save</button>
                 </div>
         </b-modal>
         <!-- Add Member Modal END-->
@@ -214,18 +214,18 @@
                 <input type="text" v-model="team.editingteacherName" class="form-control editing-textbox" />
               </td>
               <td>
-                <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" id="addUserButton" >
+                <b-button variant="outline-primary" @click="fetchUsers(team.id,team.teamName)" id="addUserButton" v-b-tooltip.hover="'Click to add or remove users from team'">
                   <b-icon icon="person-plus" ></b-icon>
                 </b-button>
                 <!-- View Icon -->
-                <b-button @click="viewScore(team.id)" id="viewScore" variant="outline-primary" class="delete-button" v-if="selectedCompetition === 'Innovation Design Challenge'">
+                <b-button @click="viewScore(team.id)" id="viewScore" variant="outline-primary" class="delete-button" v-if="selectedCompetition === 'Innovation Design Challenge'" v-b-tooltip.hover="'Click to view team score'">
                   <b-icon icon="eye"></b-icon>
                 </b-button>
-                <b-button @click="viewGAScore(team)" id="viewGAScore" variant="outline-primary" class="delete-button" v-if="selectedCompetition === 'Game Arena'">
+                <b-button @click="viewGAScore(team)" id="viewGAScore" variant="outline-primary" class="delete-button" v-if="selectedCompetition === 'Game Arena'" v-b-tooltip.hover="'Click to view team score'">
                   <b-icon icon="eye"></b-icon>
                 </b-button>
                 <!-- Edit Icon -->
-                <b-button id="edit-button" @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button">
+                <b-button id="edit-button" @click="editTeam(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit team details'">
                   <span v-if="!team.editing"><b-icon icon="pencil"></b-icon></span>
                   <span v-else><b-icon icon="save"></b-icon></span>
                 </b-button>
@@ -234,7 +234,7 @@
                 class="delete-button"
                 id="delete-button"
                 variant="outline-primary"
-                @click="deleteTeam(startIndex + index-1 )"
+                @click="deleteTeam(startIndex + index-1 )" v-b-tooltip.hover="'Click to delete team'"
                 >
                   <b-icon icon="trash"></b-icon>
                 </b-button>
@@ -341,6 +341,7 @@ export default {
       editingStatus: null, // Control the visibility of the modal
       showHistoryModal: false,
       showGAHistoryModal: false,
+      showAddMemberModal: false,
       userList: [],
       presentationList: [],
       teamMembers:[],
