@@ -3,6 +3,7 @@ export const GET_ALL_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/view-al
 export const UPDATE_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/update-user'
 export const CREATE_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/create-user'
 export const DELETE_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/delete-user'
+export const VIEW_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/view-user'
 
 //IDC TEAM
 export const GET_ALL_IDC_TEAM_BASE_URL ='http://localhost:8082/idcteam/view-all-teams'
@@ -53,6 +54,8 @@ export const GET_ALL_GAMES_BASE_URL = 'http://localhost:8083/games/view-all-game
 export const CREATE_GAME_BASE_URL = 'http://localhost:8083/games/create-game'
 export const UPDATE_GAME_ONGOING_STATUS_BASE_URL = 'http://localhost:8083/games/update-ongoing-status'
 export const UPDATE_GAME_SCORE_BASE_URL = 'http://localhost:8083/games/update-scores'
+export const CHECK_GAME_QUALIFICATION_STATUS_BASE_URL = 'http://localhost:8083/games/check-qualification-status'//
+export const QUALIFY_GAME_TEAM_BASE_URL = 'http://localhost:8083/games/qualify-group'//
 
 //UPLOAD/DOWNLOAD
 export const UPLOAD_PRIM_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/upload-prim-file'
