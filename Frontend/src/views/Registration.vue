@@ -238,7 +238,7 @@ export default {
 .form-group {
   display: flex;
   align-items: center;
-  margin-right: 50px;
+  margin-right: 20px;
 }
 
 .form-group label {
@@ -253,7 +253,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 18px;
-  width: 300px;
+  width: 250px;
 }
 
 .json-display {
