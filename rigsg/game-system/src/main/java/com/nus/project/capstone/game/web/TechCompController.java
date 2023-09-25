@@ -49,7 +49,6 @@ public class TechCompController {
         val b = gameTeamRepository.findById(UUID.fromString(t.getGameTeamIdOppo()));
         if (b.isEmpty()) return ResponseEntity.ok(GeneralMessageEntity.builder().data("Team Oppo not found").build());
 
-        t.setDateTime(Instant.now());
         val techJpa = TechCompJpaEntities.toJpaEntity(t);
         techJpa.setGamesTeam(new ArrayList<>());
         techJpa.addToGamesTeam(a.get());
