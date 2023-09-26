@@ -69,6 +69,7 @@
               <th></th>
                <th>S/No</th>
               <th>Group Name</th>
+              <th>Qualification Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -85,11 +86,14 @@
                 <input type="text" v-model="group.editingGroupName" class="form-control editing-textbox" />
               </td>
               <td>
-                <!-- Edit Icon -->
-                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit group name'">
-                  <span v-if="!group.editing"><b-icon icon="pencil"></b-icon></span>
-                  <span v-else><b-icon icon="save"></b-icon></span>
-                </b-button>
+                 <div v-if="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length > 2">
+                  Elimination Round
+                </div>
+                <div v-else>
+                  Pending Game Completion
+                </div>
+              </td>
+              <td>
                 <b-button @click="viewGAScore(group)" id="viewGAScore" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to view scores of all teams in the group'">
                   <b-icon icon="eye"></b-icon>
                 </b-button>
@@ -116,7 +120,11 @@
                     </tr>
                   </thead>
                   <tbody>
+                    <tr v-if="groupedData.length === 0">
+                      <td colspan="11"  style="color: red;">0 game created in the group</td>
+                    </tr>
                      <template v-for="(group, groupIndex) in groupedData">
+
                       <tr v-for="(item, rowIndex) in group" :key="`row-${groupIndex}-${rowIndex}`" :class="{
                         'table-row': true,
                         'row-even': groupIndex % 2 === 0,
@@ -365,7 +373,6 @@ export default {
   async mounted() {
     this.fetchTeams();
 
-
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${Vue.$keycloak.token}`
@@ -373,6 +380,7 @@ export default {
     try {
       this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
       this.groups = this.groupsData.data.data;
+
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching users:", error);
@@ -443,16 +451,20 @@ export default {
       }
       const requestBody = {
           id: group.id,
-        };
+      };
       try {
           // If the group has an ID, update the existing record using a PUT request
           const response = await axios.post(`${CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`, requestBody, { headers });
           console.log('response',response.data.data)
 
           if(response.data.data='Group ',group.id,' is ready for qualification'){
-            console.log('successsssfuuuulllll')
+
             const response = await axios.post(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
-            console.log('response',response.data.data)
+             Swal.fire({
+              title: 'Success!',
+              text: 'Top 2 teams of the group are now qualified for elimination round !',
+              icon: 'success'
+            });
           }
         }
         catch (error) {
@@ -468,7 +480,7 @@ export default {
               icon: 'error',
               title: 'Error',
               text: 'An error occurred while saving the group.',
-              html: `Response data: ${JSON.stringify(responseData.data, null, 2)}`,
+              html: `${JSON.stringify(responseData.data, null, 2)}`,
             });
           } else {
             // Handle other types of errors (e.g., network errors)
@@ -571,6 +583,18 @@ export default {
         };
       try {
         const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, { headers });
+        //console.log('this.groups',this.groups)
+        let groupFilteredObj = this.groups.filter(team => team.id === group.id);
+        console.log('groupFilteredObj',groupFilteredObj)
+        const gameTeams = groupFilteredObj[0].gameTeamResponses;
+        console.log(gameTeams)
+
+        const tempArray = [];
+        for (let index = 0; index < gameTeams.length; index++) {
+          const item = gameTeams[index];
+          tempArray.push(item.id);
+        }
+        console.log('tempArray',tempArray)
 
         this.groupMembers = response.data.data;
 
@@ -580,30 +604,34 @@ export default {
 
           const gameTeamIdHost = this.teamList.find(team => team.id === item.gameTeamIdHost);
 
-          const gameScoreOppo = this.teamList.find(team => team.id === item.gameTeamIdOppo);
+          const gameTeamIdOppo = this.teamList.find(team => team.id === item.gameTeamIdOppo);
 
-          const objectWithIdAndHostArray = {
-            id: item.id,
-            teamId: item.gameTeamIdHost,
-            gameStatus : item.gameStatus,
-            gameOutcome : item.gameOutcome,
-            hostScore: item.gameScoreHost,
-            teamName : gameTeamIdHost.teamName
-          };
+          if (tempArray.includes(item.gameTeamIdOppo)) {
+            const objectWithIdAndOppoArray = {
+              id: item.id,
+              teamId: item.gameTeamIdOppo,
+              gameStatus : item.gameStatus,
+              gameOutcome : item.gameOutcome,
+              oppoScore: item.gameScoreOppo,
+              teamName : gameTeamIdOppo.teamName
+            };
+            this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
+          }
 
-          const objectWithIdAndOppoArray = {
-            id: item.id,
-            teamId: item.gameTeamIdOppo,
-            gameStatus : item.gameStatus,
-            gameOutcome : item.gameOutcome,
-            oppoScore: item.gameScoreOppo,
-            teamName : gameScoreOppo.teamName
-          };
-          this.objectsWithIdAndTeamArray.push(objectWithIdAndHostArray);
-          this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
+          if (tempArray.includes(item.gameTeamIdHost)) {
+            const objectWithIdAndHostArray = {
+              id: item.id,
+              teamId: item.gameTeamIdHost,
+              gameStatus : item.gameStatus,
+              gameOutcome : item.gameOutcome,
+              hostScore: item.gameScoreHost,
+              teamName : gameTeamIdHost.teamName
+            };
+            this.objectsWithIdAndTeamArray.push(objectWithIdAndHostArray);
+          }
         }
         const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
-      } catch (error) {
+      }catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
       }
@@ -616,13 +644,13 @@ export default {
       },
 
     async viewGAScore(groupObj) {
+        console.log('this.groups.',this.groups)
 
         let groupFilteredObj = this.groups.filter(team => team.id === groupObj.id);
         this.gameTeamList = groupFilteredObj[0].gameTeamResponses
         console.log('teamObject AFTER',this.gameTeamList)
 
         this.showGAHistoryModal = true; // Show the modal after fetching the users
-
     },
   },
 };
