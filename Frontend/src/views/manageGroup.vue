@@ -144,10 +144,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-if="groupMembers.idcTeamResponses.length === 0">
+                    <tr v-if="groupMembers.length === 0">
                       <td colspan="11"  style="color: red;">0 team in the group</td>
                     </tr>
-                    <tr v-else v-for="(team, userIndex) in groupMembers.idcTeamResponses" :key="userIndex" class="child-row">
+                    <tr v-else v-for="(team, userIndex) in groupMembers" :key="userIndex" class="child-row">
                       <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                       <td> {{ userIndex + 1 }} </td>
                       <td> {{ team.teamName }} </td>
@@ -463,11 +463,21 @@ export default {
         let  response
 
         if (this.selectedCompetition === "Game Arena") {
-          response = await axios.post(`${VIEW_GAME_GROUP_BASE_URL}`, requestBodyJson, { headers });
+
+
+          console.log('this.groupsData',this.groups)
+
+          let groupFilteredObj = this.groups.filter(team => team.id === group.id);
+          console.log('teamObject AFTER1',groupFilteredObj)
+          this.groupMembers = groupFilteredObj[0].gameTeamResponses
+          console.log('GA',this.groupMembers)
+
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
             response = await axios.post(`${VIEW_IDC_GROUP_BASE_URL}`, requestBodyJson, { headers });
+            this.groupMembers = response.data.data.idcTeamResponses;
+            console.log('IDC',this.groupMembers)
         }
-        this.groupMembers = response.data.data;
+
 
         // Optional: Perform any additional actions, such as updating the UI.
       } catch (error) {
