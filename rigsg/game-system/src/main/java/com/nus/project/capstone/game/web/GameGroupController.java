@@ -49,16 +49,21 @@ public class GameGroupController {
 
         var groupEntity = group.get();
         var gameTeamIds = gameGroupRequests.getGameTeamIds();
-        var allGameTeamIds = gameTeamRepository.findAll();
+        var allGameTeamIds = gameTeamRepository.findAllById(gameTeamIds);
 
-        allGameTeamIds.forEach(t -> {
-            if (gameTeamIds.contains(t.getId())){
-                groupEntity.addToGameTeams(t);
-            } else {
-                groupEntity.removeGameTeams(t);
-            }
+        groupEntity.getGameTeams().forEach(t -> {
+            t.setGameGroup(null);
             gameTeamRepository.save(t);
         });
+        groupEntity.setGameTeams(new ArrayList<>());
+
+        if (!gameTeamIds.isEmpty()){
+            allGameTeamIds.forEach(t -> {
+                groupEntity.addToGameTeams(t);
+                gameTeamRepository.save(t);
+            });
+        }
+
         gameGroupRepository.save(groupEntity);
 
         return ResponseEntity.ok(GeneralMessageEntity.builder()
