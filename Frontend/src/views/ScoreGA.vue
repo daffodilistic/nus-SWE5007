@@ -86,21 +86,29 @@
                 <input type="text" v-model="group.editingGroupName" class="form-control editing-textbox" />
               </td>
               <td>
-                 <div v-if="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length > 2">
-                  Elimination Round
+                 <div v-if="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length >= 2">
+                  Ready for Elimination Round
                 </div>
                 <div v-else>
-                  Pending Game Completion
+                  Pending Qualification
                 </div>
               </td>
               <td>
                 <b-button @click="viewGAScore(group)" id="viewGAScore" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to view scores of all teams in the group'">
                   <b-icon icon="eye"></b-icon>
                 </b-button>
-                <b-button @click="createGame(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to create matchups for all teams in the group'">
+              <b-button
+                @click="createGame(startIndex + index - 1)"
+                variant="outline-primary"
+                class="delete-button"
+                v-b-tooltip.hover="'Click to create matchups for all teams in the group'"
+                v-bind:disabled="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length > 1"
+              >
                  <b-icon icon="collection-play"></b-icon>
                 </b-button>
-                <b-button @click="qualifyTeam(group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to qualify group'">
+                <b-button @click="qualifyTeam(group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to qualify group'"
+                 v-bind:disabled="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length >= 2"
+                >
                  <b-icon icon="star"></b-icon>
                  </b-button>
               </td>
@@ -134,11 +142,16 @@
                         <td v-if="rowIndex === 0" :rowspan="group.length">{{ groupIndex+1}}</td>
                         <td class="longer-td">{{ item.teamName  }}</td>
 
-                        <td v-if="rowIndex === 0 && item.gameStatus!=='done'"><input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
-                        <td v-else-if ="rowIndex === 0 && item.gameStatus==='done'">{{ item.hostScore }}</td>
-                        <td v-if="rowIndex === 1 && item.gameStatus!=='done'"><input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
-                        <td v-else-if ="rowIndex === 1 && item.gameStatus==='done'">{{ item.oppoScore }}</td>
+                        <td v-if="rowIndex === 0 && item.gameStatus!=='done'">
+                        <input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'">
+                        </td>
+                        <td v-else-if ="rowIndex === 0 && item.gameStatus==='done'">
+                          {{ item.hostScore }}
+                        </td>
 
+                        <td v-if="rowIndex === 1 && item.gameStatus!=='done'">
+                        <input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
+                        <td v-else-if ="rowIndex === 1 && item.gameStatus==='done'">{{ item.oppoScore }}</td>
 
                         <td v-if="rowIndex === 0">
                           <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
@@ -169,7 +182,7 @@
                           v-if="rowIndex === 0 && item.gameStatus === 'pending'"
                           :rowspan="group.length"
                         >
-                           <b-button @click="startGame(item.id)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
+                           <b-button @click="startGame(item.id, groupIndex)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
                             <b-icon icon="play-circle"></b-icon>&nbsp;Start
                             </b-button>
                         </td>
@@ -178,7 +191,7 @@
                           v-if="rowIndex === 0 && item.gameStatus == 'ongoing'"
                           :rowspan="group.length"
                         >
-                           <b-button @click="submitScore(item.id,group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
+                           <b-button @click="submitScore(item.id,group, groupIndex)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
                             <b-icon icon="save"></b-icon>&nbsp;Score
                             </b-button>
                         </td>
@@ -387,7 +400,7 @@ export default {
     }
   },
   methods: {
-    async submitScore(groupId,groupObj) {
+    async submitScore(groupId,groupObj,groupIndex) {
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
         text: 'You won\'t be able to revert this!',
@@ -417,6 +430,7 @@ export default {
         };
       try {
        const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
+       this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
       }
       catch (error) {
         // Handle errors, if any
@@ -424,7 +438,7 @@ export default {
       }}
   },
 
-    async startGame(groupId) {
+    async startGame(groupId,groupIndex) {
 
       const requestBody = {
         id:groupId
@@ -435,6 +449,8 @@ export default {
         };
       try {
        const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
+        this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
+
       }
 
       catch (error) {
@@ -445,6 +461,23 @@ export default {
 
    async qualifyTeam(group) {
 
+      let counter = false;
+
+      for (let i = 0; i < group.gameTeamResponses.length; i++) {
+
+        if(group.gameTeamResponses[i].qualificationRoundNumMatchesPlayed < 3){
+          counter = true
+        }
+      }
+
+      if(counter){
+        Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Please score all the teams.',
+            });
+      }
+      else{
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Vue.$keycloak.token}`
@@ -455,7 +488,7 @@ export default {
       try {
           // If the group has an ID, update the existing record using a PUT request
           const response = await axios.post(`${CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`, requestBody, { headers });
-          console.log('response',response.data.data)
+
 
           if(response.data.data='Group ',group.id,' is ready for qualification'){
 
@@ -487,6 +520,7 @@ export default {
             console.error('Network error or other type of error:', error.message);
           }
         }
+      }
     },
 
     async createGame(index) {
@@ -583,25 +617,24 @@ export default {
         };
       try {
         const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, { headers });
-        //console.log('this.groups',this.groups)
+
         let groupFilteredObj = this.groups.filter(team => team.id === group.id);
-        console.log('groupFilteredObj',groupFilteredObj)
+
         const gameTeams = groupFilteredObj[0].gameTeamResponses;
-        console.log(gameTeams)
+
 
         const tempArray = [];
         for (let index = 0; index < gameTeams.length; index++) {
           const item = gameTeams[index];
           tempArray.push(item.id);
         }
-        console.log('tempArray',tempArray)
+
 
         this.groupMembers = response.data.data;
 
         // Iterate through the data objects
         for (const item of this.groupMembers) {
           // Create an object with "id" and associated teamArray
-
           const gameTeamIdHost = this.teamList.find(team => team.id === item.gameTeamIdHost);
 
           const gameTeamIdOppo = this.teamList.find(team => team.id === item.gameTeamIdOppo);
@@ -631,6 +664,7 @@ export default {
           }
         }
         const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
+
       }catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
@@ -644,11 +678,9 @@ export default {
       },
 
     async viewGAScore(groupObj) {
-        console.log('this.groups.',this.groups)
 
         let groupFilteredObj = this.groups.filter(team => team.id === groupObj.id);
         this.gameTeamList = groupFilteredObj[0].gameTeamResponses
-        console.log('teamObject AFTER',this.gameTeamList)
 
         this.showGAHistoryModal = true; // Show the modal after fetching the users
     },
