@@ -44,7 +44,7 @@ public class IdcGroupController {
         val i = o.map(idcGroupJpaEntities -> {
             val idcGroupResponse = IdcGroupResponse.toIdcGroupResponse(idcGroupJpaEntities);
             idcGroupResponse.setIdcTeamResponses(idcGroupJpaEntities.getIdcTeams() == null ? null :
-                    idcGroupJpaEntities.getIdcTeams().stream().map(IdcTeamResponse::toIdcTeamResponse)
+                    idcGroupJpaEntities.getIdcTeams().stream().distinct().map(IdcTeamResponse::toIdcTeamResponse)
                             .collect(Collectors.toList()));
             return idcGroupResponse;
         }).orElse(null);
