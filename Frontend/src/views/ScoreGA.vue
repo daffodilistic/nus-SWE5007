@@ -122,7 +122,9 @@
                       <th>Matchup</th>
                       <th class="longer-td">Team Name</th>
                       <th>Team Score</th>
-                      <th>Game Outcome</th>
+                      <th></th>
+                      <th>Team Score</th>
+                      <th class="longer-td">Team Name</th>
                       <th>Game Status</th>
                       <th>Action</th>
                     </tr>
@@ -133,71 +135,47 @@
                     </tr>
                      <template v-for="(group, groupIndex) in groupedData">
 
-                      <tr v-for="(item, rowIndex) in group" :key="`row-${groupIndex}-${rowIndex}`" :class="{
-                        'table-row': true,
-                        'row-even': groupIndex % 2 === 0,
-                        'row-odd': groupIndex % 2 !== 0,
-                        'no-bottom-border': groupIndex === 0 && rowIndex === group.length - 1,
-                      }">
-                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ groupIndex+1}}</td>
-                        <td class="longer-td">{{ item.teamName  }}</td>
+                      <tr v-for="(item, rowIndex) in group" :key="`${groupIndex}`">
+                        <td>{{ groupIndex+1}}</td>
 
-                        <td v-if="rowIndex === 0 && item.gameStatus!=='done'">
-                        <input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'">
+                        <td class="host-td">
+                         <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
+                          >
+                            <i class="fas fa-trophy gold-trophy"></i>
+                          </span> <br>
+                        {{ item.hostTeamName  }}</td>
+
+                        <td v-if="item.gameStatus!=='done'">
+                        <input type="number" v-model="item.enteredHostScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input">
                         </td>
-                        <td v-else-if ="rowIndex === 0 && item.gameStatus==='done'">
+                        <td v-else-if ="item.gameStatus==='done'" class="score-td">
                           {{ item.hostScore }}
                         </td>
+                        <td>  <img src="../assets/Versus_icon.png" alt="Versus"></td>
+                        <td v-if="item.gameStatus!=='done'">
+                        <input type="number" v-model="item.enteredOppoScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input"></td>
+                        <td v-else-if ="item.gameStatus==='done'" class="score-td">{{ item.oppoScore }}</td>
 
-                        <td v-if="rowIndex === 1 && item.gameStatus!=='done'">
-                        <input type="number" v-model="item.enteredScore" :min="0" :disabled="item.gameStatus !== 'ongoing'"></td>
-                        <td v-else-if ="rowIndex === 1 && item.gameStatus==='done'">{{ item.oppoScore }}</td>
+                        <td class="oppo-td"><span v-if="item.gameOutcome === 'lose' && item.gameStatus==='done'"
+                          >
+                            <i class="fas fa-trophy gold-trophy"></i><br>
+                          </span>{{ item.oppoTeamName  }} </td>
 
-                        <td v-if="rowIndex === 0">
-                          <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
-                          >
-                            <i class="fas fa-trophy gold-trophy"></i> Win
-                          </span>
-                          <span v-else-if="item.gameOutcome === 'lose' && item.gameStatus==='done'">
-                            Lose
-                          </span>
-                          <span v-else>
-                            Not Scored
-                          </span>
-                        </td>
-                        <td v-if="rowIndex === 1">
-                          <span v-if="item.gameOutcome === 'lose' && item.gameStatus==='done'"
-                          >
-                            <i class="fas fa-trophy gold-trophy"></i> Win
-                          </span>
-                          <span v-else-if="item.gameOutcome === 'win' && item.gameStatus==='done'">
-                            Lose
-                          </span>
-                          <span v-else>
-                            Not Scored
-                          </span>
-                        </td>
-                        <td v-if="rowIndex === 0" :rowspan="group.length">{{ gameStatusTextMap[item.gameStatus] }}</td>
-                        <td
-                          v-if="rowIndex === 0 && item.gameStatus === 'pending'"
-                          :rowspan="group.length"
-                        >
+                        <td>{{ gameStatusTextMap[item.gameStatus] }}</td>
+                        <td v-if="gameStatusTextMap[item.gameStatus]==='Not Yet Started'">
                            <b-button @click="startGame(item.id, groupIndex)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
                             <b-icon icon="play-circle"></b-icon>&nbsp;Start
                             </b-button>
                         </td>
 
                         <td
-                          v-if="rowIndex === 0 && item.gameStatus == 'ongoing'"
-                          :rowspan="group.length"
-                        >
-                           <b-button @click="submitScore(item.id,group, groupIndex)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
+                          v-if="item.gameStatus == 'ongoing'">
+                           <b-button @click="submitScore(item.hostTeamId,item.oppoTeamId,item, groupIndex,)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
                             <b-icon icon="save"></b-icon>&nbsp;Score
                             </b-button>
                         </td>
                         <td
-                          v-if="rowIndex === 0 && item.gameStatus == 'done'"
-                          :rowspan="group.length"
+                          v-if="item.gameStatus == 'done'"
                         >
                           &nbsp;
                         </td>
@@ -400,7 +378,7 @@ export default {
     }
   },
   methods: {
-    async submitScore(groupId,groupObj,groupIndex) {
+    async submitScore(hostId,oppoId,groupObj,groupIndex) {
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
         text: 'You won\'t be able to revert this!',
@@ -411,23 +389,20 @@ export default {
         confirmButtonText: 'Yes, Submit Score!'
       });
       if (confirmation.isConfirmed) {
-      let requestBody={};
-       for (let i = 0; i < groupObj.length; i++) {
-          for (let j = i + 1; j < groupObj.length; j++) {
-
-        requestBody = {
-          id: groupId,
-          gameTeamIdHost: groupObj[i].teamId,
-          gameTeamIdOppo: groupObj[j].teamId,
-          gameScoreHost: groupObj[i].enteredScore,
-          gameScoreOppo: groupObj[j].enteredScore,
+      let requestBody = {
+          id: groupObj.id,
+          gameTeamIdHost: hostId,
+          gameTeamIdOppo: oppoId,
+          gameScoreHost: groupObj.enteredHostScore,
+          gameScoreOppo : groupObj.enteredOppoScore,
         };
-       }}
+
 
       const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
+        console.log(requestBody)
       try {
        const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
        this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
@@ -642,15 +617,18 @@ export default {
           if (tempArray.includes(item.gameTeamIdOppo)) {
             const objectWithIdAndOppoArray = {
               id: item.id,
-              teamId: item.gameTeamIdOppo,
+              oppoTeamId: item.gameTeamIdOppo,
+              oppoScore: item.gameScoreOppo,
+              hostTeamId: item.gameTeamIdHost,
+              hostScore: item.gameScoreHost,
               gameStatus : item.gameStatus,
               gameOutcome : item.gameOutcome,
-              oppoScore: item.gameScoreOppo,
-              teamName : gameTeamIdOppo.teamName
+              hostTeamName : gameTeamIdHost.teamName,
+              oppoTeamName : gameTeamIdOppo.teamName
             };
             this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
           }
-
+          /*
           if (tempArray.includes(item.gameTeamIdHost)) {
             const objectWithIdAndHostArray = {
               id: item.id,
@@ -661,9 +639,10 @@ export default {
               teamName : gameTeamIdHost.teamName
             };
             this.objectsWithIdAndTeamArray.push(objectWithIdAndHostArray);
-          }
+          }*/
         }
         const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
+        console.log(jsonArray)
 
       }catch (error) {
         // Handle errors, if any
@@ -891,8 +870,24 @@ input.form-control.editing-textbox {
   color: gold; /* Apply gold color to the trophy icon */
 }
 
-.longer-td {
+.host-td {
   width: 140px; /* Adjust the width as needed */
+  font-size: 40px;
+  color: rgba(0, 0, 255, 0.744);
+  font-weight: bold;
+}
+
+.oppo-td {
+  width: 140px; /* Adjust the width as needed */
+  font-size: 40px;
+  color: rgba(255, 0, 0, 0.807);
+  font-weight: bold;
+}
+
+.score-td {
+  font-size: 40px;
+  color: rgba(22, 3, 3, 0.807);
+  font-weight: bold;
 }
 
 .row-even {
@@ -901,6 +896,10 @@ input.form-control.editing-textbox {
 
 .row-odd {
   background-color: #ffffff; /* Odd row color */
+}
+
+.narrow-input {
+  width: 60px;
 }
 
 </style>
