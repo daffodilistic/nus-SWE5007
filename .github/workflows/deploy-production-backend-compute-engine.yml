@@ -1,0 +1,52 @@
+name: Deploy to Compute Engine (Backend)
+on:
+  push:
+    branches:
+      - production/backend/compute-engine
+
+jobs:
+  deploy:
+    strategy:
+      max-parallel: 1
+      matrix:
+        services: [demo, info-collection-system, game-system, idc-system]
+    continue-on-error: true
+    permissions:
+      contents: "read"
+      id-token: "write"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout
+        uses: "actions/checkout@v3"
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "17"
+
+      - name: Setup build environment and settings
+        env: # Or as an environment variable
+          POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_USERNAME }}
+          POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD }}
+        run: |
+          sudo apt-get install -y moreutils
+          echo "Using GCP-specific application.yml"
+          cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/resources
+          rm application.yml
+          mv application_gcp.yml application.yml
+          echo "Setting app_version and envsubst-ing app.yaml"
+          cd ${{ github.workspace }}/rigsg
+          APP_VERSION=$(git rev-parse --short HEAD)
+          echo "app_version=$APP_VERSION" >> $GITHUB_ENV
+          cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/appengine
+          envsubst < app.yaml | sponge app.yaml
+          echo "Creating github_actions.json"
+          cd ${{ github.workspace }}
+          echo ${{ secrets.GCP_CREDENTIALS_JSON }} | base64 --decode > github_actions.json
+
+      - name: Build Spring Boot application
+        run: |
+          cd ${{ github.workspace }}/rigsg
+          ./mvnw --projects ${{ matrix.services }} --also-make clean package spring-boot:repackage \
+          -D skipTests=true
