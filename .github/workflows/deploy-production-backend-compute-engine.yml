@@ -1,4 +1,4 @@
-name: Deploy to Compute Engine (Backend)
+name: Deploy Backend to Compute Engine (Production)
 on:
   push:
     branches:
