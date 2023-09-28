@@ -25,8 +25,7 @@ New-Item -Type Directory -Path .\..\docker\volumes\$env:PROJECT_NAME -Force
 Copy-Item -Path .\$env:PROJECT_NAME\target\$env:PROJECT_NAME.jar -Destination .\..\docker\volumes\$env:PROJECT_NAME\$env:PROJECT_NAME.jar -Force
 Pop-Location
 docker run --publish "8080:$env:PORT" `
-    --volume "./docker/volumes/$env:PROJECT_NAME:/application" `
+    --volume ("$pwd/docker/volumes/" + $env:PROJECT_NAME + ":/application") `
     --workdir "/application" `
     eclipse-temurin:17-jre `
-    java `
-    -jar $env:PROJECT_NAME.jar
+    java -jar "$env:PROJECT_NAME.jar"
