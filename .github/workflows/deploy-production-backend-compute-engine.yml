@@ -55,6 +55,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }} | base64 --decode > ~/.ssh/id_rsa
+          chmod 0600 ~/.ssh/id_rsa
           APP_FILENAME=$(ls ${{ github.workspace }}/rigsg/${{ matrix.services }}/target | grep .jar$)
           echo "app_filename=$APP_FILENAME" >> $GITHUB_ENV
           cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/target
