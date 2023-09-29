@@ -50,3 +50,9 @@ jobs:
           cd ${{ github.workspace }}/rigsg
           ./mvnw --projects ${{ matrix.services }} --also-make clean package spring-boot:repackage \
           -D skipTests=true
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.services }}-${{ env.APP_VERSION }}
+          path: ${{ github.workspace }}/rigsg/${{ matrix.services }}/target/*.jar
