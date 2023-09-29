@@ -51,8 +51,12 @@ jobs:
           ./mvnw --projects ${{ matrix.services }} --also-make clean package spring-boot:repackage \
           -D skipTests=true
       
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.services }}-${{ env.APP_VERSION }}
-          path: ${{ github.workspace }}/rigsg/${{ matrix.services }}/target/*.jar
+      - name: Upload artifact to VM instance
+        run: |
+          echo ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }} | base64 --decode > ~/.ssh/id_rsa
+          APP_FILENAME=$(ls ${{ matrix.services }}/target | grep .jar$)
+          echo "app_filename=$APP_FILENAME" >> $GITHUB_ENV
+          cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/target
+          # Test SSH connection by printing the hostname of the VM instance
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
+          "hostname"
