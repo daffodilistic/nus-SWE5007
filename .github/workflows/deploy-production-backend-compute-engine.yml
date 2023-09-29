@@ -53,6 +53,7 @@ jobs:
       
       - name: Upload artifact to VM instance
         run: |
+          mkdir -p ~/.ssh
           echo ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }} | base64 --decode > ~/.ssh/id_rsa
           APP_FILENAME=$(ls ${{ matrix.services }}/target | grep .jar$)
           echo "app_filename=$APP_FILENAME" >> $GITHUB_ENV
