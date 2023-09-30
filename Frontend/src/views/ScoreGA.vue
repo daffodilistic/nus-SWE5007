@@ -44,25 +44,22 @@
 
         </b-modal>
         <!-- show GA history Modal END-->
-        <div class="search-container">
-          <table>
-            <tr>
-              <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
-              <td><input type="text" v-model="searchQuery" placeholder="Search group Name" class="search-box"></td>
-            </tr>
-          </table>
-        </div>
+            <!-- Start of Accordion -->
+    <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.first-accordion
+          variant="info"
+          class="accordion-button"
+        >
+          Click to view Qualification Round
+        </b-button>
+      </b-card-header>
+      <b-collapse id="first-accordion" accordion="my-accordion" role="tabpanel">
         <div v-if="groups && groups.length > 0">
         <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
-        <div class="pagination">
-          <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-            <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-          </button>
-          <span>Page {{ currentPage }} of {{ totalPages }}</span>
-          <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-            <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-          </button>
-        </div>
+
         <table class="main-table">
           <thead>
             <tr>
@@ -87,10 +84,10 @@
               </td>
               <td>
                  <div v-if="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length >= 2">
-                  Ready for Elimination Round
+                  Elimination Stage
                 </div>
                 <div v-else>
-                  Pending Qualification
+                 Qualification Stage
                 </div>
               </td>
               <td>
@@ -106,7 +103,7 @@
               >
                  <b-icon icon="collection-play"></b-icon>
                 </b-button>
-                <b-button @click="qualifyTeam(group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to qualify group'"
+                <b-button @click="qualifyTeam(group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to qualify top 2 teams'"
                  v-bind:disabled="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length >= 2"
                 >
                  <b-icon icon="star"></b-icon>
@@ -148,13 +145,13 @@
                         <td v-if="item.gameStatus!=='done'">
                         <input type="number" v-model="item.enteredHostScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input">
                         </td>
-                        <td v-else-if ="item.gameStatus==='done'" class="score-td">
+                        <td v-else-if ="item.gameStatus==='done'" class="host-score-td">
                           {{ item.hostScore }}
                         </td>
                         <td>  <img src="../assets/Versus_icon.png" alt="Versus"></td>
                         <td v-if="item.gameStatus!=='done'">
                         <input type="number" v-model="item.enteredOppoScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input"></td>
-                        <td v-else-if ="item.gameStatus==='done'" class="score-td">{{ item.oppoScore }}</td>
+                        <td v-else-if ="item.gameStatus==='done'" class="oppo-score-td">{{ item.oppoScore }}</td>
 
                         <td class="oppo-td"><span v-if="item.gameOutcome === 'lose' && item.gameStatus==='done'"
                           >
@@ -188,15 +185,6 @@
             </tr>
           </tbody>
         </table>
-        <div class="pagination">
-        <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-          <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-        </button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-          <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-        </button>
-      </div>
       </div>
       <div v-else>
           <!-- Show a loading message or spinner while the data is being fetched -->
@@ -204,6 +192,106 @@
             <i class="fas fa-spinner fa-spin"></i>
           </div>
         </div>
+        </b-collapse>
+    </b-card>
+    <!-- End of Accordion -->
+
+    <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.second-accordion
+          variant="info"
+          class="accordion-button"
+        >
+          Click to view Elimination Round
+        </b-button>
+      </b-card-header>
+      <b-collapse id="second-accordion" accordion="my-accordion" role="tabpanel">
+              <div v-if="groups && groups.length > 0">
+        <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
+
+        <table class="main-table">
+          <thead>
+            <tr>
+              <th>Matchup</th>
+              <th class="longer-td">Team Name</th>
+              <th>Team Score</th>
+              <th></th>
+              <th>Team Score</th>
+              <th class="longer-td">Team Name</th>
+              <th>Game Status</th>
+              <th>Action</th>
+            </tr>
+            </thead>
+           <tbody>
+                    <tr v-if="groupedData.length === 0">
+                      <td colspan="11"  style="color: red;">0 game created in the group</td>
+                    </tr>
+                     <template v-for="(group, groupIndex) in groupedData">
+
+                      <tr v-for="(item, rowIndex) in group" :key="`${groupIndex}`">
+                        <td>{{ groupIndex+1}}</td>
+
+                        <td class="host-td">
+                         <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
+                          >
+                            <i class="fas fa-trophy gold-trophy"></i>
+                          </span> <br>
+                        {{ item.hostTeamName  }}</td>
+
+                        <td v-if="item.gameStatus!=='done'">
+                        <input type="number" v-model="item.enteredHostScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input">
+                        </td>
+                        <td v-else-if ="item.gameStatus==='done'" class="host-score-td">
+                          {{ item.hostScore }}
+                        </td>
+                        <td>  <img src="../assets/Versus_icon.png" alt="Versus"></td>
+                        <td v-if="item.gameStatus!=='done'">
+                        <input type="number" v-model="item.enteredOppoScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input"></td>
+                        <td v-else-if ="item.gameStatus==='done'" class="oppo-score-td">{{ item.oppoScore }}</td>
+
+                        <td class="oppo-td"><span v-if="item.gameOutcome === 'lose' && item.gameStatus==='done'"
+                          >
+                            <i class="fas fa-trophy gold-trophy"></i><br>
+                          </span>{{ item.oppoTeamName  }} </td>
+
+                        <td>{{ gameStatusTextMap[item.gameStatus] }}</td>
+                        <td v-if="gameStatusTextMap[item.gameStatus]==='Not Yet Started'">
+                           <b-button @click="startGame(item.id, groupIndex)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
+                            <b-icon icon="play-circle"></b-icon>&nbsp;Start
+                            </b-button>
+                        </td>
+
+                        <td
+                          v-if="item.gameStatus == 'ongoing'">
+                           <b-button @click="submitScore(item.hostTeamId,item.oppoTeamId,item, groupIndex,)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
+                            <b-icon icon="save"></b-icon>&nbsp;Score
+                            </b-button>
+                        </td>
+                        <td
+                          v-if="item.gameStatus == 'done'"
+                        >
+                          &nbsp;
+                        </td>
+
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else>
+          <!-- Show a loading message or spinner while the data is being fetched -->
+          <div class="loader-container">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+        </div>
+       </b-collapse>
+    </b-card>
       </div>
 </template>
 
@@ -682,7 +770,6 @@ export default {
 .main-table td {
 padding: 8px;
   text-align: center;
-  font-size: 14px;
   background-color: #f6f6f6;
 }
 .main-table th {
@@ -700,7 +787,6 @@ padding: 8px;
 .team-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
 }
 
 .team-table th{
@@ -872,23 +958,35 @@ input.form-control.editing-textbox {
 
 .host-td {
   width: 140px; /* Adjust the width as needed */
-  font-size: 40px;
+  font-size: 20px;
   color: rgba(0, 0, 255, 0.744);
   font-weight: bold;
+   font-family: 'Tourney', sans-serif;
+}
+
+.host-score-td {
+  font-size: 20px;
+  color: rgba(0, 0, 255, 0.744);
+  font-weight: bold;
+    font-family: 'Tourney', sans-serif;
 }
 
 .oppo-td {
   width: 140px; /* Adjust the width as needed */
-  font-size: 40px;
+  font-size: 20px;
   color: rgba(255, 0, 0, 0.807);
   font-weight: bold;
+  font-family: 'Tourney', sans-serif;
 }
 
-.score-td {
-  font-size: 40px;
-  color: rgba(22, 3, 3, 0.807);
+.oppo-score-td {
+  font-size: 20px;
+  color: rgba(255, 0, 0, 0.807);
   font-weight: bold;
+    font-family: 'Tourney', sans-serif;
 }
+
+
 
 .row-even {
   background-color: #f0f0f0; /* Even row color */
@@ -900,6 +998,16 @@ input.form-control.editing-textbox {
 
 .narrow-input {
   width: 60px;
+}
+
+.accordion-button {
+
+  color: #100101;
+}
+
+.accordion-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
 }
 
 </style>
