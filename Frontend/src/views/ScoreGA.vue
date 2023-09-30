@@ -210,7 +210,7 @@
           v-b-toggle.second-accordion
           variant="info"
           class="accordion-button"
-          @click="loadGroup"
+          @click="loadElimination"
         >
           Click to view Elimination Round
         </b-button>
@@ -230,8 +230,7 @@
         <div v-if="groups && groups.length > 0">
           <div class="tournament-bracket">
             <Round :roundMatches="round1" :isSecondRound="true" />
-            <Round :roundMatches="round2" :isSecondRound="true" />
-            <Round :roundMatches="round3" :isLastRound="true" />
+
           </div>
         </div>
       <div v-else>
@@ -275,21 +274,6 @@ export default {
 
   data() {
     return {
-      round1: [
-        { id: 1, homeTeam: 'Team A', awayTeam: 'Team B', homeScore: 1, awayScore: 2 },
-        { id: 2, homeTeam: 'Team C', awayTeam: 'Team D', homeScore: 3, awayScore: 4 },
-        { id: 2, homeTeam: 'Team C', awayTeam: 'Team D', homeScore: 1, awayScore: 2 },
-        { id: 2, homeTeam: 'Team C', awayTeam: 'Team D', homeScore: 1, awayScore: 4 },
-
-
-      ],
-      round2: [
-        { id: 3, homeTeam: 'Winner 1', awayTeam: 'Winner 2', homeScore: 1, awayScore: 2 },
-        { id: 2, homeTeam: 'Team C', awayTeam: 'Team D', homeScore: 3, awayScore: 1 },
-      ],
-      round3: [
-        { id: 4, homeTeam: 'Champion', awayTeam: 'Second Place', homeScore: 1, awayScore: 2 },
-      ],
       currentPageModal: 1,
       itemsPerPageModal: 10,
       currentGroupId: "",
@@ -466,7 +450,7 @@ export default {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
-        console.log(requestBody)
+
       try {
        const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
       this.toggleRow(groupIndex)
@@ -677,12 +661,26 @@ export default {
       try {
           this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
           this.groups = this.groupsData.data.data;
+
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+    },
+
+     async loadElimination() {
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      };
+      try {
           const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, { headers });
           this.allGameData = response.data.data
         } catch (error) {
           console.error("Error fetching data:", error);
         }
-        console.log('loaded group',this.allGameData)
+        this.round1 = this.allGameData.filter(item => item.stage === "Elim-01")
+        console.log('elim01Array', this.round1)
     },
 
     async fetchTeams() {
@@ -770,8 +768,6 @@ export default {
           }*/
         }
         const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
-        console.log(jsonArray)
-
       }catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
@@ -1035,8 +1031,6 @@ input.form-control.editing-textbox {
   font-weight: bold;
     font-family: 'Tourney', sans-serif;
 }
-
-
 
 .row-even {
   background-color: #f0f0f0; /* Even row color */
