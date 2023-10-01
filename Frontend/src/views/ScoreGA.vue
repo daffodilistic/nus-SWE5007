@@ -63,8 +63,8 @@
           <tr>1. Click on <b-icon icon="collection-play"></b-icon> to create matchups for all the teams in the group</tr>
           <tr>2. Click on <i :class="'fas fa-plus'" class="expand-icon"></i> to view team matchups <b-icon icon="arrow-right-circle-fill"></b-icon> Click on <b-icon icon="play-circle"></b-icon> to start the match</tr>
           <tr>3. After the match is completed, enter score for participating teams <b-icon icon="arrow-right-circle-fill"></b-icon> Click on <b-icon icon="save"></b-icon> to submit the score</tr>
-          <tr>4. After all the matchups are completed, click on  <b-icon icon="star"></b-icon> to qualify the top 2 teams in the group</tr>
-          <tr>5. Repeat step 1 to 4 for all groups</tr>
+          <tr>4. After scores are submitted for all the matchups, click on  <b-icon icon="star"></b-icon> to qualify the top 2 teams in the group</tr>
+          <tr>5. Repeat steps 1 to 4 for all groups</tr>
         </table>
 
         <table class="main-table">
@@ -229,8 +229,9 @@
       <div v-if="!shouldShowStartButton">
         <div v-if="groups && groups.length > 0">
           <div class="tournament-bracket">
-            <Round :roundMatches="round1" :isSecondRound="true" />
-
+            <div v-for="(stage, index) in filteredStages" :key="stage">
+              <Round :roundMatches="getRoundMatches(stage)" :isSecondRound="true" />
+            </div>
           </div>
         </div>
       <div v-else>
@@ -253,8 +254,10 @@ import { VIEW_GAME_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_GAME_TEAM_
 import Swal from 'sweetalert2';
 import Vue from 'vue'
 import Round from './Round.vue';
+import eventBus from './eventBus.js';
 
 export default {
+
   components: {
     Round,
   },
@@ -293,8 +296,15 @@ export default {
       objectsWithIdAndTeamArray : [],
       gameTeamList: [],
       showGAHistoryModal: false,
-      allGameData: [],
+      allGameData: [], //all game objects
+      filteredStages: [], //distinc stages of elimination rd
+      rounds:[],
     };
+  },
+  created() {
+    // Listen for the 'start-game' event
+    //eventBus.$on('start-game', this.startGame);
+    eventBus.$on('load-elimination-data', this.loadElimination);
   },
   computed: {
 
@@ -427,6 +437,9 @@ export default {
     }
   },
   methods: {
+    getRoundMatches(stage) {
+      return this.rounds.filter(round => round.stage === stage);
+    },
     async submitScore(hostId,oppoId,groupObj,groupIndex) {
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
@@ -461,17 +474,18 @@ export default {
       }}
   },
 
-    async startGame(groupId,groupIndex) {
+    async startGame(gameId,groupIndex) {
+      console.log('startGame Called')
 
       const requestBody = {
-        id:groupId
+        id:gameId
       };
       const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
       try {
-       const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
+       //const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
         this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
 
       }
@@ -668,7 +682,9 @@ export default {
     },
 
      async loadElimination() {
-
+      this.allGameData = [];
+      this.rounds = [];
+      this.filteredStages=[];
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Vue.$keycloak.token}`
@@ -679,8 +695,51 @@ export default {
         } catch (error) {
           console.error("Error fetching data:", error);
         }
-        this.round1 = this.allGameData.filter(item => item.stage === "Elim-01")
-        console.log('elim01Array', this.round1)
+
+        const uniqueStages = new Set();
+
+        // Loop through allGameData and add distinct stage values to the Set
+        this.allGameData.forEach(item => {
+          uniqueStages.add(item.stage);
+        });
+
+         const distinctStagesArray = Array.from(uniqueStages);
+
+      // Filter the array to show only values beginning with "Elim"
+        this.filteredStages = distinctStagesArray.filter((stage) =>
+          stage.startsWith("Elim")
+        );
+
+        const filteredGames = this.allGameData.filter((game) => game.stage.startsWith('Elim'));
+
+        for (let index = 0; index < this.filteredStages.length; index++) {
+          for (let index = 0; index < filteredGames.length; index++) {
+            const elimGame = filteredGames[index];
+            const roundNumber = parseInt(elimGame.stage.split('-')[1], 10);
+
+             if (elimGame.stage === `Elim-0${roundNumber}`) {
+
+              const gameTeamIdHost = this.teamList.find(team => team.id === elimGame.gameTeamIdHost);
+
+              const gameTeamIdOppo = this.teamList.find(team => team.id === elimGame.gameTeamIdOppo);
+
+              const objectWithIdAndOppoArray = {
+                id: elimGame.id,
+                oppoTeamId: elimGame.gameTeamIdOppo,
+                oppoScore: elimGame.gameScoreOppo,
+                hostTeamId: elimGame.gameTeamIdHost,
+                hostScore: elimGame.gameScoreHost,
+                gameStatus : elimGame.gameStatus,
+                gameOutcome : elimGame.gameOutcome,
+                hostTeamName : gameTeamIdHost.teamName,
+                oppoTeamName : gameTeamIdOppo.teamName,
+                stage : `Elim-0${roundNumber}`
+              };
+
+              this.rounds.push(objectWithIdAndOppoArray);
+             }
+          }
+        }
     },
 
     async fetchTeams() {

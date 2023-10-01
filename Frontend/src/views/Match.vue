@@ -1,106 +1,97 @@
 <template>
   <div class="match">
-    <div class="team" :class="{ 'winner': match.gameScoreHost > match.gameScoreOppo }">
+    <div class="team" :class="{ 'winner': match.hostScore > match.oppoScore }">
       {{ match.hostTeamName }}
-      <span v-if="showTrophy && match.gameScoreHost > match.gameScoreOppo" class="trophy">🏆</span>
-      <span v-else-if="showStar && match.gameScoreHost > match.gameScoreOppo" class="star">⭐</span>
+      <span v-if="showTrophy && match.hostScore > match.oppoScore" class="trophy">🏆</span>
+      <span v-else-if="showStar && match.hostScore > match.oppoScore" class="star">⭐</span>
     </div>
-    <div class="score">&nbsp;&nbsp;&nbsp;&nbsp;{{ match.gameScoreHost }} - {{ match.gameScoreOppo }}&nbsp;&nbsp;&nbsp;&nbsp;</div>
-    <div class="team" :class="{ 'winner': match.gameScoreOppo > match.gameScoreHost }">
+    <div class="score">
+      <template v-if="match.gameStatus !== 'done'">
+        <input type="number" v-model="match.enteredHostScore" :min="0" :disabled="match.gameStatus !== 'ongoing'" class="narrow-input">
+        <img src="../assets/Versus_icon.png" alt="Versus">
+        <input type="number" v-model="match.enteredOppoScore" :min="0" :disabled="match.gameStatus !== 'ongoing'"
+        class="narrow-input">
+      </template>
+      <template v-else-if="match.gameStatus === 'done'">
+        {{ match.hostScore }} - {{ match.oppoScore }}
+      </template>
+    </div>
+    <div class="team" :class="{ 'winner': match.oppoScore > match.hostScore }">
       {{ match.oppoTeamName }}
-      <span v-if="showTrophy && match.gameScoreOppo > match.gameScoreHost" class="trophy">🏆</span>
-      <span v-else-if="showStar && match.gameScoreOppo > match.gameScoreHost" class="star">⭐</span>
+      <span v-if="showTrophy && match.oppoScore > match.hostScore" class="trophy">🏆</span>
+      <span v-else-if="showStar && match.oppoScore > match.hostScore" class="star">⭐</span>
+    </div>
+
+    <div>
+     <template v-if="gameStatusTextMap[match.gameStatus]==='Not Yet Started'">
+        <b-button @click="startGame(match.id)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
+        <b-icon icon="play-circle"></b-icon>&nbsp;Start
+        </b-button>
+     </template>
     </div>
   </div>
 </template>
 
 <script>
 import Round from './Round.vue';
-import { GET_ALL_GAMES_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL} from '@/api';
-import Vue from 'vue'
 import axios from "axios";
+import { UPDATE_GAME_ONGOING_STATUS_BASE_URL,UPDATE_GAME_SCORE_BASE_URL,QUALIFY_GAME_TEAM_BASE_URL} from '@/api';
+import Swal from 'sweetalert2';
+import Vue from 'vue'
+import ScoreGA from './ScoreGA.vue';
+import eventBus from './eventBus.js';
 
 export default {
    props: {
-    match: Object, // Contains match data (homeTeam, awayTeam, gameScoreHost, gameScoreOppo)
+    match: Object, // Contains match data (homeTeam, awayTeam, hostScore, oppoScore)
     showStar: Boolean, // Indicates whether to show a star
     showTrophy: Boolean, // Indicates whether to show a trophy
   },
   components: {
     Round,
+    ScoreGA
   },
   data() {
     return {
-      round5: [
-        { id: 3, homeTeam: 'Winner 1', awayTeam: 'Winner 2', homeScore: 1, awayScore: 2 },
-        { id: 2, homeTeam: 'Team C', awayTeam: 'Team D', homeScore: 3, awayScore: 1 },
-      ],
-      round4: [
-        { id: 4, homeTeam: 'Champion', awayTeam: 'Second Place', homeScore: 1, awayScore: 2 },
-      ],
-      round1:[],
-      teamList:[],
     };
   },
-  async mounted() {
-
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
-      };
-      try {
-          const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, { headers });
-          this.allGameData = response.data.data
-          this.fetchTeams();
-          console.log('wewewewew')
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
+   computed: {
+    gameStatusTextMap() {
+    // Define a mapping of age group values to their corresponding text
+    const gameStatusMap = {
+      'pending': 'Not Yet Started',
+      'ongoing': 'In-Progress',
+      'done': 'Completed',
+      // Add more entries as needed for other age groups
+    };
+    return gameStatusMap;
+  }
   },
+  methods:{
 
- methods: {
+async startGame(gameId) {
 
-  async fetchTeams() {
+      //eventBus.$emit('start-game', gameId);
+       const requestBody = {
+        id:gameId
+      };
 
       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
-      };
-      let response = '';
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
+        };
       try {
-        response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-        this.teamList = response.data.data
-
-        }catch (error) {
-          console.error("Error fetching data:", error);
-        }
-        const tempArray = [];
-
-      for (const item of this.allGameData) {
-          // Create an object with "id" and associated teamArray
-
-          if(item.stage.indexOf('quali') || item.stage.indexOf('Quali')){
-            const gameTeamIdHost = this.teamList.find(team => team.id === item.gameTeamIdHost);
-
-            const gameTeamIdOppo = this.teamList.find(team => team.id === item.gameTeamIdOppo);
-
-            const objectWithIdAndOppoArray = {
-              id: item.id,
-              oppoTeamId: item.gameTeamIdOppo,
-              oppoScore: item.gameScoreOppo,
-              hostTeamId: item.gameTeamIdHost,
-              hostScore: item.gameScoreHost,
-              gameStatus : item.gameStatus,
-              gameOutcome : item.gameOutcome,
-              hostTeamName : gameTeamIdHost.teamName,
-              oppoTeamName : gameTeamIdOppo.teamName
-            };
-            this.round1.push(objectWithIdAndOppoArray);
-          }
-
+       const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
+       console.log(requestBody)
       }
-       console.log(' this.round1', this.round1)
-    }
+
+      catch (error) {
+        // Handle errors, if any
+        console.error('Error calling API:', error);
+      }
+      eventBus.$emit('load-elimination-data');
+  },
+
   }
 }
 </script>
@@ -152,5 +143,9 @@ export default {
 
   /* Use Google Fonts for the Sports World font */
   font-family: 'Sports World', sans-serif;
+}
+
+.narrow-input {
+  width: 50px;
 }
 </style>
