@@ -102,7 +102,7 @@
                   <b-icon icon="eye"></b-icon>
                 </b-button>
               <b-button
-                @click="createGame(startIndex + index - 1)"
+                @click="createQualiGame(startIndex + index - 1)"
                 variant="outline-primary"
                 class="delete-button"
                 v-b-tooltip.hover="'Click to create matchups for all teams in the group'"
@@ -141,7 +141,6 @@
 
                       <tr v-for="(item, rowIndex) in group" :key="`${groupIndex}`">
                         <td>{{ groupIndex+1}}</td>
-
                         <td class="host-td">
                          <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
                           >
@@ -255,6 +254,7 @@ import Swal from 'sweetalert2';
 import Vue from 'vue'
 import Round from './Round.vue';
 import eventBus from '../utils/eventBus.js';
+import { delay } from '../utils/utils.js';
 
 export default {
 
@@ -299,6 +299,7 @@ export default {
       allGameData: [], //all game objects
       filteredStages: [], //distinc stages of elimination rd
       rounds:[],
+      filteredGames:[]
     };
   },
   created() {
@@ -306,7 +307,8 @@ export default {
     eventBus.$on('start-game', this.startGame);
     eventBus.$on('load-group-data', this.loadGroup);
     eventBus.$on('load-elimination-data', this.loadElimination);
-     eventBus.$on('submit-score', this.submitScore);
+    eventBus.$on('submit-score', this.submitScore);
+    eventBus.$on('check-advance', this.checkAdvanceRound);
   },
   computed: {
 
@@ -470,8 +472,15 @@ export default {
 
       try {
       const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
+
+      this.loadGroup();
       if(groupIndex!=='na'){
         this.toggleRow(groupIndex)
+      }else{
+        await delay(1000);
+        this.loadElimination();
+        await delay(1000);
+        this.checkAdvanceRound();
       }
       }
       catch (error) {
@@ -493,6 +502,7 @@ export default {
       try {
        const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
        if(groupIndex!=='na'){
+        this.loadGroup();
         this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
         }
       }
@@ -542,6 +552,7 @@ export default {
               icon: 'success'
             });
           }
+          await delay(1000);
           this.loadGroup();
         }
         catch (error) {
@@ -567,7 +578,7 @@ export default {
       }
     },
 
-    async createGame(index) {
+    async createQualiGame(index) {
 
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
@@ -688,14 +699,90 @@ export default {
           console.error("Error fetching data:", error);
         }
     },
-    async CheckAdvanceRound() {
+    async checkAdvanceRound() {
 
+        const roundNumbersArray = this.filteredStages.map(item => {
+          return parseInt(item.split('-')[1], 10);
+        });
+        //check what is the current round
+        const largestNumber = Math.max(...roundNumbersArray);
 
+        //check if all games in this round is completed
+        const doneGameArr = this.filteredGames.filter((game) => game.stage===`Elim-0${largestNumber}` && game.gameStatus === "done");
+        const totalGameArr = this.filteredGames.filter((game) => game.stage===`Elim-0${largestNumber}`);
+        console.log('doneGameArr',doneGameArr)
+        //get all winners in the team.
+        let winnerArray = [];
+         for (let index = 0; index < doneGameArr.length; index++) {
+
+             const winner = doneGameArr[index]
+
+             if(winner.gameOutcome ==='win'){
+                winnerArray.push(winner.gameTeamIdHost)
+             }else{
+                winnerArray.push(winner.gameTeamIdOppo)
+             }
+          }
+          console.log('winnerArray',winnerArray)
+
+        //check if completed, is the game for next round created
+        if(totalGameArr.length===doneGameArr.length && totalGameArr.length > 1 ){
+
+            const currentDate = new Date();
+            const isoDateTime = currentDate.toISOString(); // Generates date-time in "YYYY-MM-DDTHH:mm:ss.sssZ" format
+            const formattedDateTime = isoDateTime.slice(0, 19) + "Z";// Now, format it to "YYYY-MM-DDTHH:mm:ssZ" format
+
+            let index1 =0;
+            let index2 =1;
+            console.log('loop entered')
+
+             const headers = {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Vue.$keycloak.token}`
+            };
+            for (let index = 0; index < totalGameArr.length/2; index++) {
+
+              let requestBody = {
+                gameTeamIdHost: winnerArray[index1],
+                gameTeamIdOppo: winnerArray[index2],
+                datetime: formattedDateTime,
+                stage : `Elim-0${largestNumber+1}`,
+              };
+
+               try {
+                const response = await axios.post(`${CREATE_GAME_BASE_URL}`, requestBody, { headers });
+
+                Swal.fire({
+                  title: 'Round '+ largestNumber+ ' Completed!',
+                  text: 'Matchups for Round '+ (largestNumber + 1)+ ' Created Successfully !',
+                  icon: 'success'
+                });
+              }
+              catch (error) {
+              // Handle errors, if any
+                console.error('Error saving group:', error);
+              }
+              index1 +=2;
+              index2 +=2;
+
+              console.log('index1 - ', index1 ,' index2 - ',index2)
+              console.log('requestBody ',requestBody)
+
+            }this.loadElimination();
+        }else{
+            Swal.fire({
+                  title: 'Round '+ largestNumber+ ' Completed!',
+                  text: 'Elimination Round Completed Successfully !',
+                  icon: 'success'
+                });
+        }
     },
      async loadElimination() {
       this.allGameData = [];
       this.rounds = [];
       this.filteredStages=[];
+      this.filteredGames=[];
+
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Vue.$keycloak.token}`
@@ -721,11 +808,11 @@ export default {
           stage.startsWith("Elim")
         );
 
-        const filteredGames = this.allGameData.filter((game) => game.stage.startsWith('Elim'));
+        this.filteredGames = this.allGameData.filter((game) => game.stage.startsWith('Elim'));
 
         for (let index = 0; index < this.filteredStages.length; index++) {
-          for (let index = 0; index < filteredGames.length; index++) {
-            const elimGame = filteredGames[index];
+          for (let index = 0; index < this.filteredGames.length; index++) {
+            const elimGame = this.filteredGames[index];
             const roundNumber = parseInt(elimGame.stage.split('-')[1], 10);
 
              if (elimGame.stage === `Elim-0${roundNumber}`) {
@@ -733,21 +820,25 @@ export default {
               const gameTeamIdHost = this.teamList.find(team => team.id === elimGame.gameTeamIdHost);
 
               const gameTeamIdOppo = this.teamList.find(team => team.id === elimGame.gameTeamIdOppo);
+              const idExists = this.rounds.some(round => round.id === elimGame.id);
 
-              const objectWithIdAndOppoArray = {
-                id: elimGame.id,
-                oppoTeamId: elimGame.gameTeamIdOppo,
-                oppoScore: elimGame.gameScoreOppo,
-                hostTeamId: elimGame.gameTeamIdHost,
-                hostScore: elimGame.gameScoreHost,
-                gameStatus : elimGame.gameStatus,
-                gameOutcome : elimGame.gameOutcome,
-                hostTeamName : gameTeamIdHost.teamName,
-                oppoTeamName : gameTeamIdOppo.teamName,
-                stage : `Elim-0${roundNumber}`
-              };
+              if (!idExists) {
+                const objectWithIdAndOppoArray = {
+                  id: elimGame.id,
+                  oppoTeamId: elimGame.gameTeamIdOppo,
+                  oppoScore: elimGame.gameScoreOppo,
+                  hostTeamId: elimGame.gameTeamIdHost,
+                  hostScore: elimGame.gameScoreHost,
+                  gameStatus : elimGame.gameStatus,
+                  gameOutcome : elimGame.gameOutcome,
+                  hostTeamName : gameTeamIdHost.teamName,
+                  oppoTeamName : gameTeamIdOppo.teamName,
+                  stage : `Elim-0${roundNumber}`
+                };
 
-              this.rounds.push(objectWithIdAndOppoArray);
+                this.rounds.push(objectWithIdAndOppoArray);
+
+              }
              }
           }
         }
