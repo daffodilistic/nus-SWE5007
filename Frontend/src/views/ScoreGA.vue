@@ -254,7 +254,7 @@ import { VIEW_GAME_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_GAME_TEAM_
 import Swal from 'sweetalert2';
 import Vue from 'vue'
 import Round from './Round.vue';
-import eventBus from './eventBus.js';
+import eventBus from '../utils/eventBus.js';
 
 export default {
 
@@ -303,8 +303,10 @@ export default {
   },
   created() {
     // Listen for the 'start-game' event
-    //eventBus.$on('start-game', this.startGame);
+    eventBus.$on('start-game', this.startGame);
+    eventBus.$on('load-group-data', this.loadGroup);
     eventBus.$on('load-elimination-data', this.loadElimination);
+     eventBus.$on('submit-score', this.submitScore);
   },
   computed: {
 
@@ -440,7 +442,9 @@ export default {
     getRoundMatches(stage) {
       return this.rounds.filter(round => round.stage === stage);
     },
+
     async submitScore(hostId,oppoId,groupObj,groupIndex) {
+
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
         text: 'You won\'t be able to revert this!',
@@ -465,8 +469,10 @@ export default {
         };
 
       try {
-       const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
-      this.toggleRow(groupIndex)
+      const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
+      if(groupIndex!=='na'){
+        this.toggleRow(groupIndex)
+      }
       }
       catch (error) {
         // Handle errors, if any
@@ -485,9 +491,10 @@ export default {
           'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
       try {
-       //const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
+       const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
+       if(groupIndex!=='na'){
         this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
-
+        }
       }
 
       catch (error) {
@@ -667,7 +674,8 @@ export default {
     },
 
     async loadGroup() {
-
+      this.groupsData = [];
+      this.groups = [];
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Vue.$keycloak.token}`
@@ -680,7 +688,10 @@ export default {
           console.error("Error fetching data:", error);
         }
     },
+    async CheckAdvanceRound() {
 
+
+    },
      async loadElimination() {
       this.allGameData = [];
       this.rounds = [];

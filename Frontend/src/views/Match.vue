@@ -24,8 +24,14 @@
 
     <div>
      <template v-if="gameStatusTextMap[match.gameStatus]==='Not Yet Started'">
-        <b-button @click="startGame(match.id)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
+        <b-button @click="startGame(match.id,'na')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
         <b-icon icon="play-circle"></b-icon>&nbsp;Start
+        </b-button>
+     </template>
+
+      <template v-if="match.gameStatus == 'ongoing'">
+        <b-button @click="submitScore(match.hostTeamId,match.oppoTeamId,match,'na')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
+          <b-icon icon="save"></b-icon>&nbsp;Score
         </b-button>
      </template>
     </div>
@@ -37,9 +43,10 @@ import Round from './Round.vue';
 import axios from "axios";
 import { UPDATE_GAME_ONGOING_STATUS_BASE_URL,UPDATE_GAME_SCORE_BASE_URL,QUALIFY_GAME_TEAM_BASE_URL} from '@/api';
 import Swal from 'sweetalert2';
-import Vue from 'vue'
+import Vue from 'vue';
 import ScoreGA from './ScoreGA.vue';
-import eventBus from './eventBus.js';
+import eventBus from '../utils/eventBus.js';
+import { delay } from '../utils/utils.js';
 
 export default {
    props: {
@@ -69,29 +76,22 @@ export default {
   },
   methods:{
 
-async startGame(gameId) {
-
-      //eventBus.$emit('start-game', gameId);
-       const requestBody = {
-        id:gameId
-      };
-
-      const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Vue.$keycloak.token}`
-        };
-      try {
-       const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
-       console.log(requestBody)
-      }
-
-      catch (error) {
-        // Handle errors, if any
-        console.error('Error calling API:', error);
-      }
+    async submitScore(hostTeamId,oppoTeamId,matchObj,index) {
+      eventBus.$emit('submit-score',hostTeamId,oppoTeamId,matchObj,index);
+      await delay(1000);
+      eventBus.$emit('load-group-data');
+      await delay(1000);
       eventBus.$emit('load-elimination-data');
-  },
 
+    },
+
+    async startGame(gameId,index) {
+      eventBus.$emit('start-game',gameId,index);
+      await delay(1000);
+      eventBus.$emit('load-elimination-data');
+      await delay(1000);
+      eventBus.$emit('load-group-data');
+    }
   }
 }
 </script>
