@@ -57,7 +57,8 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                             "/**/delete**",
                             "/games/create-group",
                             "/games/assign-team",
-                            "/games/update-game").hasRole("admin")
+                            "/games/update-game",
+                            "/analytics/generate").hasRole("admin")
                     .antMatchers("/games/create-game",
                             "/games/update-ongoing-status",
                             "/games/update-scores",

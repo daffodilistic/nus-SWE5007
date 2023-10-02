@@ -44,25 +44,29 @@
 
         </b-modal>
         <!-- show GA history Modal END-->
-        <div class="search-container">
-          <table>
-            <tr>
-              <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
-              <td><input type="text" v-model="searchQuery" placeholder="Search group Name" class="search-box"></td>
-            </tr>
-          </table>
-        </div>
+            <!-- Start of Accordion -->
+    <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.first-accordion
+          variant="info"
+          class="accordion-button"
+        >
+          Click to view Qualification Round
+        </b-button>
+      </b-card-header>
+      <b-collapse id="first-accordion" accordion="my-accordion" role="tabpanel">
         <div v-if="groups && groups.length > 0">
-        <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
-        <div class="pagination">
-          <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-            <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-          </button>
-          <span>Page {{ currentPage }} of {{ totalPages }}</span>
-          <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-            <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-          </button>
-        </div>
+        <table class="instruction-table">
+          <tr><u>Instructions :</u></tr>
+          <tr>1. Click on <b-icon icon="collection-play"></b-icon> to create matchups for all the teams in the group</tr>
+          <tr>2. Click on <i :class="'fas fa-plus'" class="expand-icon"></i> to view team matchups <b-icon icon="arrow-right-circle-fill"></b-icon> Click on <b-icon icon="play-circle"></b-icon> to start the match</tr>
+          <tr>3. After the match is completed, enter score for participating teams <b-icon icon="arrow-right-circle-fill"></b-icon> Click on <b-icon icon="save"></b-icon> to submit the score</tr>
+          <tr>4. After scores are submitted for all the matchups, click on  <b-icon icon="star"></b-icon> to qualify the top 2 teams in the group</tr>
+          <tr>5. Repeat steps 1 to 4 for all groups</tr>
+        </table>
+
         <table class="main-table">
           <thead>
             <tr>
@@ -87,10 +91,10 @@
               </td>
               <td>
                  <div v-if="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length >= 2">
-                  Ready for Elimination Round
+                  Completed
                 </div>
                 <div v-else>
-                  Pending Qualification
+                 In-Progress
                 </div>
               </td>
               <td>
@@ -98,7 +102,7 @@
                   <b-icon icon="eye"></b-icon>
                 </b-button>
               <b-button
-                @click="createGame(startIndex + index - 1)"
+                @click="createQualiGame(startIndex + index - 1)"
                 variant="outline-primary"
                 class="delete-button"
                 v-b-tooltip.hover="'Click to create matchups for all teams in the group'"
@@ -106,7 +110,7 @@
               >
                  <b-icon icon="collection-play"></b-icon>
                 </b-button>
-                <b-button @click="qualifyTeam(group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to qualify group'"
+                <b-button @click="qualifyTeam(group)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to qualify top 2 teams'"
                  v-bind:disabled="group.gameTeamResponses.filter(team => team.isQualifiedForElimination).length >= 2"
                 >
                  <b-icon icon="star"></b-icon>
@@ -131,34 +135,33 @@
                   </thead>
                   <tbody>
                     <tr v-if="groupedData.length === 0">
-                      <td colspan="11"  style="color: red;">0 game created in the group</td>
+                      <td colspan="11"  style="color: red;">0 game created in the group. Click on <b-icon icon="collection-play"></b-icon> to create games!</td>
                     </tr>
                      <template v-for="(group, groupIndex) in groupedData">
 
                       <tr v-for="(item, rowIndex) in group" :key="`${groupIndex}`">
                         <td>{{ groupIndex+1}}</td>
-
                         <td class="host-td">
                          <span v-if="item.gameOutcome === 'win' && item.gameStatus==='done'"
                           >
-                            <i class="fas fa-trophy gold-trophy"></i>
+                            <i class="fas fa-star gold-star"></i>
                           </span> <br>
                         {{ item.hostTeamName  }}</td>
 
                         <td v-if="item.gameStatus!=='done'">
                         <input type="number" v-model="item.enteredHostScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input">
                         </td>
-                        <td v-else-if ="item.gameStatus==='done'" class="score-td">
+                        <td v-else-if ="item.gameStatus==='done'" class="host-score-td">
                           {{ item.hostScore }}
                         </td>
                         <td>  <img src="../assets/Versus_icon.png" alt="Versus"></td>
                         <td v-if="item.gameStatus!=='done'">
                         <input type="number" v-model="item.enteredOppoScore" :min="0" :disabled="item.gameStatus !== 'ongoing'" class="narrow-input"></td>
-                        <td v-else-if ="item.gameStatus==='done'" class="score-td">{{ item.oppoScore }}</td>
+                        <td v-else-if ="item.gameStatus==='done'" class="oppo-score-td">{{ item.oppoScore }}</td>
 
                         <td class="oppo-td"><span v-if="item.gameOutcome === 'lose' && item.gameStatus==='done'"
                           >
-                            <i class="fas fa-trophy gold-trophy"></i><br>
+                            <i class="fas fa-star gold-star"></i><br>
                           </span>{{ item.oppoTeamName  }} </td>
 
                         <td>{{ gameStatusTextMap[item.gameStatus] }}</td>
@@ -188,15 +191,6 @@
             </tr>
           </tbody>
         </table>
-        <div class="pagination">
-        <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-          <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-        </button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-          <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-        </button>
-      </div>
       </div>
       <div v-else>
           <!-- Show a loading message or spinner while the data is being fetched -->
@@ -204,6 +198,55 @@
             <i class="fas fa-spinner fa-spin"></i>
           </div>
         </div>
+        </b-collapse>
+    </b-card>
+    <!-- End of Accordion -->
+
+    <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.second-accordion
+          variant="info"
+          class="accordion-button"
+          @click="loadElimination"
+        >
+          Click to view Elimination Round
+        </b-button>
+      </b-card-header>
+      <b-collapse id="second-accordion" accordion="my-accordion" role="tabpanel">
+         <b-button
+      @click="startElimination()"
+      variant="outline-primary"
+      v-b-tooltip.hover="'Click to Kick Start Elimination Round!'"
+      v-if="shouldShowStartButton"
+       style="width: 100%; height: 80px;"
+    >
+            <b-icon icon="play-circle" style="font-size: 36px; line-height: 148px;"></b-icon>&nbsp;Start
+            </b-button>
+      <br>
+      <div v-if="!shouldShowStartButton">
+        <div v-if="groups && groups.length > 0">
+          <div class="tournament-bracket">
+            <div v-for="(stage, index) in filteredStages" :key="stage">
+
+               <Round
+                  :roundMatches="getRoundMatches(stage)"
+                  :isSecondRound="index < filteredStages.length - 1"
+                  :isLastRound="index === filteredStages.length - 1"
+                />
+            </div>
+          </div>
+        </div>
+      <div v-else>
+          <!-- Show a loading message or spinner while the data is being fetched -->
+          <div class="loader-container">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+        </div></div>
+       </b-collapse>
+    </b-card>
+
       </div>
 </template>
 
@@ -214,8 +257,15 @@ import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
 import { VIEW_GAME_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,CREATE_GAME_BASE_URL,GET_ALL_GAMES_BASE_URL,UPDATE_GAME_ONGOING_STATUS_BASE_URL,UPDATE_GAME_SCORE_BASE_URL,CHECK_GAME_QUALIFICATION_STATUS_BASE_URL,QUALIFY_GAME_TEAM_BASE_URL} from '@/api';
 import Swal from 'sweetalert2';
 import Vue from 'vue'
+import Round from './Round.vue';
+import eventBus from '../utils/eventBus.js';
+import { delay } from '../utils/utils.js';
 
 export default {
+
+  components: {
+    Round,
+  },
   head() {
     return {
       link: [
@@ -251,9 +301,27 @@ export default {
       objectsWithIdAndTeamArray : [],
       gameTeamList: [],
       showGAHistoryModal: false,
+      allGameData: [], //all game objects
+      filteredStages: [], //distinc stages of elimination rd
+      rounds:[],
+      filteredGames:[]
     };
   },
+  created() {
+    // Listen for the 'start-game' event
+    eventBus.$on('start-game', this.startGame);
+    eventBus.$on('load-group-data', this.loadGroup);
+    eventBus.$on('load-elimination-data', this.loadElimination);
+    eventBus.$on('submit-score', this.submitScore);
+    eventBus.$on('check-advance', this.checkAdvanceRound);
+  },
   computed: {
+
+     shouldShowStartButton() {
+      // Calculate whether to show the button based on your condition
+      const elim01Count = this.allGameData.filter(item => item.stage === "Elim-01").length;
+      return elim01Count <= 3;
+    },
 
     gameStatusTextMap() {
     // Define a mapping of age group values to their corresponding text
@@ -378,7 +446,12 @@ export default {
     }
   },
   methods: {
+    getRoundMatches(stage) {
+      return this.rounds.filter(round => round.stage === stage);
+    },
+
     async submitScore(hostId,oppoId,groupObj,groupIndex) {
+
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
         text: 'You won\'t be able to revert this!',
@@ -397,15 +470,23 @@ export default {
           gameScoreOppo : groupObj.enteredOppoScore,
         };
 
-
       const headers = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${Vue.$keycloak.token}`
         };
-        console.log(requestBody)
+
       try {
-       const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
-       this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
+      const response = await axios.put(`${UPDATE_GAME_SCORE_BASE_URL}`,requestBody, { headers });
+
+      this.loadGroup();
+      if(groupIndex!=='na'){
+        this.toggleRow(groupIndex)
+      }else{
+        await delay(1000);
+        this.loadElimination();
+        await delay(1000);
+        this.checkAdvanceRound();
+      }
       }
       catch (error) {
         // Handle errors, if any
@@ -413,10 +494,11 @@ export default {
       }}
   },
 
-    async startGame(groupId,groupIndex) {
+    async startGame(gameId,groupIndex) {
+      console.log('startGame Called')
 
       const requestBody = {
-        id:groupId
+        id:gameId
       };
       const headers = {
           'Content-Type': 'application/json',
@@ -424,8 +506,10 @@ export default {
         };
       try {
        const response = await axios.put(`${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,requestBody, { headers });
+       if(groupIndex!=='na'){
+        this.loadGroup();
         this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
-
+        }
       }
 
       catch (error) {
@@ -441,7 +525,7 @@ export default {
       for (let i = 0; i < group.gameTeamResponses.length; i++) {
 
         if(group.gameTeamResponses[i].qualificationRoundNumMatchesPlayed < 3){
-          counter = true
+          counter = false
         }
       }
 
@@ -464,7 +548,6 @@ export default {
           // If the group has an ID, update the existing record using a PUT request
           const response = await axios.post(`${CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`, requestBody, { headers });
 
-
           if(response.data.data='Group ',group.id,' is ready for qualification'){
 
             const response = await axios.post(`${QUALIFY_GAME_TEAM_BASE_URL}`, requestBody, { headers });
@@ -474,6 +557,8 @@ export default {
               icon: 'success'
             });
           }
+          await delay(1000);
+          this.loadGroup();
         }
         catch (error) {
         // Handle errors, if any
@@ -498,7 +583,7 @@ export default {
       }
     },
 
-    async createGame(index) {
+    async createQualiGame(index) {
 
       const confirmation = await Swal.fire({
         title: 'Are you sure?',
@@ -517,7 +602,11 @@ export default {
         'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       const teams = group.gameTeamResponses; // Assuming your group object has a 'teams' property containing an array of teams
+      const currentDate = new Date();
+      const isoDateTime = currentDate.toISOString(); // Generates date-time in "YYYY-MM-DDTHH:mm:ss.sssZ" format
 
+      // Now, format it to "YYYY-MM-DDTHH:mm:ssZ" format
+      const formattedDateTime = isoDateTime.slice(0, 19) + "Z";
     // Loop through each team in the group
     for (let i = 0; i < teams.length; i++) {
       for (let j = i + 1; j < teams.length; j++) {
@@ -525,6 +614,8 @@ export default {
         const requestBody = {
           gameTeamIdHost: teams[i].id,
           gameTeamIdOppo: teams[j].id,
+          datetime:formattedDateTime,
+          stage:'Quali'
         };
 
         try {
@@ -544,18 +635,217 @@ export default {
         }
       }
     },
+    async startElimination() {
+          let firstPlaceArray = [];
+          let secondPlaceArray = [];
+          //loop through all game group, to get its 1st and 2nd place teams.
+         for (let index = 0; index < this.groups.length; index++) {
+          const grp =  this.groups[index];
+          for(let index = 0; index < grp.gameTeamResponses.length; index++){
+            if(grp.gameTeamIdFirst === grp.gameTeamResponses[index].id && grp.gameTeamResponses[index].isQualifiedForElimination){
+              const details = {
+                firstTeamID: grp.gameTeamIdFirst,
+                groupId:grp.id,
+                teamName:grp.gameTeamResponses[index].teamName
+              }
+              firstPlaceArray.push(details);
+           }
+           if(grp.gameTeamIdSecond === grp.gameTeamResponses[index].id && grp.gameTeamResponses[index].isQualifiedForElimination){
+            const details = {
+              secondTeamID: grp.gameTeamIdSecond,
+              groupId:grp.id,
+              teamName:grp.gameTeamResponses[index].teamName
+            }
+            secondPlaceArray.push(details);
+           }
+          }
+        }
+         const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
+        };
+        let i = firstPlaceArray.length - 1
+         for (let index = 0; index < firstPlaceArray.length; index++) {
+             try {
+              const requestBody = {
+                  gameTeamIdHost: firstPlaceArray[index].firstTeamID,
+                  gameTeamIdOppo: secondPlaceArray[i].secondTeamID,
+                  stage:'Elim-01'
+              };
+
+             const response = await axios.post(`${CREATE_GAME_BASE_URL}`,requestBody, { headers });
+              Swal.fire({
+              title: 'Success!',
+              text: 'Elimination Round Started!',
+              icon: 'success'
+            });
+            this.loadGroup();
+
+            } catch (error) {
+              console.error("Error fetching data:", error);
+            }
+            i--
+         }
+
+    },
 
     async loadGroup() {
+      this.groupsData = [];
+      this.groups = [];
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
-
           this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
           this.groups = this.groupsData.data.data;
+
         } catch (error) {
           console.error("Error fetching data:", error);
+        }
+    },
+    async checkAdvanceRound() {
+
+        const roundNumbersArray = this.filteredStages.map(item => {
+          return parseInt(item.split('-')[1], 10);
+        });
+        //check what is the current round
+        const largestNumber = Math.max(...roundNumbersArray);
+
+        //check if all games in this round is completed
+        const doneGameArr = this.filteredGames.filter((game) => game.stage===`Elim-0${largestNumber}` && game.gameStatus === "done");
+        const totalGameArr = this.filteredGames.filter((game) => game.stage===`Elim-0${largestNumber}`);
+        console.log('doneGameArr',doneGameArr)
+        //get all winners in the team.
+        let winnerArray = [];
+         for (let index = 0; index < doneGameArr.length; index++) {
+
+             const winner = doneGameArr[index]
+
+             if(winner.gameOutcome ==='win'){
+                winnerArray.push(winner.gameTeamIdHost)
+             }else{
+                winnerArray.push(winner.gameTeamIdOppo)
+             }
+          }
+          console.log('winnerArray',winnerArray)
+
+        //check if completed, is the game for next round created
+        if(totalGameArr.length===doneGameArr.length && totalGameArr.length > 1 ){
+
+            const currentDate = new Date();
+            const isoDateTime = currentDate.toISOString(); // Generates date-time in "YYYY-MM-DDTHH:mm:ss.sssZ" format
+            const formattedDateTime = isoDateTime.slice(0, 19) + "Z";// Now, format it to "YYYY-MM-DDTHH:mm:ssZ" format
+
+            let index1 =0;
+            let index2 =1;
+            console.log('loop entered')
+
+             const headers = {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Vue.$keycloak.token}`
+            };
+            for (let index = 0; index < totalGameArr.length/2; index++) {
+
+              let requestBody = {
+                gameTeamIdHost: winnerArray[index1],
+                gameTeamIdOppo: winnerArray[index2],
+                datetime: formattedDateTime,
+                stage : `Elim-0${largestNumber+1}`,
+              };
+
+               try {
+                const response = await axios.post(`${CREATE_GAME_BASE_URL}`, requestBody, { headers });
+
+                Swal.fire({
+                  title: 'Round '+ largestNumber+ ' Completed!',
+                  text: 'Matchups for Round '+ (largestNumber + 1)+ ' Created Successfully !',
+                  icon: 'success'
+                });
+              }
+              catch (error) {
+              // Handle errors, if any
+                console.error('Error saving group:', error);
+              }
+              index1 +=2;
+              index2 +=2;
+
+              console.log('index1 - ', index1 ,' index2 - ',index2)
+              console.log('requestBody ',requestBody)
+
+            }this.loadElimination();
+        }else{
+            Swal.fire({
+                  title: 'Round '+ largestNumber+ ' Completed!',
+                  text: 'Elimination Round Completed Successfully !',
+                  icon: 'success'
+                });
+        }
+    },
+     async loadElimination() {
+      this.allGameData = [];
+      this.rounds = [];
+      this.filteredStages=[];
+      this.filteredGames=[];
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      };
+      try {
+          const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, { headers });
+          this.allGameData = response.data.data
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+
+        const uniqueStages = new Set();
+
+        // Loop through allGameData and add distinct stage values to the Set
+        this.allGameData.forEach(item => {
+          uniqueStages.add(item.stage);
+        });
+
+         const distinctStagesArray = Array.from(uniqueStages);
+
+      // Filter the array to show only values beginning with "Elim"
+        this.filteredStages = distinctStagesArray.filter((stage) =>
+          stage.startsWith("Elim")
+        );
+
+        this.filteredGames = this.allGameData.filter((game) => game.stage.startsWith('Elim'));
+
+        for (let index = 0; index < this.filteredStages.length; index++) {
+          for (let index = 0; index < this.filteredGames.length; index++) {
+            const elimGame = this.filteredGames[index];
+            const roundNumber = parseInt(elimGame.stage.split('-')[1], 10);
+
+             if (elimGame.stage === `Elim-0${roundNumber}`) {
+
+              const gameTeamIdHost = this.teamList.find(team => team.id === elimGame.gameTeamIdHost);
+
+              const gameTeamIdOppo = this.teamList.find(team => team.id === elimGame.gameTeamIdOppo);
+              const idExists = this.rounds.some(round => round.id === elimGame.id);
+
+              if (!idExists) {
+                const objectWithIdAndOppoArray = {
+                  id: elimGame.id,
+                  oppoTeamId: elimGame.gameTeamIdOppo,
+                  oppoScore: elimGame.gameScoreOppo,
+                  hostTeamId: elimGame.gameTeamIdHost,
+                  hostScore: elimGame.gameScoreHost,
+                  gameStatus : elimGame.gameStatus,
+                  gameOutcome : elimGame.gameOutcome,
+                  hostTeamName : gameTeamIdHost.teamName,
+                  oppoTeamName : gameTeamIdOppo.teamName,
+                  stage : `Elim-0${roundNumber}`
+                };
+
+                this.rounds.push(objectWithIdAndOppoArray);
+
+              }
+             }
+          }
         }
     },
 
@@ -610,9 +900,11 @@ export default {
         // Iterate through the data objects
         for (const item of this.groupMembers) {
           // Create an object with "id" and associated teamArray
-          const gameTeamIdHost = this.teamList.find(team => team.id === item.gameTeamIdHost);
 
-          const gameTeamIdOppo = this.teamList.find(team => team.id === item.gameTeamIdOppo);
+          if(item.stage.indexOf('Elim')){
+            const gameTeamIdHost = this.teamList.find(team => team.id === item.gameTeamIdHost);
+
+            const gameTeamIdOppo = this.teamList.find(team => team.id === item.gameTeamIdOppo);
 
           if (tempArray.includes(item.gameTeamIdOppo)) {
             const objectWithIdAndOppoArray = {
@@ -627,7 +919,7 @@ export default {
               oppoTeamName : gameTeamIdOppo.teamName
             };
             this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
-          }
+          }}
           /*
           if (tempArray.includes(item.gameTeamIdHost)) {
             const objectWithIdAndHostArray = {
@@ -642,8 +934,6 @@ export default {
           }*/
         }
         const jsonArray = JSON.stringify(this.objectsWithIdAndTeamArray, null, 2);
-        console.log(jsonArray)
-
       }catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
@@ -658,6 +948,16 @@ export default {
 
     async viewGAScore(groupObj) {
 
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Vue.$keycloak.token}`
+      };
+      try {
+          this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
+          this.groups = this.groupsData.data.data;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
         let groupFilteredObj = this.groups.filter(team => team.id === groupObj.id);
         this.gameTeamList = groupFilteredObj[0].gameTeamResponses
 
@@ -682,7 +982,6 @@ export default {
 .main-table td {
 padding: 8px;
   text-align: center;
-  font-size: 14px;
   background-color: #f6f6f6;
 }
 .main-table th {
@@ -700,7 +999,6 @@ padding: 8px;
 .team-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
 }
 
 .team-table th{
@@ -866,28 +1164,38 @@ input.form-control.editing-textbox {
   margin-top: 10px;
   margin-right: 27px;
 }
-.gold-trophy {
+.gold-star {
   color: gold; /* Apply gold color to the trophy icon */
 }
 
 .host-td {
   width: 140px; /* Adjust the width as needed */
-  font-size: 40px;
+  font-size: 20px;
   color: rgba(0, 0, 255, 0.744);
   font-weight: bold;
+   font-family: 'Tourney', sans-serif;
+}
+
+.host-score-td {
+  font-size: 20px;
+  color: rgba(0, 0, 255, 0.744);
+  font-weight: bold;
+    font-family: 'Tourney', sans-serif;
 }
 
 .oppo-td {
   width: 140px; /* Adjust the width as needed */
-  font-size: 40px;
+  font-size: 20px;
   color: rgba(255, 0, 0, 0.807);
   font-weight: bold;
+  font-family: 'Tourney', sans-serif;
 }
 
-.score-td {
-  font-size: 40px;
-  color: rgba(22, 3, 3, 0.807);
+.oppo-score-td {
+  font-size: 20px;
+  color: rgba(255, 0, 0, 0.807);
   font-weight: bold;
+    font-family: 'Tourney', sans-serif;
 }
 
 .row-even {
@@ -901,5 +1209,50 @@ input.form-control.editing-textbox {
 .narrow-input {
   width: 60px;
 }
+
+.accordion-button {
+
+  color: #100101;
+}
+
+.accordion-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
+}
+
+.tournament-bracket {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 20px; /* Add margin for spacing */
+  justify-content: space-between; /* Evenly distribute space */
+  width: 77%; /* Adjust as per your layout requirement */
+  margin: 0 auto; /* Center the entire bracket */
+  position: relative;
+}
+
+/* Styling for arrow lines between rounds*/
+.arrow {
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 15px solid #333; /* Arrow color */
+  right: 655px;
+  position: absolute; /* Position the arrow absolutely within the container */
+  top: 59%; /* Vertically center the arrow within the container */
+  transform: translateY(-50%); /* Adjust for vertical centering */
+}
+
+.instruction-table {
+  text-align: left;
+  font-size: 14px;
+  color: #120b51;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Create connecting lines using pseudo-elements */
 
 </style>
