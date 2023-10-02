@@ -18,7 +18,9 @@
     "mdb-vue-ui-kit": "^4.0.0",
     "vue": "^2.7.14",
     "vue-router": "^3.1.5",
-    "vue-sweetalert2": "^5.0.5"
+    "vue-select": "^3.20.2",
+    "vue-sweetalert2": "^5.0.5",
+    "vue-tournament": "^1.1.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.22.10",
