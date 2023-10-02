@@ -28,9 +28,16 @@ export const ageGroupOptions = [
     { value: 'Final 2nd Stage', text: 'Final 2nd Stage', competitionId:'1'},
     { value: 'Final 1st Stage', text: 'Final 1st Stage', competitionId:'1'},
     { value: 'Promotional Round', text: 'Promotional Round', competitionId:'1'},
+    { value: 'Preliminary Round', text: 'Preliminary Round', competitionId:'1'},
     { value: 'Qualification Round', text: 'Qualification Round', competitionId:'2'},
     { value: 'Eimination Round', text: 'Eimination Round', competitionId:'2'},
     { value: 'Not Qualified', text: 'Not Qualified', competitionId:'1'},
+  ];
+
+  export const tcGameOptions = [
+    { value: 'Sprinting', text: 'Sprinting', competitionId:'3'},
+    { value: 'Mountaineering', text: 'Mountaineering', competitionId:'3'},
+    { value: 'Sumo', text: 'Sumo', competitionId:'3'},
   ];
 
   export const countriesOptions = [

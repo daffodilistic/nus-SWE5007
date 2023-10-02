@@ -1,28 +1,23 @@
 <template>
   <div id="app">
-    <div id="nav">
-    <nav class="container navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="">RIC SG</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#testbar" aria-controls="testbar" aria-expanded="false" aria-label="Toggle navigation" @click="toggle" >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbar1" style="display:none;">
-        <div class="navbar-nav mr-auto">
-          <router-link to="/" class="nav-item nav-link">Home</router-link>
-          <router-link to="/registration" class="nav-item nav-link">Register Team</router-link>
-          <router-link v-if="authenticated && userRoles.includes('participant')" to="/contestantProfile" class="nav-item nav-link">Team Profile</router-link>
-          <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageContestant" class="nav-item nav-link">Manage Contestant</router-link>
-          <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageGroup" class="nav-item nav-link">Manage Group</router-link>
-          <router-link v-if="authenticated && userRoles.includes('judge')" to="/score" class="nav-item nav-link">Score</router-link>
-          <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageTeam" class="nav-item nav-link">Manage Team</router-link>
-          <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageMetric" class="nav-item nav-link">Manage Metric</router-link>
-          <router-link v-if="authenticated" to="/login" v-on:click.native="logout()" replace class="nav-item nav-link">Logout</router-link>
-          <router-link v-else to="/login" v-on:click.native="login()" class="nav-item nav-link">Login</router-link>
-        </div>
-      </div>
+    <nav class="top-menu">
+      <router-link to="/" class="menu-item">Home</router-link>
+      <router-link to="/registration" class="menu-item">Register Team</router-link>
+      <router-link v-if="authenticated && userRoles.includes('judge')" to="/score" class="menu-item">Score IDC</router-link>
+      <router-link v-if="authenticated && userRoles.includes('judge')" to="/scoreGA" class="menu-item">Score GA</router-link>
+      <router-link v-if="authenticated && userRoles.includes('judge')" to="/scoreTC" class="menu-item">Score TC</router-link>
+      <router-link v-if="authenticated && userRoles.includes('participant')" to="/contestantProfile" class="menu-item">Team Profile</router-link>
+      <router-link v-if="authenticated && userRoles.includes('admin')" to="/upload" class="menu-item">Upload</router-link>
+      <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageContestant" class="menu-item">Manage Contestant</router-link>
+        <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageTeam" class="menu-item">Manage Team</router-link>
+      <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageGroup" class="menu-item">Manage Group</router-link>
+
+      <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageMetric" class="menu-item">Manage Metric</router-link>
+      <router-link v-if="authenticated" to="/login" v-on:click.native="logout()" replace class="menu-item">Logout</router-link>
+
+      <router-link v-else to="/login" v-on:click.native="login()" class="menu-item">Login</router-link>
     </nav>
     <router-view @authenticated="setAuthenticated" />
-  </div>
   </div>
 </template>
 
@@ -42,16 +37,6 @@ export default {
       this.authenticated = status;
       if (this.authenticated) {
         this.checkAuthentication();
-      }
-    },
-    toggle() {
-      console.log("test");
-      var x = document.getElementById("navbar1");
-      console.log(x);
-      if (x.style.display === "none") {
-        x.style.display = "block";
-      } else {
-        x.style.display = "none";
       }
     },
     checkAuthentication() {
@@ -82,7 +67,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  /* padding: 20px; */
+  padding: 20px;
 }
 
 .top-menu {
@@ -93,7 +78,8 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   font-size: 16px;
-  margin-bottom: 70px;
+  margin-bottom: 15px;
+
 }
 
 .menu-item {
@@ -126,25 +112,5 @@ export default {
     border-left: none;
     border-top: 1px solid #dcdcdc;
   }
-}
-
-#nav {
-  /* padding: 30px; */
-  background: #f8f9fa;
-  text-align: center;
-}
-
-#navbar {
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: whitesmoke;
-  background: #5DADE2;
-  border-radius: .5rem;
 }
 </style>

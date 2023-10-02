@@ -62,3 +62,7 @@ export const UPLOAD_PRIM_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/uplo
 export const UPLOAD_PROMO_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/upload-promo-file'
 export const DOWNLOAD_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/download-file?file=participants'
 export const VIEW_ALL_FILES_BASE_URL = 'http://localhost:8082/idcteam/view-all-participants-files'
+
+//TECHNICAL COMP
+export const VIEW_ALL_TC_BASE_URL = 'http://localhost:8083/tech-comp/view-all-tech-comps'
+export const CREATE_TC_BASE_URL = 'http://localhost:8083/tech-comp/create-tech-comp'
