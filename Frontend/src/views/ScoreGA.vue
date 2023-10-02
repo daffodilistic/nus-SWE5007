@@ -229,7 +229,6 @@
         <div v-if="groups && groups.length > 0">
           <div class="tournament-bracket">
             <div v-for="(stage, index) in filteredStages" :key="stage">
-
                <Round
                   :roundMatches="getRoundMatches(stage)"
                   :isSecondRound="index < filteredStages.length - 1"
@@ -326,7 +325,7 @@ export default {
     gameStatusTextMap() {
     // Define a mapping of age group values to their corresponding text
     const gameStatusMap = {
-      'pending': 'Not Yet Started',
+      'pending': 'Not Started',
       'ongoing': 'In-Progress',
       'done': 'Completed',
       // Add more entries as needed for other age groups
@@ -728,7 +727,7 @@ export default {
                 winnerArray.push(winner.gameTeamIdOppo)
              }
           }
-          console.log('winnerArray',winnerArray)
+          console.log('totalGameArr.length',totalGameArr.length,'-doneGameArr.length-',doneGameArr.length)
 
         //check if completed, is the game for next round created
         if(totalGameArr.length===doneGameArr.length && totalGameArr.length > 1 ){
@@ -774,7 +773,7 @@ export default {
               console.log('requestBody ',requestBody)
 
             }this.loadElimination();
-        }else{
+        }else if(totalGameArr.length===doneGameArr.length && totalGameArr.length ===1 ){
             Swal.fire({
                   title: 'Round '+ largestNumber+ ' Completed!',
                   text: 'Elimination Round Completed Successfully !',
@@ -1226,7 +1225,7 @@ input.form-control.editing-textbox {
   align-items: center;
   margin: 20px; /* Add margin for spacing */
   justify-content: space-between; /* Evenly distribute space */
-  width: 80%; /* Adjust as per your layout requirement */
+  width: 75%; /* Adjust as per your layout requirement */
   margin: 0 auto; /* Center the entire bracket */
   position: relative;
 }
