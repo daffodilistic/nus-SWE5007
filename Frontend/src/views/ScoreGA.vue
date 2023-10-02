@@ -1226,7 +1226,7 @@ input.form-control.editing-textbox {
   align-items: center;
   margin: 20px; /* Add margin for spacing */
   justify-content: space-between; /* Evenly distribute space */
-  width: 77%; /* Adjust as per your layout requirement */
+  width: 80%; /* Adjust as per your layout requirement */
   margin: 0 auto; /* Center the entire bracket */
   position: relative;
 }
