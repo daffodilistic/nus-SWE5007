@@ -1,14 +1,16 @@
 <template>
   <div class="match">
     <div class="team" :class="{ 'winner': match.hostScore > match.oppoScore }">
-      {{ match.hostTeamName }}
+
       <span v-if="showTrophy && match.hostScore > match.oppoScore" class="trophy">🏆</span>
       <span v-else-if="showStar && match.hostScore > match.oppoScore" class="star">⭐</span>
+      <span v-else="showBlank && match.hostScore < match.oppoScore" class="blank"> <br></span>
+       {{ match.hostTeamName }}
     </div>
     <div class="score">
       <template v-if="match.gameStatus !== 'done'">
         <input type="number" v-model="match.enteredHostScore" :min="0" :disabled="match.gameStatus !== 'ongoing'" class="narrow-input">
-        <img src="../assets/Versus_icon.png" alt="Versus">
+         -
         <input type="number" v-model="match.enteredOppoScore" :min="0" :disabled="match.gameStatus !== 'ongoing'"
         class="narrow-input">
       </template>
@@ -17,9 +19,11 @@
       </template>
     </div>
     <div class="team" :class="{ 'winner': match.oppoScore > match.hostScore }">
-      {{ match.oppoTeamName }}
+
       <span v-if="showTrophy && match.oppoScore > match.hostScore" class="trophy">🏆</span>
       <span v-else-if="showStar && match.oppoScore > match.hostScore" class="star">⭐</span>
+      <span v-else="showBlank && match.oppoScore < match.hostScore" class="blank"> <br></span>
+        {{ match.oppoTeamName }}
     </div>
 
     <div>
@@ -40,10 +44,6 @@
 
 <script>
 import Round from './Round.vue';
-import axios from "axios";
-import { UPDATE_GAME_ONGOING_STATUS_BASE_URL,UPDATE_GAME_SCORE_BASE_URL,QUALIFY_GAME_TEAM_BASE_URL} from '@/api';
-import Swal from 'sweetalert2';
-import Vue from 'vue';
 import ScoreGA from './ScoreGA.vue';
 import eventBus from '../utils/eventBus.js';
 import { delay } from '../utils/utils.js';
@@ -53,6 +53,7 @@ export default {
     match: Object, // Contains match data (homeTeam, awayTeam, hostScore, oppoScore)
     showStar: Boolean, // Indicates whether to show a star
     showTrophy: Boolean, // Indicates whether to show a trophy
+    showBlank :Boolean
   },
   components: {
     Round,
@@ -78,10 +79,6 @@ export default {
 
     async submitScore(hostTeamId,oppoTeamId,matchObj,index) {
       eventBus.$emit('submit-score',hostTeamId,oppoTeamId,matchObj,index);
-      await delay(1000);
-      eventBus.$emit('load-group-data');
-      await delay(1000);
-      eventBus.$emit('load-elimination-data');
 
     },
 
@@ -89,9 +86,11 @@ export default {
       eventBus.$emit('start-game',gameId,index);
       await delay(1000);
       eventBus.$emit('load-elimination-data');
-      await delay(1000);
-      eventBus.$emit('load-group-data');
-    }
+    },
+
+     async checkAdvanceRound(gameId,index) {
+        eventBus.$emit('check-advance');
+    },
   }
 }
 </script>
@@ -121,8 +120,13 @@ export default {
 }
 
 /* Style for the trophy and star icons */
-.trophy, .star {
+.star,.blank {
   font-size: 20px;
+  margin-left: 4px;
+}
+
+.trophy {
+  font-size: 30px;
   margin-left: 4px;
 }
 
@@ -139,13 +143,22 @@ export default {
   color: white; /* Text color for the score */
   padding: 4px 8px; /* Adjust padding for spacing */
   border-radius: 4px; /* Add rounded corners */
-  font-size: 20px;
+  font-size: 30px;
 
   /* Use Google Fonts for the Sports World font */
-  font-family: 'Sports World', sans-serif;
+  font-family: 'Tourney', sans-serif;
+  display: flex;
+  align-items: center;
 }
 
 .narrow-input {
   width: 50px;
+}
+
+.host-score-td {
+  font-size: 20px;
+  color: rgba(0, 0, 255, 0.744);
+  font-weight: bold;
+    font-family: 'Tourney', sans-serif;
 }
 </style>

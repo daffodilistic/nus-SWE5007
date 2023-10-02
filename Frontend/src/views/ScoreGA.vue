@@ -224,12 +224,17 @@
     >
             <b-icon icon="play-circle" style="font-size: 36px; line-height: 148px;"></b-icon>&nbsp;Start
             </b-button>
-
+      <br>
       <div v-if="!shouldShowStartButton">
         <div v-if="groups && groups.length > 0">
           <div class="tournament-bracket">
             <div v-for="(stage, index) in filteredStages" :key="stage">
-              <Round :roundMatches="getRoundMatches(stage)" :isSecondRound="true" />
+
+               <Round
+                  :roundMatches="getRoundMatches(stage)"
+                  :isSecondRound="index < filteredStages.length - 1"
+                  :isLastRound="index === filteredStages.length - 1"
+                />
             </div>
           </div>
         </div>
