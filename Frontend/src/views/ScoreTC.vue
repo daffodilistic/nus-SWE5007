@@ -1,15 +1,7 @@
 <template>
 
   <div>
-    <br><br>
-    <div class="search-container">
-      <table>
-        <tr>
-          <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
-          <td><input type="text" v-model="searchQuery" placeholder="Search techComp Name" class="search-box"></td>
-        </tr>
-      </table>
-    </div>
+    <br>
     <div v-if="techComps && techComps.length > 0">
     <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
     <div class="pagination">
@@ -45,7 +37,7 @@
 
           </td>
           <td>{{ startIndex + index }}</td>
-          <td v-if="!techComp.editing" >
+          <td v-if="!techComp.editing" class="normal-td">
             {{ techComp.gameName }}
           </td>
           <td v-else>
@@ -67,6 +59,9 @@
                 </button>
               </template>
               <template v-else>
+              <span v-if="techComp.gameOutcome === 'win'">
+                <i class="fas fa-star gold-star"></i><br>
+                </span>
                 {{ techComp.gameTeamIdHostName }}
               </template>
             </div>
@@ -78,7 +73,7 @@
                 v-model="selectedHostTeam"
                 :options="teamList"
                 label="teamName"
-                placeholder="Select Game"
+                placeholder="Select Team"
                 id="hostTeam"
                 class="editing-dropdown"
               ></v-select>
@@ -96,17 +91,21 @@
                 </button>
               </template>
               <template v-else>
-                {{ techComp.gameTeamIdOppoName }}
+                <span v-if="techComp.gameOutcome === 'lose'">
+                <i class="fas fa-star gold-star"></i><br>
+                </span>
+                <span style="color: red">{{ techComp.gameTeamIdOppoName }}</span>
               </template>
             </div>
           </td>
+
           <td v-else>
             <div class="form-group select">
               <v-select
                 v-model="selectedOppoTeam"
                 :options="teamList"
                 label="teamName"
-                placeholder="Select Game"
+                placeholder="Select Team"
                 id="hostTeam"
                 class="editing-dropdown"
               ></v-select>
@@ -134,7 +133,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="pagination">
+    <div class="pagination"><br>
     <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
       <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
     </button>
@@ -219,13 +218,8 @@ export default {
       // If the search query is empty, show all techComps
       if (this.searchQuery.trim() === '') {
         // Sort the techComps by "Stage Name" in ascending order (A to Z)
-        return this.techComps.slice().sort((a, b) => {
-          const stageA = a.firstName || '';
-          const stageB = b.firstName || '';
-          return stageA.localeCompare(stageB);
-        });
+        return this.techComps
       }
-
       // Otherwise, filter techComps based on the search query
       const query = this.searchQuery.trim().toLowerCase();
       return this.techComps.filter((techComp) => techComp.firstName.toLowerCase().includes(query));
@@ -494,7 +488,7 @@ export default {
   border: none;
   border-radius: 15px;
   overflow: hidden;
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .main-table th,
@@ -610,6 +604,10 @@ export default {
    font-family: 'Tourney', sans-serif;
    height: 30px;
 }
+
+.normal-td {
+  font-size: 18x;
+}
 .oppo-td {
   width: 140px; /* Adjust the width as needed */
   font-size: 25px;
@@ -665,4 +663,7 @@ export default {
   background-color: #b30021; /* Change the background color on hover */
 }
 
+.gold-star {
+  color: gold; /* Apply gold color to the trophy icon */
+}
 </style>

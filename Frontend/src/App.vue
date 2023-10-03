@@ -3,11 +3,9 @@
     <nav class="top-menu">
       <router-link to="/" class="menu-item">Home</router-link>
       <router-link to="/registration" class="menu-item">Register Team</router-link>
-      <router-link v-if="authenticated && userRoles.includes('judge')" to="/score" class="menu-item">Score IDC</router-link>
-      <router-link v-if="authenticated && userRoles.includes('judge')" to="/scoreGA" class="menu-item">Score GA</router-link>
-      <router-link v-if="authenticated && userRoles.includes('judge')" to="/scoreTC" class="menu-item">Score TC</router-link>
+      <router-link v-if="authenticated && userRoles.includes('judge')" to="/mainScore" class="menu-item">Score</router-link>
       <router-link v-if="authenticated && userRoles.includes('participant')" to="/contestantProfile" class="menu-item">Team Profile</router-link>
-      <router-link v-if="authenticated && userRoles.includes('admin')" to="/upload" class="menu-item">Upload</router-link>
+      <router-link v-if="authenticated && userRoles.includes('admin')" to="/upload" class="menu-item">Admin Upload</router-link>
       <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageContestant" class="menu-item">Manage Contestant</router-link>
         <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageTeam" class="menu-item">Manage Team</router-link>
       <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageGroup" class="menu-item">Manage Group</router-link>

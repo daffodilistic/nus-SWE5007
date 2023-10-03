@@ -101,6 +101,13 @@ const routes = [
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/ScoreTC.vue')
     }
+  },
+  {
+    path: '/mainScore',
+    name: 'mainScore',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/mainScore.vue')
+    }
   }
 ]
 
