@@ -40,12 +40,12 @@
         </tr>
       </thead>
       <tbody v-for="(techComp, index) in paginatedTechComps" :key="index">
-        <tr :class="{'parent-row': true, 'active-row': activeRow === index}">
+        <tr>
           <td>
 
           </td>
           <td>{{ startIndex + index }}</td>
-          <td v-if="!techComp.editing">
+          <td v-if="!techComp.editing" >
             {{ techComp.gameName }}
           </td>
           <td v-else>
@@ -56,9 +56,22 @@
               </select>
             </div>
           </td>
-          <td v-if="!techComp.editing">
-            {{ techComp.gameTeamIdHost }}
+          <td
+            v-if="!techComp.editing"
+            :class="techComp.gameStatus === 'done' ? 'host-td' : 'big-button-td'"
+          >
+            <div :class="techComp.gameStatus === 'done' ? 'host-container' : 'button-container-host'">
+              <template v-if="techComp.gameStatus !== 'done'">
+                <button class="big-button-host" @click="qualifyWinner(techComp.id,techComp.gameTeamIdHost)">
+                  {{ techComp.gameTeamIdHostName }}
+                </button>
+              </template>
+              <template v-else>
+                {{ techComp.gameTeamIdHostName }}
+              </template>
+            </div>
           </td>
+
           <td v-else>
             <div class="form-group select">
               <v-select
@@ -72,8 +85,20 @@
             </div>
           </td>
           <td>  <img src="../assets/Versus_icon.png" alt="Versus"></td>
-          <td v-if="!techComp.editing">
-            {{ techComp.gameTeamIdOppo }}
+          <td
+            v-if="!techComp.editing"
+            :class="techComp.gameStatus === 'done' ? 'host-td' : 'big-button-td'"
+          >
+            <div :class="techComp.gameStatus === 'done' ? 'host-container' : 'button-container-oppo'">
+              <template v-if="techComp.gameStatus !== 'done'">
+                <button class="big-button-oppo" @click="qualifyWinner(techComp.id,techComp.gameTeamIdOppo)">
+                  {{ techComp.gameTeamIdOppoName }}
+                </button>
+              </template>
+              <template v-else>
+                {{ techComp.gameTeamIdOppoName }}
+              </template>
+            </div>
           </td>
           <td v-else>
             <div class="form-group select">
@@ -90,7 +115,7 @@
           <td>
             {{ gameStatusTextMap[techComp.gameStatus] }}
           </td>
-          <td>
+          <td v-if="techComp.gameStatus === ''">
             <!-- Edit Icon -->
             <b-button id="edit-button" @click="editingUser(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit techComp particulars'">
               <span v-if="!techComp.editing"><b-icon icon="pencil"></b-icon></span>
@@ -240,25 +265,53 @@ export default {
     };
     try {
       const techCompsData = await axios.get(`${VIEW_ALL_TC_BASE_URL}`, { headers });
-      this.techComps = techCompsData.data.data;
+      const techComp = techCompsData.data.data;
 
         const response2 = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
         this.teamList = response2.data.data
-        console.log('this.teamList',this.teamList)
 
-
-
+        //merge 2 arrays
+        for (let i = 0; i < this.teamList.length; i++) {
+          for (let j = 0; j < techComp.length; j++) {
+            if (this.teamList[i].id === techComp[j].gameTeamIdHost) {
+              techComp[j].gameTeamIdHostName = this.teamList[i].teamName;; // Add gameTeamIdHostName property to techComp
+            } else if (this.teamList[i].id === techComp[j].gameTeamIdOppo) {
+              techComp[j].gameTeamIdOppoName = this.teamList[i].teamName; // Add gameTeamIdOppoName property to techComp
+            }
+          }
+        }
+        this.techComps = techComp
+        console.log(this.techComps)
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching techComps:", error);
     }
   },
   methods: {
-      searchOptions(searchTerm) {
-      // Implement custom logic to filter options based on the searchTerm
-      // You can filter options from an API or local data source here
+
+    async qualifyWinner(gameID,winnerID) {
+      console.log('gameID - ',gameID,' winnerID - ',winnerID)
+
+      let token = "";
+          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+
+
+      }catch (error) {
+        // Handle any errors that might occur during the request
+        console.error("Error fetching techComps:", error);
+      }
     },
-     async loadTechComp() {
+
+    async loadTechComp() {
       this.techComps=[];
       this.teamList=[];
 
@@ -292,6 +345,7 @@ export default {
         selectedTechComp: '',
         selectedHostTeam: '',
         selectedOppoTeam: '',
+        gameStatus : ''
       };
 
       this.techComps.unshift(newTechComp);
@@ -313,7 +367,7 @@ export default {
         if (techComp.editing) {
           // Save the changes
           techComp.userName = techComp.editingUserName;
-
+          techComp.gameStatus = '',
           techComp.editing = false;
           let token = "";
           if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
@@ -445,10 +499,8 @@ export default {
 
 .main-table th,
 .main-table td {
-padding: 8px;
   text-align: center;
-  font-size: 14px;
-  background-color: #f6f6f6;
+  height: 30px;
 }
 .main-table th {
   background-color: #d7e7f2;
@@ -462,9 +514,7 @@ padding: 8px;
   cursor: pointer;
 }
 
-.active-row {
-  background-color: rgb(218, 234, 253)/* Light blue for active parent row */
-}
+
 
 .pagination {
   display: flex;
@@ -474,14 +524,12 @@ padding: 8px;
 }
 
 .page-button {
-  padding: 8px 16px;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
   margin: 0 5px;
-  background-color: transparent;
 }
 
 .search-container {
@@ -501,39 +549,16 @@ padding: 8px;
 }
 
 .page-button .icon {
-  background-color: transparent;
+
   border: none;
   padding: 0; /* Remove padding to make the icons fit better */
   font-size: 16px;
-}
-
-.parent-row .expand-icon {
-  margin-right: 10px; /* Add some spacing between the icon and text */
-  font-size: 16px;
-  color: rgb(65, 127, 202); /* Set the color to blue (#3498db) */
-}
-
-.main-table th:first-child,
-.main-table td:first-child {
-  /* Set a fixed width for the new column */
-  width: 30px;
-}
-.parent-row .expand-icon {
-  /* Adjust the icon's size, margin, and color as needed */
-  font-size: 16px;
-  margin-right: 10px;
-  color: rgb(65, 127, 202);
 }
 
 .delete-button {
   margin-left: 5px;
 }
 
-/* Styles for the text box in editing mode */
-input.form-control.editing-textbox {
-  font-size: 14px;
-  min-width: 100px;
-}
 
 .loader-container {
   display: flex;
@@ -570,12 +595,74 @@ input.form-control.editing-textbox {
 }
 
 /* Optionally, add styles for the dropdown arrow icon */
-.editing-dropdown .dropdown-toggle::after {
+.editing-dropdown {
   font-family: 'Font Awesome'; /* Assuming you're using Font Awesome for icons */
   content: '\f107'; /* Replace with the correct icon code */
   margin-left: 5px; /* Add some spacing between the text and the icon */
-  color: #555; /* Set the color of the icon */
 }
 
+
+.host-td {
+  width: 140px; /* Adjust the width as needed */
+  font-size: 25x;
+  color: rgba(0, 0, 255, 0.744);
+  font-weight: bold;
+   font-family: 'Tourney', sans-serif;
+   height: 30px;
+}
+.oppo-td {
+  width: 140px; /* Adjust the width as needed */
+  font-size: 25px;
+  color: rgba(255, 0, 0, 0.807);
+  font-weight: bold;
+  font-family: 'Tourney', sans-serif;
+  height: 30px;
+}
+
+.big-button-td {
+  padding: 15px; /* Add margin around the TD element */
+}
+
+.button-container-host {
+  background-image: linear-gradient(to bottom, #9ec0e6, #003271); /* Gradient background */
+  padding: 10px; /* Adjust padding to control the container size */
+  border-radius: 8px; /* Rounded corners for the container */
+  display: inline-block; /* Make the container inline-block to shrink to content */
+  color: #fff; /* Text color on the gradient background */
+}
+
+.big-button-host {
+  font-size: 18px; /* Adjust font size to make text bigger */
+  background-color: transparent; /* Make button background transparent */
+  color: #ffffff; /* Change text color */
+  border: none;
+  cursor: pointer;
+  font-family: 'Tourney', sans-serif;
+}
+
+.big-button-host:hover {
+  background-color: #0056b3; /* Change the background color on hover */
+}
+
+.button-container-oppo {
+  background-image: linear-gradient(to bottom, #e9a1a1, #d70606); /* Gradient background */
+  padding: 10px; /* Adjust padding to control the container size */
+  border-radius: 8px; /* Rounded corners for the container */
+  display: inline-block; /* Make the container inline-block to shrink to content */
+  color: #fff; /* Text color on the gradient background */
+}
+
+.big-button-oppo {
+  font-size: 18px; /* Adjust font size to make text bigger */
+  background-color: transparent; /* Make button background transparent */
+  color: #ffffff; /* Change text color */
+  border: none;
+  cursor: pointer;
+  font-family: 'Tourney', sans-serif;
+}
+
+.big-button-oppo:hover {
+  background-color: #b30021; /* Change the background color on hover */
+}
 
 </style>
