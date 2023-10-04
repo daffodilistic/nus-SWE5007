@@ -27,7 +27,7 @@
     </div>
 
     <div>
-     <template v-if="gameStatusTextMap[match.gameStatus]==='Not Yet Started'"><br>
+     <template v-if="gameStatusTextMap[match.gameStatus]==='Not Started'"><br>
         <b-button @click="startGame(match.id,'na')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
         <b-icon icon="play-circle"></b-icon>
         </b-button>
@@ -67,7 +67,7 @@ export default {
     gameStatusTextMap() {
     // Define a mapping of age group values to their corresponding text
     const gameStatusMap = {
-      'pending': 'Not Yet Started',
+      'pending': 'Not Started',
       'ongoing': 'In-Progress',
       'done': 'Completed',
       // Add more entries as needed for other age groups

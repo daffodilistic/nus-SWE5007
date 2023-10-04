@@ -165,7 +165,7 @@
                           </span>{{ item.oppoTeamName  }} </td>
 
                         <td>{{ gameStatusTextMap[item.gameStatus] }}</td>
-                        <td v-if="gameStatusTextMap[item.gameStatus]==='Not Yet Started'">
+                        <td v-if="gameStatusTextMap[item.gameStatus]==='Not Started'">
                            <b-button @click="startGame(item.id, groupIndex)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
                             <b-icon icon="play-circle"></b-icon>&nbsp;Start
                             </b-button>

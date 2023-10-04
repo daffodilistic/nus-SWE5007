@@ -48,21 +48,23 @@
               </select>
             </div>
           </td>
-          <td
+           <td
             v-if="!techComp.editing"
             :class="techComp.gameStatus === 'done' ? 'host-td' : 'big-button-td'"
           >
-            <div :class="techComp.gameStatus === 'done' ? 'host-container' : 'button-container-host'">
+            <div :class="techComp.gameStatus === 'done' ? 'host-container' : (techComp.gameStatus === 'pending' ? 'button-container-disabled' : 'button-container-host')">
               <template v-if="techComp.gameStatus !== 'done'">
-                <button class="big-button-host" @click="qualifyWinner(techComp.id,techComp.gameTeamIdHost)">
+                <!-- Use the :disabled attribute to disable the button -->
+                <!-- Apply the .disabled-button class when disabled -->
+                <button class="big-button-host" @click="qualifyWinner(techComp.id,'win')" :disabled="techComp.gameStatus === 'pending'" :class="{ 'disabled-button': techComp.gameStatus === 'pending' }">
                   {{ techComp.gameTeamIdHostName }}
                 </button>
               </template>
               <template v-else>
-              <span v-if="techComp.gameOutcome === 'win'">
-                <i class="fas fa-star gold-star"></i><br>
+                <span v-if="techComp.gameOutcome === 'win'">
+                  <i class="fas fa-star gold-star"></i><br>
                 </span>
-                {{ techComp.gameTeamIdHostName }}
+                <span style="color: red">{{ techComp.gameTeamIdHostName }}</span>
               </template>
             </div>
           </td>
@@ -84,15 +86,17 @@
             v-if="!techComp.editing"
             :class="techComp.gameStatus === 'done' ? 'host-td' : 'big-button-td'"
           >
-            <div :class="techComp.gameStatus === 'done' ? 'host-container' : 'button-container-oppo'">
+            <div :class="techComp.gameStatus === 'done' ? 'host-container' : (techComp.gameStatus === 'pending' ? 'button-container-disabled' : 'button-container-oppo')">
               <template v-if="techComp.gameStatus !== 'done'">
-                <button class="big-button-oppo" @click="qualifyWinner(techComp.id,techComp.gameTeamIdOppo)">
+                <!-- Use the :disabled attribute to disable the button -->
+                <!-- Apply the .disabled-button class when disabled -->
+                <button class="big-button-oppo" @click="qualifyWinner(techComp.id,'lose')" :disabled="techComp.gameStatus === 'pending'" :class="{ 'disabled-button': techComp.gameStatus === 'pending' }">
                   {{ techComp.gameTeamIdOppoName }}
                 </button>
               </template>
               <template v-else>
                 <span v-if="techComp.gameOutcome === 'lose'">
-                <i class="fas fa-star gold-star"></i><br>
+                  <i class="fas fa-star gold-star"></i><br>
                 </span>
                 <span style="color: red">{{ techComp.gameTeamIdOppoName }}</span>
               </template>
@@ -130,6 +134,11 @@
               <b-icon icon="trash"></b-icon>
             </b-button>
           </td>
+          <td v-if="gameStatusTextMap[techComp.gameStatus]==='Not Started'">
+            <b-button @click="startGame(techComp.id)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
+            <b-icon icon="play-circle"></b-icon>&nbsp;Start
+            </b-button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -155,7 +164,7 @@
 
 <script>
 import axios from "axios";
-import { VIEW_ALL_TC_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,CREATE_TC_BASE_URL,DELETE_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL } from '@/api';
+import { VIEW_ALL_TC_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,CREATE_TC_BASE_URL,DELETE_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,UPDATE_TC_STATUS_BASE_URL,UPDATE_TC_OUTCOME_BASE_URL } from '@/api';
 import { tcGameOptions } from "../dropdownOptions";
 import Swal from 'sweetalert2';
 import Vue from 'vue'
@@ -283,8 +292,29 @@ export default {
   },
   methods: {
 
-    async qualifyWinner(gameID,winnerID) {
-      console.log('gameID - ',gameID,' winnerID - ',winnerID)
+async startGame(gameId) {
+      console.log('startGame Called')
+
+      const requestBody = {
+        id:gameId
+      };
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
+        };
+      try {
+       const response = await axios.put(`${UPDATE_TC_STATUS_BASE_URL}`,requestBody, { headers });
+
+        this.loadTechComp();
+      }
+
+      catch (error) {
+        // Handle errors, if any
+        console.error('Error calling API:', error);
+      }
+  },
+    async qualifyWinner(gameID,result) {
+      console.log('gameID - ',gameID,' winnerID - ',result)
 
       let token = "";
           if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
@@ -298,6 +328,12 @@ export default {
       };
       try {
 
+        const requestBody = {
+          id: gameID,
+          gameOutcome: result,
+        };
+        const response = await axios.put(`${UPDATE_TC_OUTCOME_BASE_URL}`, requestBody, { headers });
+        this.loadTechComp();
 
       }catch (error) {
         // Handle any errors that might occur during the request
@@ -306,6 +342,7 @@ export default {
     },
 
     async loadTechComp() {
+      console.log('Tech Comp Loaded');
       this.techComps=[];
       this.teamList=[];
 
@@ -320,13 +357,24 @@ export default {
       'Authorization': `Bearer ${token}`
     };
     try {
-     const techCompsData = await axios.get(`${VIEW_ALL_TC_BASE_URL}`, { headers });
-      this.techComps = techCompsData.data.data;
+      const techCompsData = await axios.get(`${VIEW_ALL_TC_BASE_URL}`, { headers });
+      const techComp = techCompsData.data.data;
 
-        const response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-        this.teamList = response.data.data
-        console.log('this.teamList',this.teamList)
+        const response2 = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
+        this.teamList = response2.data.data
 
+        //merge 2 arrays
+        for (let i = 0; i < this.teamList.length; i++) {
+          for (let j = 0; j < techComp.length; j++) {
+            if (this.teamList[i].id === techComp[j].gameTeamIdHost) {
+              techComp[j].gameTeamIdHostName = this.teamList[i].teamName;; // Add gameTeamIdHostName property to techComp
+            } else if (this.teamList[i].id === techComp[j].gameTeamIdOppo) {
+              techComp[j].gameTeamIdOppoName = this.teamList[i].teamName; // Add gameTeamIdOppoName property to techComp
+            }
+          }
+        }
+        this.techComps = techComp
+        console.log(this.techComps)
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching techComps:", error);
@@ -406,11 +454,12 @@ export default {
                 const response = await axios.post(`${url2}`, requestBody, { headers });
 
                 // Add the newly created techComp to the beginning of the techComps array
-                this.techComps.unshift(response.data.data);
+                this.loadTechComp();
                 url ='';
+
               }
             }
-            this.loadTechComp();
+
             // Optional: Perform any additional actions, such as updating the UI.
           } catch (error) {
             // Handle errors, if any
@@ -665,5 +714,14 @@ export default {
 
 .gold-star {
   color: gold; /* Apply gold color to the trophy icon */
+}
+
+
+.button-container-disabled {
+    background-image: linear-gradient(to bottom, #c7c3c3, #464444); /* Gradient background */
+  padding: 10px; /* Adjust padding to control the container size */
+  border-radius: 8px; /* Rounded corners for the container */
+  display: inline-block; /* Make the container inline-block to shrink to content */
+  color: #313131; /* Text color on the gradient background */
 }
 </style>
