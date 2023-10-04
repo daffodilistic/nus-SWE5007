@@ -50,7 +50,6 @@ public class GCPFileService {
     @Autowired
     public GCPFileService(
             @Value("${spring.cloud.gcp.bucket.credential}") String gcpBucketCredential,
-            // @Value("${spring.cloud.gcp.credentials.encoded-key}") String gcpCredential,
             @Value("${spring.cloud.gcp.project-id}") String gcpProjectId,
             @Value("${spring.cloud.gcp.bucket.id}") String gcpBucketId,
             @Value("${spring.cloud.gcp.bucket.dirName}") String gcpDirectoryName) {
@@ -78,7 +77,12 @@ public class GCPFileService {
             Path filePath = new File(file.getOriginalFilename()).toPath();
             byte[] fileData = FileUtils.readFileToByteArray(convertFile(file));
             String contentType = Files.probeContentType(filePath);
-            String fileName = constructFileName(gcpDirectoryName, teamName, getRound(filePath.toString()));
+            String fileName;
+            if (teamName.equals("admin")){
+                fileName = "admin" + "/" + file.getOriginalFilename();
+            } else {
+                fileName = constructFileName(gcpDirectoryName, teamName, getRound(filePath.toString()));
+            }
             logger.info("Going to upload to [{}] with contentType [{}]", fileName, contentType);
 
             Blob blob = bucket.create(fileName, fileData, contentType);
@@ -95,9 +99,14 @@ public class GCPFileService {
         }
     }
 
-    public List<String> getAllDownloadableFilesFromParticipants(){
+    public List<String> getAllDownloadableFiles(boolean isParticipant){
         List<String> fileNames = new ArrayList<>();
-        Page<Blob> blobs = bucket.list(Storage.BlobListOption.prefix(gcpDirectoryName));
+        Page<Blob> blobs;
+        if (isParticipant){
+            blobs = bucket.list(Storage.BlobListOption.prefix(gcpDirectoryName));
+        } else {
+            blobs = bucket.list(Storage.BlobListOption.prefix("admin"));
+        }
         for (Blob blob : blobs.iterateAll()) {
             if (!blob.isDirectory()) {
                 fileNames.add(blob.getName());
