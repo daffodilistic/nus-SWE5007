@@ -18,6 +18,6 @@ public class TechCompRequests {
     private String gameName;
     private String gameStatus;
     private String gameOutcome;
-    private String gameVenue;
-    private Instant dateTime;
+    private String venue;
+    private Instant datetime;
 }
