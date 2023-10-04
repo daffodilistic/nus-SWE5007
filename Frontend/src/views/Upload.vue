@@ -3,7 +3,7 @@
     <form @submit.prevent="onSubmit" class="upload-type">
       <div class="form-row">
         <label for="game-type"><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i> &nbsp;&nbsp;&nbsp;Competition Choice</label>
-        <select name="game-type" id="game-type" class="white-background">
+        <select v-model="selectedComp" name="game-type" id="game-type" class="white-background">
           <option value="" disabled selected>Select an option</option>
           <!-- Use v-for to loop through competitionChoiceOptions -->
           <option v-for="option in competitionChoiceOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
@@ -12,7 +12,7 @@
       <br>
       <div class="form-row">
         <label for="upload-type"><i class="fas fa-file" style='color: rgb(65, 127, 202)'></i> &nbsp;&nbsp;&nbsp;Document Category</label>
-        <select name="upload-type" id="upload-type" class="white-background">
+        <select v-model="selectedUploadType" name="upload-type" id="upload-type" class="white-background">
           <option value="" disabled selected>Select an option</option>
           <option v-for="option in adminUploadTypeOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
         </select>
@@ -24,7 +24,7 @@
         <input type="file" name="file-upload" id="file-upload" @change="onFileChange" accept=".pdf,.doc,.docx,.xlsx,.csv" />
       </div>
       <br><br>
-      <button type="submit"><i class="fas fa-upload"></i> Upload</button>
+      <button type="submit" @click="upload()"><i class="fas fa-upload"></i> Upload</button>
     </form>
   </div>
 </template>
@@ -107,23 +107,88 @@ button[type="submit"] {
 
 <script>
 import {competitionChoiceOptions,adminUploadTypeOptions } from "../dropdownOptions";
+import {UPLOAD_ADMIN_FILES_BASE_URL} from '@/api';
+import axios from "axios";
+import Vue from 'vue';
+import Swal from 'sweetalert2';
 
 export default {
   data() {
     return {
       competitionChoiceOptions: competitionChoiceOptions,
       adminUploadTypeOptions : adminUploadTypeOptions,
+      selectedFile: null,
+      selectedComp:'',
+      selectedUploadType:''
     };
   },
   methods: {
+
     onFileChange(event) {
       // Handle the file change event here
-      const selectedFile = event.target.files[0];
-      console.log("Selected File:", selectedFile);
+      this.selectedFile = event.target.files[0];
+      console.log("Selected File:", this.selectedFile);
       // You can perform any further processing with the selected file here
     },
-    onSubmit() {
-      // Handle form submission here, if needed
+    async upload() {
+      console.log(this.selectedUploadType,' ',this.selectedComp);
+      let token='';
+      if (!this.selectedFile) {
+        console.log("No file selected.");
+         Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Please upload a file.',
+            });
+        return;
+      }
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+
+      const newFileName = `${this.selectedComp}-${this.selectedUploadType}-${this.selectedFile.name}`;
+
+      const formData = new FormData();
+        formData.append("files", this.selectedFile, newFileName);
+        formData.append("localFilePath",this.selectedFile.name);
+
+      try {
+        const requestBody = {
+          localFilePath: this.selectedFile, // Using the file name here
+          fileContent: null // This will hold the file content
+        };
+
+        // Read the file content using FileReader
+        const reader = new FileReader();
+
+        // Define the onload event handler for the reader
+        reader.onload = async (event) => {
+          requestBody.fileContent = event.target.result;
+          console.log('requestBody:', requestBody.fileContent);
+
+          const response = await axios.post(`${UPLOAD_ADMIN_FILES_BASE_URL}`, formData, {
+                  headers: {
+                  "Content-Type": "multipart/form-data",
+                  "Authorization": `Bearer ${token}`
+                }});
+        };
+
+        // Read the file as an ArrayBuffer (binary data)
+        reader.readAsArrayBuffer(this.selectedFile);
+
+         // Show a success message to the user using VueSweetalert2
+          Swal.fire({
+          title: 'Success!',
+          text: 'Upload successful!',
+          icon: 'success',
+          timer: 2000, // Display the success message for 2 seconds
+        });
+      } catch (error) {
+        // Handle errors, if any
+        console.error('Error calling API:', error);
+      }
     },
   },
 };

@@ -5,12 +5,12 @@ export const ageGroupOptions = [
 
   export const competitionChoiceOptions = [
     { value: 'IDC', text: 'Innovation Design Challenge', id:'1'},
-    { value: 'GA', text: 'Game Arena', id:'2' },
+    { value: 'GAC', text: 'Game Arena', id:'2' },
   ];
 
   export const adminUploadTypeOptions = [
-    { value: 'Game Manual', text: 'Game Manual', id:'1'},
-    { value: 'Time Table', text: 'Time Table', id:'2' },
+    { value: 'GM', text: 'Game Manual', id:'1'},
+    { value: 'TT', text: 'Time Table', id:'2' },
   ];
 
   export const qualificationOptions = [

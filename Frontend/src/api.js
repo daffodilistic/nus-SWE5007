@@ -61,6 +61,7 @@ export const QUALIFY_GAME_TEAM_BASE_URL = 'http://localhost:8083/games/qualify-g
 export const UPLOAD_PRIM_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/upload-prim-file'
 export const UPLOAD_PROMO_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/upload-promo-file'
 export const DOWNLOAD_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/download-file?file=participants'
+export const DOWNLOAD_ADMIN_FILE_IDC_BASE_URL = 'http://localhost:8082/idcteam/download-file?file=admin'
 export const VIEW_ALL_FILES_BASE_URL = 'http://localhost:8082/idcteam/view-all-participants-files'
 export const VIEW_ALL_ADMIN_FILES_BASE_URL = 'http://localhost:8082/idcteam/view-all-admin-files'
 export const UPLOAD_ADMIN_FILES_BASE_URL = 'http://localhost:8082/idcteam/upload-file'
