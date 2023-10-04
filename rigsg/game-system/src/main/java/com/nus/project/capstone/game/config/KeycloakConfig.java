@@ -58,12 +58,15 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                             "/games/create-group",
                             "/games/assign-team",
                             "/games/update-game",
+                            "/tech-comp/create-tech-comp",
+                            "/tech-comp/update-tech-comp",
                             "/analytics/generate").hasRole("admin")
                     .antMatchers("/games/create-game",
-                            "/games/update-ongoing-status",
-                            "/games/update-scores",
+                            "/**/update-ongoing-status",
+                            "/**/update-scores",
                             "/games/check-qualification-status",
-                            "/games/qualify-group").hasRole("judge")
+                            "/games/qualify-group",
+                            "/tech-comp/update-outcome").hasRole("judge")
                     .anyRequest().denyAll();
         } else {
             logger.info("Keycloak Auth is NOT turned on !!");

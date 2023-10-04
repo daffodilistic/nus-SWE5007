@@ -1,6 +1,5 @@
 package com.nus.project.capstone.model.persistence.game;
 
-import com.nus.project.capstone.model.entity.game.GamesRequests;
 import com.nus.project.capstone.model.entity.game.TechCompRequests;
 import lombok.*;
 
@@ -38,7 +37,7 @@ public class TechCompJpaEntities {
     private String gameStatus;
     private String gameOutcome;
     private String venue;
-    private Instant dateTime;
+    private Instant datetime;
 
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
@@ -62,8 +61,8 @@ public class TechCompJpaEntities {
                 .gameOutcome(t.getGameOutcome())
                 .gameName(t.getGameName())
                 .gameStatus(t.getGameStatus())
-                .venue(t.getGameVenue())
-                .dateTime(t.getDateTime())
+                .venue(t.getVenue())
+                .datetime(t.getDatetime())
                 .build();
     }
 
@@ -75,8 +74,8 @@ public class TechCompJpaEntities {
                 .gameName(u.getGameName() == null ? this.getGameName() : u.getGameName())
                 .gameStatus(u.getGameStatus() == null ? this.getGameStatus() : u.getGameStatus())
                 .gameOutcome(u.getGameOutcome() == null ? this.getGameOutcome() : u.getGameOutcome())
-                .venue(u.getGameVenue() == null ? this.getVenue() : u.getGameVenue())
-                .dateTime(u.getDateTime() == null ? this.getDateTime() : u.getDateTime())
+                .venue(u.getVenue() == null ? this.getVenue() : u.getVenue())
+                .datetime(u.getDatetime() == null ? this.getDatetime() : u.getDatetime())
                 .build();
     }
 }

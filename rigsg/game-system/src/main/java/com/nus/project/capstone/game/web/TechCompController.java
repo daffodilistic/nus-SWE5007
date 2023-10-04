@@ -1,8 +1,6 @@
 package com.nus.project.capstone.game.web;
 
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
-import com.nus.project.capstone.model.entity.game.GamesRequests;
-import com.nus.project.capstone.model.entity.game.GamesResponse;
 import com.nus.project.capstone.model.entity.game.TechCompRequests;
 import com.nus.project.capstone.model.entity.game.TechCompResponse;
 import com.nus.project.capstone.model.persistence.game.GameTeamRepository;
@@ -14,13 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.nus.project.capstone.game.web.Tools.PENDING;
-import static com.nus.project.capstone.game.web.Tools.UNKNOWN;
+import static com.nus.project.capstone.game.web.Tools.*;
+import static com.nus.project.capstone.game.web.Tools.genericFailureMessage;
 
 @Slf4j
 @RestController
@@ -55,7 +52,7 @@ public class TechCompController {
         techJpa.addToGamesTeam(b.get());
 
         techJpa.setGameStatus(PENDING);
-        techJpa.setGameOutcome(PENDING);
+        techJpa.setGameOutcome(UNKNOWN);
 
         val techComp = techCompRepository.save(techJpa);
         return ResponseEntity.ok(GeneralMessageEntity.builder()
@@ -65,6 +62,41 @@ public class TechCompController {
     @PutMapping("/update-tech-comp")
     public ResponseEntity<GeneralMessageEntity> updateTechCompInterface(@RequestBody TechCompRequests updateTechCompRequests) {
         return updateTechComp(updateTechCompRequests);
+    }
+
+    @PutMapping("/update-ongoing-status")
+    public ResponseEntity<GeneralMessageEntity> updateTechCompStatus(@RequestBody TechCompRequests r) {
+        if (r.getGameTeamIdHost() == null &&
+                r.getGameTeamIdOppo() == null &&
+                r.getGameName() == null &&
+                r.getGameStatus() == null &&
+                r.getGameOutcome() == null &&
+                r.getVenue() == null &&
+                r.getDatetime() == null) {
+            r.setGameStatus(ONGOING);
+            return updateTechComp(r);
+        } else {
+            return genericFailureMessage();
+        }
+    }
+
+    @PutMapping("/update-outcome")
+    public ResponseEntity<GeneralMessageEntity> updateTechCompOutcome(@RequestBody TechCompRequests r) {
+        if (r.getGameTeamIdHost() == null &&
+                r.getGameTeamIdOppo() == null &&
+                r.getGameName() == null &&
+                r.getGameStatus() == null &&
+                r.getVenue() == null &&
+                r.getDatetime() == null) {
+            if (r.getGameOutcome().equals(WIN) || r.getGameOutcome().equals(DRAW) || r.getGameOutcome().equals(LOSE)){
+                r.setGameStatus(DONE);
+                return updateTechComp(r);
+            } else {
+                return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("gameOutcome invalid! Must be win, lose or draw").build());
+            }
+        } else {
+            return genericFailureMessage();
+        }
     }
 
     private ResponseEntity<GeneralMessageEntity> updateTechComp(@RequestBody TechCompRequests updateTechCompRequests) {
