@@ -1,6 +1,7 @@
 package com.nus.project.capstone.game.analytics;
 
 import com.nus.project.capstone.model.persistence.game.GameDataJpaEntities;
+import com.nus.project.capstone.model.persistence.game.GameDataRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,37 +33,48 @@ public class RandomDataGenerator {
     };
 
     public RandomDataGenerator() {
-        for(int i=0; i<30; i++){
-            teamPool.add("Team" + i);
-            school.add("School" + UpperCaseAlphabet[i % 15]);
-            country.add(countryState[i % 10]);
-        }
-
     }
 
-    public GameDataJpaEntities getRandomGameData(String gameName, String yearMonth){
-        this.gameData.setId(UUID.randomUUID());
-        this.gameData.setGameName(gameName);
-        this.gameData.setHostTeam(teamPool.get(random.nextInt(teamPool.size())));
-        this.gameData.setHostSchool(school.get(random.nextInt(school.size())));
-        this.gameData.setHostLocation(country.get(random.nextInt(country.size())));
-        this.gameData.setHostAvgExp(random.nextFloat() * 5.0f);
-        this.gameData.setOppoTeam(teamPool.get(random.nextInt(teamPool.size())));
-        this.gameData.setOppoSchool(school.get(random.nextInt(school.size())));
-        this.gameData.setOppoLocation(country.get(random.nextInt(country.size())));
-        this.gameData.setOppoAvgExp(random.nextFloat() * 5.0f);
-        if (gameName.equals("game_arena")){
-            int hostScore = random.nextInt(281);
-            int oppoScore = random.nextInt(281);
-            this.gameData.setHostScore(hostScore);
-            this.gameData.setOppoScore(oppoScore);
-            this.gameData.setGameOutcome(calculateOutcome(hostScore, oppoScore));
-        } else {
-            this.gameData.setHostScore(-1);
-            this.gameData.setOppoScore(-1);
-            this.gameData.setGameOutcome(outcome[random.nextInt(outcome.length)]);
+    public void setNumOfTeams(Integer num){
+        teamPool = new ArrayList<>();
+        school = new ArrayList<>();
+        country = new ArrayList<>();
+        int schoolSize = num / 2;
+        int locationSize = num / 3;
+        for(int i=0; i<num; i++){
+            teamPool.add("Team" + i);
+            school.add("School" + UpperCaseAlphabet[i % schoolSize]);
+            country.add(countryState[i % locationSize]);
         }
-        this.gameData.setYearMonth(yearMonth);
-        return gameData;
+    }
+
+    public void getRandomGameData(String gameName, String yearMonth, GameDataRepository repo){
+        for (int i = 0; i < teamPool.size() - 1; i++){
+            for (int j = i+1; j < teamPool.size(); j++){
+                this.gameData.setId(UUID.randomUUID());
+                this.gameData.setGameName(gameName);
+                this.gameData.setHostTeam(teamPool.get(i));
+                this.gameData.setHostSchool(school.get(random.nextInt(school.size())));
+                this.gameData.setHostLocation(country.get(random.nextInt(country.size())));
+                this.gameData.setHostAvgExp(random.nextFloat() * 5.0f);
+                this.gameData.setOppoTeam(teamPool.get(j));
+                this.gameData.setOppoSchool(school.get(random.nextInt(school.size())));
+                this.gameData.setOppoLocation(country.get(random.nextInt(country.size())));
+                this.gameData.setOppoAvgExp(random.nextFloat() * 5.0f);
+                if (gameName.equals("game_arena")){
+                    int hostScore = random.nextInt(281);
+                    int oppoScore = random.nextInt(281);
+                    this.gameData.setHostScore(hostScore);
+                    this.gameData.setOppoScore(oppoScore);
+                    this.gameData.setGameOutcome(calculateOutcome(hostScore, oppoScore));
+                } else {
+                    this.gameData.setHostScore(-1);
+                    this.gameData.setOppoScore(-1);
+                    this.gameData.setGameOutcome(outcome[random.nextInt(outcome.length)]);
+                }
+                this.gameData.setYearMonth(yearMonth);
+                repo.save(gameData);
+            }
+        }
     }
 }
