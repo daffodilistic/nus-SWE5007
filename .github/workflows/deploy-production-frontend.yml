@@ -34,8 +34,6 @@ jobs:
       - name: Fix SSH key
         run: sed -i 's/\r$//g' ~/.ssh/id_rsa
 
-      - name: Upload artifact to VM instance
+      - name: Upload dist folder to VM instance
         run: |
-          # Test SSH connection by printing the hostname of the VM instance
-          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
-          "hostname"
+          rsync -avz -e "ssh" ${{ github.workspace }}/Frontend/dist/ ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }}:/var/containers/apache/docker/volumes/httpd/
