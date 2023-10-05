@@ -51,8 +51,15 @@ jobs:
           ./mvnw --projects ${{ matrix.services }} --also-make clean package spring-boot:repackage \
           -D skipTests=true
       
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Install SSH key of bastion
+        uses: shimataro/ssh-key-action@v2
         with:
-          name: ${{ matrix.services }}-${{ env.APP_VERSION }}
-          path: ${{ github.workspace }}/rigsg/${{ matrix.services }}/target/*.jar
+          key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+          name: id_rsa-bastion
+          known_hosts: ${{ secrets.PRODUCTION_SSH_FINGERPRINT }}
+
+      - name: Upload artifact to VM instance
+        run: |
+          # Test SSH connection by printing the hostname of the VM instance
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
+          "hostname"
