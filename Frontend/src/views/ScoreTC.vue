@@ -727,7 +727,6 @@ async startGame(gameId) {
   color: gold; /* Apply gold color to the trophy icon */
 }
 
-
 .button-container-disabled {
     background-image: linear-gradient(to bottom, #c7c3c3, #464444); /* Gradient background */
   padding: 10px; /* Adjust padding to control the container size */

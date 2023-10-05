@@ -12,6 +12,7 @@
 <script>
 import contestantProfileGA from './contestantProfileGA.vue'; // Import your Tab1 component
 import contestantProfileIDC from './contestantProfileIDC.vue'; // Import your Tab2 component
+import contestantProfileTA from './contestantProfileTA.vue'; // Import your Tab1 component
 
 export default {
   data() {
@@ -33,7 +34,7 @@ export default {
         case 'Grand Arena':
           return contestantProfileGA;
         case 'Technical Competition':
-          return contestantProfileGA;
+          return contestantProfileTA;
         default:
           return null;
       }
