@@ -25,7 +25,7 @@ jobs:
         with:
           key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
           name: id_rsa-production
-          known_hosts: ${{ secrets.PRODUCTION_SSH_FINGERPRINT }}
+          known_hosts: unnecessary
 
       - name: Upload artifact to VM instance
         run: |
