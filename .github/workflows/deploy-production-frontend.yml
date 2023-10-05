@@ -25,7 +25,12 @@ jobs:
         with:
           key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
           name: id_rsa-production
-          known_hosts: unnecessary
+          known_hosts: 'unnecessary'
+          
+      - name: Adding Known Hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.PRODUCTION_SSH_HOST }} > ~/.ssh/known_hosts
+        shell: bash
 
       - name: Upload artifact to VM instance
         run: |
