@@ -32,7 +32,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.PRODUCTION_SSH_HOST }} > ~/.ssh/known_hosts
         
       - name: Fix SSH key
-        run: sudo sed -i 's/\r$//g' /root/.ssh/id_rsa
+        run: sed -i 's/\r$//g' ~/.ssh/id_rsa-production
 
       - name: Upload artifact to VM instance
         run: |
