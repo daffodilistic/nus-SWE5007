@@ -1,7 +1,6 @@
 package com.nus.project.capstone.model.entity.game;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nus.project.capstone.model.persistence.game.GamesJpaEntities;
 import com.nus.project.capstone.model.persistence.game.TechCompJpaEntities;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +19,8 @@ public class TechCompResponse {
     private String gameName;
     private String gameStatus;
     private String gameOutcome;
-    private String gameVenue;
-    private Instant dateTime;
+    private String venue;
+    private Instant datetime;
 
     public static TechCompResponse toTechCompResponse(TechCompJpaEntities t) {
         return TechCompResponse.builder()
@@ -31,8 +30,8 @@ public class TechCompResponse {
                 .gameName(t.getGameName())
                 .gameStatus(t.getGameStatus())
                 .gameOutcome(t.getGameOutcome())
-                .gameVenue(t.getVenue())
-                .dateTime(t.getDateTime())
+                .venue(t.getVenue())
+                .datetime(t.getDatetime())
                 .build();
     }
 

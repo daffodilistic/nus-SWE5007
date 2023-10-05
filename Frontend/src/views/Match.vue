@@ -2,15 +2,15 @@
   <div class="match">
     <div class="team" :class="{ 'winner': match.hostScore > match.oppoScore }">
 
-      <span v-if="showTrophy && match.hostScore > match.oppoScore" class="trophy">🏆</span>
-      <span v-else-if="showStar && match.hostScore > match.oppoScore" class="star">⭐</span>
+      <span v-if="showTrophy && match.hostScore > match.oppoScore" class="trophy">🏆<br></span>
+      <span v-else-if="showStar && match.hostScore > match.oppoScore" class="star">⭐<br></span>
       <span v-else="showBlank && match.hostScore < match.oppoScore" class="blank"> <br></span>
        {{ match.hostTeamName }}
     </div>
     <div class="score">
       <template v-if="match.gameStatus !== 'done'">
         <input type="number" v-model="match.enteredHostScore" :min="0" :disabled="match.gameStatus !== 'ongoing'" class="narrow-input">
-         -
+         &nbsp;-&nbsp;
         <input type="number" v-model="match.enteredOppoScore" :min="0" :disabled="match.gameStatus !== 'ongoing'"
         class="narrow-input">
       </template>
@@ -20,22 +20,22 @@
     </div>
     <div class="team" :class="{ 'winner': match.oppoScore > match.hostScore }">
 
-      <span v-if="showTrophy && match.oppoScore > match.hostScore" class="trophy">🏆</span>
-      <span v-else-if="showStar && match.oppoScore > match.hostScore" class="star">⭐</span>
+      <span v-if="showTrophy && match.oppoScore > match.hostScore" class="trophy">🏆<br></span>
+      <span v-else-if="showStar && match.oppoScore > match.hostScore" class="star">⭐<br></span>
       <span v-else="showBlank && match.oppoScore < match.hostScore" class="blank"> <br></span>
         {{ match.oppoTeamName }}
     </div>
 
     <div>
-     <template v-if="gameStatusTextMap[match.gameStatus]==='Not Yet Started'">
+     <template v-if="gameStatusTextMap[match.gameStatus]==='Not Started'"><br>
         <b-button @click="startGame(match.id,'na')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to start game for this matchup'">
-        <b-icon icon="play-circle"></b-icon>&nbsp;Start
+        <b-icon icon="play-circle"></b-icon>
         </b-button>
      </template>
 
-      <template v-if="match.gameStatus == 'ongoing'">
+      <template v-if="match.gameStatus == 'ongoing'"><br>
         <b-button @click="submitScore(match.hostTeamId,match.oppoTeamId,match,'na')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score for this matchup'">
-          <b-icon icon="save"></b-icon>&nbsp;Score
+          <b-icon icon="save"></b-icon>
         </b-button>
      </template>
     </div>
@@ -67,7 +67,7 @@ export default {
     gameStatusTextMap() {
     // Define a mapping of age group values to their corresponding text
     const gameStatusMap = {
-      'pending': 'Not Yet Started',
+      'pending': 'Not Started',
       'ongoing': 'In-Progress',
       'done': 'Completed',
       // Add more entries as needed for other age groups
@@ -111,6 +111,7 @@ export default {
   flex: 1;
   text-align: center;
   font-weight: bold;
+  width: 120px;
 
 }
 

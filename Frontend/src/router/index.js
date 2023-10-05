@@ -71,14 +71,14 @@ const routes = [
     name: 'Score',
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/Score.vue')
-    }
+    },
   },
   {
     path: '/scoreGA',
     name: 'ScoreGA',
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/ScoreGA.vue')
-    }
+    },
   },
   {
     path: '/manageGroup',
@@ -93,6 +93,20 @@ const routes = [
     name: 'upload',
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/Upload.vue')
+    }
+  },
+  {
+    path: '/scoreTC',
+    name: 'scoreTC',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/ScoreTC.vue')
+    }
+  },
+  {
+    path: '/mainScore',
+    name: 'mainScore',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/mainScore.vue')
     }
   }
 ]

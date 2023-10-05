@@ -24,43 +24,6 @@
           </form>
         </b-modal>
         <!-- show upload Modal END-->
-     <!-- show history Modal START-->
-        <b-modal
-          v-model="showHistoryModal"
-          modal-class="custom-modal"
-          title="Competition Score"
-          hide-footer
-        >
-            <!-- List of users to be displayed inside the modal -->
-            <table class="modal-table">
-                  <thead>
-                    <tr>
-                      <th>Stage</th>
-                      <th>Venue</th>
-                      <th>Score</th>
-                      <th>Date / Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <template v-if="presentationList.length === 0">
-                      <tr>
-                        <td colspan="5"><br><br>No records available.</td>
-                      </tr>
-                      <tr><br><br></tr>
-                    </template>
-                    <template v-else>
-                      <tr v-for="(presentation, presentationIndex) in presentationList" :key="presentation.id">
-                        <td>{{ presentation.stage }} </td>
-                        <td>{{ presentation.venue }} </td>
-                        <td>{{ presentation.score }} </td>
-                        <td>{{ formatDateTime(presentation.dateTime) }}</td>
-                      </tr>
-                      <tr><br><br></tr>
-                    </template>
-                  </tbody>
-                </table>
-        </b-modal>
-        <!-- show history Modal END-->
 
          <!-- show download START-->
        <b-modal
@@ -98,22 +61,31 @@
         </b-modal>
         <!-- show download Modal END-->
         <div style="text-align: right;">
-          <b-button id="viewScore" @click="viewScore(team.id)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to view score history'">
-            <b-icon icon="archive"></b-icon>
-          </b-button>&nbsp;
           <b-button id="viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to upload submission'">
             <b-icon icon="cloud-upload"></b-icon>
           </b-button>&nbsp;
-          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to view submission history'">
-            <b-icon icon="folder2-open"></b-icon>
+           <b-button id="gameManual" @click="downloadAdminFile(selectedCompetition,'GM')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to download Game Manual'">
+            <b-icon icon="book"></b-icon>&nbsp;Game Manual
           </b-button>&nbsp;
-           <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to download Game Manual'">
-            <b-icon icon="book"></b-icon>
-          </b-button>&nbsp;
-            <b-button id="gameManual" @click="downloadManual()" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to download Time Table'">
-            <b-icon icon="table"></b-icon>
-          </b-button>
+            <b-button id="gameManual" @click="downloadAdminFile(selectedCompetition,'TT')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to download Time Table'">
+            <b-icon icon="table"></b-icon>&nbsp;Time Table
+          </b-button><br><br>
         </div>
+
+         <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.first-accordion
+          variant="info"
+          class="accordion-button"
+        > &nbsp;&nbsp;<img src="../assets/team.png" alt="Versus" width="35px" height="30px">&nbsp;
+          Team Details
+        </b-button>
+      </b-card-header>
+      <b-collapse id="first-accordion" accordion="my-accordion" role="tabpanel">
+
+    <!-- End of Accordion -->
       <div class="form-container">
       <table>
       <tr>&nbsp;</tr>
@@ -201,13 +173,103 @@
             </tr>
       </table>
     </div>
+     </b-collapse>
+    </b-card>
+
+     <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.second-accordion
+          variant="info"
+          class="accordion-button"
+          @click="viewScore(team.id)"
+        >
+           &nbsp;&nbsp;<img src="../assets/qualification.png" alt="Versus" width="35px" height="30px">&nbsp;
+      Qualification History
+        </b-button>
+      </b-card-header>
+      <b-collapse id="second-accordion" accordion="my-accordion" role="tabpanel">
+         <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th>Stage</th>
+                      <th>Venue</th>
+                      <th>Score</th>
+                      <th>Date / Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="presentationList.length === 0">
+                      <tr>
+                        <td colspan="5"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                      <tr v-for="(presentation, presentationIndex) in presentationList" :key="presentation.id">
+                        <td>{{ presentation.stage }} </td>
+                        <td>{{ presentation.venue }} </td>
+                        <td>{{ presentation.score }} </td>
+                        <td>{{ formatDateTime(presentation.dateTime) }}</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                  </tbody>
+                </table>
+     </b-collapse>
+    </b-card>
+
+<b-card no-body class="mb-2">
+  <b-card-header header-tag="header" class="p-2" role="tab" style="background-color: #f5f5f5;">
+    <b-button
+      block
+      v-b-toggle.third-accordion
+      variant="info"
+      class="accordion-button"
+      @click="viewDownload(team.teamName)"
+    >
+       &nbsp;&nbsp;<img src="../assets/folder.png" alt="Versus" width="35px" height="30px">&nbsp;
+      File Submission History
+    </b-button>
+      </b-card-header>
+      <b-collapse id="third-accordion" accordion="my-accordion" role="tabpanel">
+          <table class="modal-table">
+                  <thead>
+                    <tr>
+                      <th>Filename</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="downloadFileList.length === 0">
+                      <tr>
+                        <td colspan="5"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                       <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
+                        <td>{{ file }} </td>
+                        <td> <b-button id = "downloadFile" @click="downloadFile(file)" variant="outline-primary" class="delete-button">
+                <b-icon icon="cloud-download"></b-icon>
+              </b-button></td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                  </tbody>
+                </table>
+     </b-collapse>
+    </b-card>
+
+
     </b-tab>
   </b-tabs>
 </template>
 
 <script>
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL} from '@/api';
+import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL} from '@/api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -216,13 +278,14 @@ export default {
     return {
       competitionChoiceOptions: competitionChoiceOptions,
       selectedCompetition: "Innovation Design Challenge",
-      idcTeamId: "ac71e3fe-8055-40a3-90aa-0b60c77abe50",
+      idcTeamId: "60ac712e-75a0-4f33-b1c9-4a6e0e5a7920",
       team:'',
       showHistoryModal: false,
       showUploadModal: false,
       showDownloadModal: false,
       presentationList: [],
       downloadFileList: [],
+      downloadAdminFileList: [],
       selectedFile: null, // Initialize the selectedFile variable
     };
   },
@@ -276,6 +339,7 @@ export default {
       return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   },
     async viewScore(teamId) {
+      console.log(teamId)
        let token='';
        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
             token = Vue.$keycloak.token;
@@ -293,7 +357,7 @@ export default {
         const response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
         const teamObject = response.data.data
         this.presentationList = teamObject.presentationResponses
-        this.showHistoryModal = true; // Show the modal after fetching the users
+        //this.showHistoryModal = true; // Show the modal after fetching the users
       }
       catch (error) {
         console.error("Error fetching users:", error);
@@ -330,7 +394,7 @@ export default {
         }
         return false;
       });
-        this.showDownloadModal = true; // Show the modal after fetching the users
+        //this.showDownloadModal = true; // Show the modal after fetching the users
       }
       catch (error) {
         console.error("Error fetching users:", error);
@@ -535,6 +599,90 @@ export default {
   console.error('Error downloading file:', error);
   // Handle the error here (e.g., show an error message to the user)
 });
+    },
+     async downloadAdminFile(compType,docType) {
+
+       let token='';
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        const response = await axios.get(`${VIEW_ALL_ADMIN_FILES_BASE_URL}`, { headers });
+        const originalArray = response.data.data;
+        let prefix1 = '';
+        if (compType==='Innovation Design Challenge'){
+          prefix1 = 'IDC'
+        }else{
+          prefix1 = 'GAC'
+        }
+
+        // Remove the "participants/" prefix from each item
+        const interimArray = originalArray.map((item) => {
+          // Use string manipulation to remove the prefix
+          return item.replace('admin/', '');
+        });
+
+        this.downloadAdminFileList = interimArray.filter((item) => {
+        const parts = item.split('-');
+        if (parts.length >= 2) {
+          // Check if the first part of the filename matches the prefix
+          return parts[0] === prefix1 && parts[1] === docType;;
+        }
+        return false;
+      });
+
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
+      }
+       axios({
+        url: `${DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
+        method: 'POST',
+        responseType: 'blob',
+        headers: {
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
+        },
+
+      })
+      .then((res) => {
+        // Get the file type (MIME type) from the response Blob
+        const fileType = res.data.type;
+
+        // Extract the filename from the URL or generate it dynamically
+        const urlParts = res.config.url.split('/');
+        const filename = urlParts[urlParts.length - 1];
+
+        // Create a Blob from the response data
+        const blob = new Blob([res.data], { type: fileType });
+
+        // Create a URL for the Blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link element
+        const link = document.createElement('a');
+        link.href = url;
+
+        // Set the download attribute to the extracted/generated filename
+        link.setAttribute('download', filename);
+
+        // Trigger the download
+        document.body.appendChild(link);
+        link.click();
+
+        // Clean up
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error('Error downloading file:', error);
+        // Handle the error here (e.g., show an error message to the user)
+      });
     }
   },
 };
@@ -547,6 +695,8 @@ export default {
   flex-wrap: wrap;
 
   justify-content: left;
+
+  margin-left: 20px;
 }
 
 .form-group {
@@ -626,5 +776,15 @@ button[type="submit"] {
   border-radius: 4px;
   cursor: pointer;
   font-size: 20px;
+}
+
+.accordion-button {
+
+  color: #100101;
+}
+
+.accordion-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
 }
 </style>

@@ -27,11 +27,11 @@ public class GameDataController {
 
     @PostMapping("/generate")
     public ResponseEntity<GeneralMessageEntity> generateRandomData(@RequestBody GameDataRequest g) {
-        for(int i=0; i<g.getNumSamples(); i++){
-            gameDataRepository.save(generator.getRandomGameData(g.getGameName(), g.getYearMonth()));
-        }
+        generator.setNumOfTeams(g.getNumSamples());
+        generator.getRandomGameData(g.getGameName(), g.getYearMonth(), gameDataRepository);
+        int numSamples = ((g.getNumSamples() * (g.getNumSamples() - 1)) / 2);
         return ResponseEntity.ok(GeneralMessageEntity.builder()
-                .data(String.format("Generated %s data", g.getNumSamples())).build());
+                .data(String.format("Generated %s data", numSamples)).build());
     }
 
 }
