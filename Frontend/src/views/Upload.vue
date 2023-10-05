@@ -1,5 +1,18 @@
 <template>
-  <div class="upload">
+<div>
+
+   <b-card no-body class="mb-2">
+    <b-card-header header-tag="header" class="p-2" role="tab">
+      <b-button
+        block
+        v-b-toggle.first-accordion
+        variant="info"
+        class="accordion-button"
+      > &nbsp;&nbsp;&nbsp;<b-icon icon="cloud-upload"></b-icon> &nbsp;&nbsp;&nbsp;&nbsp;Upload File
+      </b-button>
+    </b-card-header>
+    <b-collapse id="first-accordion" accordion="my-accordion" role="tabpanel">
+    <div class="upload">
     <form @submit.prevent="onSubmit" class="upload-type">
       <div class="form-row">
         <label for="game-type"><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i> &nbsp;&nbsp;&nbsp;Competition Choice</label>
@@ -23,21 +36,81 @@
         <label for="file-upload"><i class="fas fa-file-upload" style='color: rgb(65, 127, 202)'></i> &nbsp;&nbsp;&nbsp;Upload File</label>
         <input type="file" name="file-upload" id="file-upload" @change="onFileChange" accept=".pdf,.doc,.docx,.xlsx,.csv" />
       </div>
-      <br><br>
+      <br>
       <button type="submit" @click="upload()"><i class="fas fa-upload"></i> Upload</button>
-    </form>
+    </form></div>
+        </b-collapse>
+  </b-card>
+
+  <!-- Separate the b-card from the form -->
+  <b-card no-body class="mb-2">
+    <b-card-header header-tag="header" class="p-2" role="tab">
+      <b-button
+        block
+        v-b-toggle.second-accordion
+        variant="info"
+        class="accordion-button"
+        @click="viewDownload()"
+      > &nbsp;&nbsp;<img src="../assets/folder.png" alt="Versus" width="35px" height="30px">&nbsp;
+      File Upload History
+      </b-button>
+    </b-card-header>
+    <b-collapse id="second-accordion" accordion="my-accordion" role="tabpanel">
+      <!-- Collapsible content here -->
+      <div class="upload">
+       <table class="modal-table">
+                  <thead>
+                    <tr>
+                    <th>Competition Type</th>
+                     <th>File Type</th>
+                      <th>Filename</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-if="downloadFileList.length === 0">
+                      <tr>
+                        <td colspan="5"><br><br>No records available.</td>
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                    <template v-else>
+                       <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
+                       <td>{{ CompTypeTextMap[file.substring(0, 3)] }} </td>
+                       <td>{{ fileTypeTextMap[file.substring(4, 6)] }} </td>
+                        <td>{{ file.substring(7) }} </td>
+                        <td> <b-button id = "downloadFile" @click="downloadFile(file)" variant="outline-primary" class="delete-button">
+                <b-icon icon="cloud-download"></b-icon>
+              </b-button></td>
+
+                      </tr>
+                      <tr><br><br></tr>
+                    </template>
+                  </tbody>
+                </table></div>
+    </b-collapse>
+  </b-card>
   </div>
 </template>
 
 <style scoped>
+
+.modal-table {
+  width: 100%; /* Set the table width to take full width of the modal */
+  /* Optionally, you can set a max-width for the table if needed */
+
+  text-align: left;
+}
 .upload {
-  display: flex;
+
   /* Create a column layout for the form container */
   justify-content: center;
   /* Center horizontally */
   align-items: center;
   /* Center vertically */
-  margin-top: 100px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left:50px;
 }
 
 .upload-type {
@@ -45,7 +118,7 @@
   /* Change background color to match the login page */
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 20px;
+  padding: 10px;
   /* Adjust padding for consistency */
   width: 30%;
   /* Set the width to match the login page */
@@ -59,24 +132,23 @@
 }
 
 .form-row {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .form-row label {
   display: block;
   margin-bottom: 5px;
-  font-size: 20px;
+  font-size: 15px;
   color: #676767;
 }
 
 .form-row select,
 .form-row input[type="file"] {
   width: 100%;
-  height: 50px;
+  height: 31px;
   /* Match the height of text inputs in the login page */
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 10px;
   background-color: #fff;
 }
 
@@ -101,13 +173,23 @@ button[type="submit"] {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 15px;
+}
+
+.accordion-button {
+
+  color: #100101;
+}
+
+.accordion-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
 }
 </style>
 
 <script>
 import {competitionChoiceOptions,adminUploadTypeOptions } from "../dropdownOptions";
-import {UPLOAD_ADMIN_FILES_BASE_URL} from '@/api';
+import {UPLOAD_ADMIN_FILES_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL} from '@/api';
 import axios from "axios";
 import Vue from 'vue';
 import Swal from 'sweetalert2';
@@ -119,8 +201,30 @@ export default {
       adminUploadTypeOptions : adminUploadTypeOptions,
       selectedFile: null,
       selectedComp:'',
-      selectedUploadType:''
+      selectedUploadType:'',
+      downloadFileList: [],
     };
+  },
+  computed: {
+CompTypeTextMap() {
+    // Define a mapping of age group values to their corresponding text
+
+    const compTypeTextMap = {
+      'GAC': 'Grand Arena',
+      'IDC': 'Innovation Design Challenge',
+    };
+    return compTypeTextMap;
+  },
+
+    fileTypeTextMap() {
+    // Define a mapping of age group values to their corresponding text
+
+    const fileTypeTextMap = {
+      'GM': 'Game Manual',
+      'TT': 'Time Table',
+    };
+    return fileTypeTextMap;
+  }
   },
   methods: {
 
@@ -185,10 +289,89 @@ export default {
           icon: 'success',
           timer: 2000, // Display the success message for 2 seconds
         });
+        this.selectedFile=null;
       } catch (error) {
         // Handle errors, if any
         console.error('Error calling API:', error);
       }
+    },
+    async viewDownload() {
+       let token='';
+       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+            token = Vue.$keycloak.token;
+          } else {
+            token = "mockedToken";//for unit test
+          }
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        const response = await axios.get(`${VIEW_ALL_ADMIN_FILES_BASE_URL}`, { headers });
+        const originalArray = response.data.data;
+
+        // Remove the "participants/" prefix from each item
+        const interimArray = originalArray.map((item) => {
+          // Use string manipulation to remove the prefix
+          return item.replace('admin/', '');
+        });
+
+        this.downloadFileList = interimArray.filter((item) => {
+        const parts = item.split('-');
+        if (parts.length > 1) {
+          // Check if the first part of the filename matches the prefix
+          return parts[0] === 'GAC' || parts[0] === 'IDC';
+        }
+        return false;
+      });
+        //this.showDownloadModal = true; // Show the modal after fetching the users
+      }
+      catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    downloadFile(file) {
+      axios({
+  url: `${DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${file}`,
+  method: 'POST',
+  responseType: 'blob',
+  headers: {
+    'Authorization': `Bearer ${Vue.$keycloak.token}`
+  },
+})
+.then((res) => {
+  // Get the file type (MIME type) from the response Blob
+  const fileType = res.data.type;
+
+  // Extract the filename from the URL or generate it dynamically
+  const urlParts = res.config.url.split('/');
+  const filename = urlParts[urlParts.length - 1];
+
+  // Create a Blob from the response data
+  const blob = new Blob([res.data], { type: fileType });
+
+  // Create a URL for the Blob
+  const url = window.URL.createObjectURL(blob);
+
+  // Create a link element
+  const link = document.createElement('a');
+  link.href = url;
+
+  // Set the download attribute to the extracted/generated filename
+  link.setAttribute('download', filename);
+
+  // Trigger the download
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(link);
+})
+.catch((error) => {
+  console.error('Error downloading file:', error);
+  // Handle the error here (e.g., show an error message to the user)
+});
     },
   },
 };

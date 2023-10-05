@@ -25,44 +25,9 @@
         </b-modal>
         <!-- show upload Modal END-->
 
-         <!-- show download START-->
-       <b-modal
-          v-model="showDownloadModal"
-          modal-class="custom-modal"
-          title="Download File"
-          hide-footer
-        >
-            <!-- List of users to be displayed inside the modal -->
-            <table class="modal-table">
-                  <thead>
-                    <tr>
-                      <th>Filename</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <template v-if="downloadFileList.length === 0">
-                      <tr>
-                        <td colspan="5"><br><br>No records available.</td>
-                      </tr>
-                      <tr><br><br></tr>
-                    </template>
-                    <template v-else>
-                       <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
-                        <td>{{ file }} </td>
-                        <td> <b-button id = "downloadFile" @click="downloadFile(file)" variant="outline-primary" class="delete-button">
-                <b-icon icon="cloud-download"></b-icon>
-              </b-button></td>
-                      </tr>
-                      <tr><br><br></tr>
-                    </template>
-                  </tbody>
-                </table>
-        </b-modal>
-        <!-- show download Modal END-->
         <div style="text-align: right;">
           <b-button id="viewUpload" @click="viewUpload(team)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to upload submission'">
-            <b-icon icon="cloud-upload"></b-icon>
+            <b-icon icon="cloud-upload"></b-icon>&nbsp;Upload
           </b-button>&nbsp;
            <b-button id="gameManual" @click="downloadAdminFile(selectedCompetition,'GM')" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to download Game Manual'">
             <b-icon icon="book"></b-icon>&nbsp;Game Manual
@@ -262,7 +227,6 @@
      </b-collapse>
     </b-card>
 
-
     </b-tab>
   </b-tabs>
 </template>
@@ -278,7 +242,7 @@ export default {
     return {
       competitionChoiceOptions: competitionChoiceOptions,
       selectedCompetition: "Innovation Design Challenge",
-      idcTeamId: "60ac712e-75a0-4f33-b1c9-4a6e0e5a7920",
+      idcTeamId: "c8bf6a0b-ea4c-4b0e-adde-a4d0d7de9e10",
       team:'',
       showHistoryModal: false,
       showUploadModal: false,
