@@ -70,7 +70,7 @@ jobs:
 
       - name: Stop running Docker containers
         run: |
-          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_HOST }} \
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
           " \
           cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
           sudo docker compose down \
@@ -78,7 +78,7 @@ jobs:
 
       - name: Delete old JAR files
         run: |
-          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_HOST }} \
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
           " \
             cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
             rm -rf ./build \
@@ -90,9 +90,8 @@ jobs:
 
       - name: Timestamping deployment
         run: |
-          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_HOST }} \
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
           " \
             cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
             echo "Commit ${{ github.sha }} deployed at $(TZ=":Asia/Singapore" date)" > deployment_info.txt \
           "
-
