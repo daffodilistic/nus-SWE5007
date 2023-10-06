@@ -138,7 +138,6 @@
           <th>Team Name</th>
           <th></th>
           <th>Team Name</th>
-          <th>Game Status</th>
         </tr>
       </thead>
       <tbody v-for="(techComp, index) in techComps" :key="index">
@@ -161,9 +160,6 @@
                   <i class="fas fa-star gold-star"></i><br>
                 </span>
             {{ techComp.gameTeamIdOppoName }}
-          </td>
-          <td>
-            {{ gameStatusTextMap[techComp.gameStatus] }}
           </td>
         </tr>
       </tbody>
@@ -477,6 +473,7 @@ export default {
   /* Optionally, you can set a max-width for the table if needed */
   min-width: 450px;
   text-align: center;
+  margin-left:50px;
 }
 
 button[type="submit"] {
@@ -533,5 +530,12 @@ button[type="submit"] {
   font-weight: bold;
   font-family: 'Tourney', sans-serif;
   height: 30px;
+}
+
+.main-table {
+  margin-top:20px;
+  margin-left:20px;
+  margin-bottom: 20px;
+
 }
 </style>
