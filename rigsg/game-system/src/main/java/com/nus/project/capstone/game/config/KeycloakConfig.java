@@ -56,7 +56,7 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                             "/games/update-team",
                             "/**/delete**",
                             "/games/create-group",
-                            "/games/assign-team",
+                            "/games/assign**",
                             "/games/update-game",
                             "/tech-comp/create-tech-comp",
                             "/tech-comp/update-tech-comp",
