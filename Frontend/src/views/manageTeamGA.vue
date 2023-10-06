@@ -184,7 +184,7 @@
             </tr>
           </thead>
           <tbody v-for="(team, index) in paginatedTeams" :key="index">
-            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
+            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index,team.id)">
               <td>
                 <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" id="expand" class="expand-icon" @click="toggleRow(index)"></i>
               </td>
@@ -551,7 +551,7 @@ export default {
     }
   },
 
-    async toggleRow(index) {
+    async toggleRow(index,teamID) {
 
     if (this.activeRow === index) {
       this.activeRow = null; // Collapse the row if it's already expanded
@@ -578,7 +578,7 @@ export default {
         this.teamMembers = allUsers.filter((record) => {
           return (
             record.hasOwnProperty('gameTeam') &&
-            record.gameTeam === team.id
+            record.gameTeam === teamID
           );
         });
 

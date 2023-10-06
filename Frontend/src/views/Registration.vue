@@ -156,7 +156,14 @@ export default {
         userIDs.push(createUserResponse.data.data.id);
       }
 
-      const teamData = {
+      let teamData = '';
+      let url = ''
+      let url2 = ''
+
+    if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
+      url = CREATE_IDC_TEAM_BASE_URL
+      url2 = ADD_MEMBER_IDC_TEAM_BASE_URL
+      teamData = {
           teamName: this.teamName,
           ageGroup: this.ageGroup,
           //teacherName: this.teacherName,
@@ -164,24 +171,35 @@ export default {
           isQualifiedFinal: false,
           isQualifiedFinalSecondStage: false,
       };
-      let url = ''
-      let url2 = ''
-    if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
-      url = CREATE_IDC_TEAM_BASE_URL
-      url2 = ADD_MEMBER_IDC_TEAM_BASE_URL
-    } else if (this.competitionChoice === 'GA' || this.competitionChoice === 'Game Arena'){
+    } else if (this.competitionChoice === 'GAC' || this.competitionChoice === 'Game Arena'){
+      teamData = {
+          teamName: this.teamName,
+          ageGroup: this.ageGroup,
+          //teacherName: this.teacherName,
+          qualificationRoundScore: 0,
+          qualificationRoundPoint: 0,
+          qualificationRoundNumMatchesPlayed: 0,
+          isQualifiedForElimination:false
+      };
       url = CREATE_GAME_TEAM_BASE_URL
       url2 =ADD_MEMBER_GAME_TEAM_BASE_URL
     }
     try {
 
         const createTeamResponse = await axios.post(`${url}`, teamData, { headers });
-
-        const RegisterTeamData = {
-          id: createTeamResponse.data.data,
-          teamName: this.teamName,
-          userIds: userIDs
-        };
+        let RegisterTeamData = {};
+        if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
+          RegisterTeamData = {
+            id: createTeamResponse.data.data,
+            teamName: this.teamName,
+            userIds: userIDs
+          };
+        }else if (this.competitionChoice === 'GAC' || this.competitionChoice === 'Game Arena'){
+          RegisterTeamData = {
+            id: createTeamResponse.data.data,
+            userIds: userIDs
+          };
+        }
 
         //register created user to team
         const registerTeamResponse = await axios.put(`${url2}`, RegisterTeamData, { headers });
@@ -238,7 +256,7 @@ export default {
 .form-group {
   display: flex;
   align-items: center;
-  margin-right: 20px;
+  margin-right: 50px;
 }
 
 .form-group label {
@@ -253,7 +271,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 18px;
-  width: 250px;
+  width: 300px;
 }
 
 .json-display {

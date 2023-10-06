@@ -184,7 +184,7 @@
             </tr>
           </thead>
           <tbody v-for="(team, index) in paginatedTeams" :key="index">
-            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
+            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index,team.id)">
               <td>
                 <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" id="expand" class="expand-icon" @click="toggleRow(index)"></i>
               </td>
@@ -573,7 +573,8 @@ export default {
     }
   },
 
-    async toggleRow(index) {
+    async toggleRow(index,teamID) {
+
 
     if (this.activeRow === index) {
       this.activeRow = null; // Collapse the row if it's already expanded
@@ -581,6 +582,7 @@ export default {
     } else {
       this.activeRow = index;
       const team = this.filteredTeams[index];
+      console.log('team-',teamID)
       let token = "";
           if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
             token = Vue.$keycloak.token;
@@ -594,7 +596,7 @@ export default {
       try {
         // Make the API call here using the team ID as the request body
         const requestBody = {
-          id: team.id,
+          id: teamID,
         };
 
         const response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`, requestBody, { headers });
