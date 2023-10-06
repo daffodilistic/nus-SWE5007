@@ -55,7 +55,7 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
-          name: id_rsa-bastion
+          name: id_rsa
           known_hosts: ${{ secrets.PRODUCTION_SSH_FINGERPRINT }}
 
       - name: Upload artifact to VM instance
