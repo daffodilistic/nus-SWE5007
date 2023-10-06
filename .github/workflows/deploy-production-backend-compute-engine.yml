@@ -81,7 +81,7 @@ jobs:
           ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
           " \
             cd $DEPLOY_DIRECTORY/${{ matrix.services }}/docker/volumes/${{ matrix.services }}/ && \
-            rm -rf ./
+            rm -rf .*
           "
 
       - name: Upload JAR file to VM
