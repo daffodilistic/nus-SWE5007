@@ -90,12 +90,12 @@
                       <th>Experience (Year)</th>
                     </tr>
                   </thead>
-                  <!--
+
                   <tbody>
-                    <tr v-if="team.userResponses.length === 0">
+                    <tr v-if="teamMembers.length === 0">
                       <td colspan="11"  style="color: red;">0 member in the team</td>
                     </tr>
-                    <tr v-else v-for="(user, userIndex) in team.userResponses">
+                    <tr v-else v-for="(user, userIndex) in teamMembers">
                       <td> {{ userIndex + 1 }} </td>
                       <td> {{ user.firstName }} </td>
                       <td> {{ user.lastName }} </td>
@@ -107,7 +107,7 @@
                       <td> {{ user.schoolName }} </td>
                       <td> {{ user.yearsOfExp }} </td>
                     </tr>
-                  </tbody>-->
+                  </tbody>
                 </table>
               </td>
             </tr>
@@ -163,7 +163,7 @@
 
 <script>
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL} from '@/api';
+import {DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_USER_INFO_BASE_URL} from '@/api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -171,13 +171,14 @@ export default {
   data() {
     return {
       competitionChoiceOptions: competitionChoiceOptions,
-      gameTeamId: "20d57366-a160-4166-867d-4f31cc60f350",
+      gameTeamId: "",
       team:'',
       presentationList: [],
       downloadFileList: [],
       downloadAdminFileList: [],
       selectedFile: null, // Initialize the selectedFile variable
-      gameTeamList:[]
+      gameTeamList:[],
+      teamMembers:[]
     };
   },
   computed: {
@@ -194,9 +195,53 @@ export default {
     return ageGroupMap;
   },
   },
-
+  async mounted() {
+    this.getTeamID();
+  },
   methods: {
+    async getTeamID(){
+      let token='';
+        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+          token = Vue.$keycloak.token;
+        }else {
+          token = "mockedToken";//for unit test
+        }
 
+        const tokenData = Vue.$keycloak.tokenParsed;
+
+        const userName = tokenData.preferred_username;
+
+        // Assign the user's name to a variable or use it as needed
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+        const team = response.data.data;
+         console.log(userName,'team',team)
+
+        const filteredUser = team.filter((record) => record.firstName===userName);
+        this.gameTeamId = filteredUser[0].gameTeam;
+
+         this.teamMembers = team.filter((record) => {
+          return (
+            record.hasOwnProperty('gameTeam') &&
+            record.gameTeam === this.gameTeamId
+          );
+        });
+
+        const requestBody = {
+          id: this.gameTeamId,
+        };
+         this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+         this.team  = this.teamsData.data.data;
+         console.log('this.team',this.team)
+      } catch (error) {
+        // Handle any errors that might occur during the request
+        console.error("Error fetching users:", error);
+      }
+    },
     formatDateTime(dateTime) {
       const date = new Date(dateTime);
       const day = String(date.getDate()).padStart(2, '0');

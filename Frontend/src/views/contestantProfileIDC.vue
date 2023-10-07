@@ -59,7 +59,7 @@
             <div class="form-group">
               <label><i class="fa fa-users fa-lg" style='color: rgb(65, 127, 202)'></i></label>
               <label class="label-color">Team Name :</label>
-              {{ team.teamName }}
+              {{ team.teamName}}
             </div>
           </td>
           <td>
@@ -230,7 +230,7 @@
 <script>
 import contestantProfileGA from './contestantProfileGA.vue'; // Import your Tab1 component
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL} from '@/api';
+import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL,GET_ALL_USER_INFO_BASE_URL} from '@/api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -239,7 +239,7 @@ export default {
     return {
       competitionChoiceOptions: competitionChoiceOptions,
       selectedCompetition: "Innovation Design Challenge",
-      idcTeamId: "c8bf6a0b-ea4c-4b0e-adde-a4d0d7de9e10",
+      idcTeamId: "",
       team:'',
       showHistoryModal: false,
       showUploadModal: false,
@@ -248,8 +248,11 @@ export default {
       downloadFileList: [],
       downloadAdminFileList: [],
       selectedFile: null, // Initialize the selectedFile variable
+
+
     };
   },
+
   computed: {
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
@@ -265,29 +268,43 @@ export default {
   },
   },
    async mounted() {
-     let token='';
-     if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-    const requestBody = {
-      id: this.idcTeamId,
-    };
-
-    try {
-      this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
-     this.team  = this.teamsData.data.data;
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
+    this.getTeamID();
   },
 
   methods: {
+    async getTeamID(){
+      let token='';
+        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+          token = Vue.$keycloak.token;
+        }else {
+          token = "mockedToken";//for unit test
+        }
+
+        const tokenData = Vue.$keycloak.tokenParsed;
+
+        const userName = tokenData.preferred_username;
+
+        // Assign the user's name to a variable or use it as needed
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      try {
+        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+        const team = response.data.data;
+        const filteredUser = team.filter((record) => record.firstName===userName);
+        this.idcTeamId = filteredUser[0].idcTeam;
+
+        const requestBody = {
+          id: this.idcTeamId,
+        };
+         this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+         this.team  = this.teamsData.data.data;
+      } catch (error) {
+        // Handle any errors that might occur during the request
+        console.error("Error fetching users:", error);
+      }
+    },
     getComponent(tab) {
       switch (tab) {
         case 'Innovation Design Challenge':
@@ -312,7 +329,7 @@ export default {
       return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
   },
     async viewScore(teamId) {
-      console.log(teamId)
+
        let token='';
        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
             token = Vue.$keycloak.token;
@@ -386,7 +403,7 @@ export default {
       } else if (team.isQualifiedPromo) {
         qualificationStatus = "Promotional Round";
       } else {
-        qualificationStatus = "Not Qualified";
+        qualificationStatus = "Preliminary Round";
       }
 
       return qualificationStatus;
@@ -408,11 +425,8 @@ export default {
         id: this.idcTeamId,
       };
       try {
-
             this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
             this.team  = this.teamsData.data.data;
-            console.log('teamsData',this.team)
-
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -447,16 +461,11 @@ export default {
     onFileChange(event) {
       // Handle the file change event here
       this.selectedFile = event.target.files[0];
-      console.log("Selected File:", selectedFile);
-      console.log("File Name:", selectedFile.name);
-      console.log("File Size:", selectedFile.size);
-      console.log("File Type:", selectedFile.type);
       // You can perform any further processing with the selected file here
     },
     async upload(team) {
       let token='';
       if (!this.selectedFile) {
-        console.log("No file selected.");
         return;
       }
        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
@@ -487,7 +496,6 @@ export default {
         // Define the onload event handler for the reader
         reader.onload = async (event) => {
           requestBody.fileContent = event.target.result;
-          console.log('requestBody:', requestBody.fileContent);
 
           let response = '';
 
