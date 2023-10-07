@@ -17,7 +17,7 @@ export const DELETE_IDC_TEAM_BASE_URL = 'http://localhost:8082/idcteam/delete-te
 //GAME TEAM
 export const GET_ALL_GAME_TEAM_BASE_URL = 'http://localhost:8083/games/view-all-teams'
 export const VIEW_GAME_TEAM_BASE_URL = ''
-export const UPDATE_GAME_TEAM_BASE_URL = ''
+export const UPDATE_GAME_TEAM_BASE_URL = 'http://localhost:8083/games/update-team'
 export const ADD_MEMBER_GAME_TEAM_BASE_URL = 'http://localhost:8083/games/assign-user'
 export const CREATE_GAME_TEAM_BASE_URL = 'http://localhost:8083/games/create-team'
 export const DELETE_GAME_TEAM_BASE_URL =''
