@@ -4,7 +4,7 @@
       <router-link to="/" class="menu-item">Home</router-link>
       <router-link to="/registration" class="menu-item">Register Team</router-link>
       <router-link v-if="authenticated && (userRoles.includes('judge') || userRoles.includes('admin'))" to="/mainScore" class="menu-item">Score</router-link>
-      <router-link v-if="authenticated && userRoles.includes('participant')" to="/contestantProfile" class="menu-item">Team Profile</router-link>
+      <router-link v-if="authenticated && (userRoles.includes('participant') && !userRoles.includes('judge') && !userRoles.includes('admin'))" to="/contestantProfile" class="menu-item">Team Profile</router-link>
       <router-link v-if="authenticated && userRoles.includes('admin')" to="/upload" class="menu-item">Admin Upload</router-link>
       <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageContestant" class="menu-item">Manage Contestant</router-link>
         <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageTeam" class="menu-item">Manage Team</router-link>
@@ -18,7 +18,7 @@
     <div>
       <!-- Add a row for the welcome message -->
       <div v-if="authenticated" class="welcome-message">
-       Hi, <span class="bold-text">{{ userName }}</span> &nbsp;&nbsp;&nbsp;Role: <span class="bold-text">{{ capitalizeFirstLetter(userRoles[3]) }}</span>
+       Hi, <span class="bold-text">{{ userName }}</span> &nbsp;&nbsp;&nbsp;Role: <span class="bold-text">{{  capitalizeFirstLetter(roleName[0])}}</span>
       </div>
     </div>
     <router-view @authenticated="setAuthenticated" />
@@ -36,9 +36,17 @@ export default {
       authenticated: false,
       userRoles: [],
       userName:'',
+      roleName:[]
     };
   },
   methods: {
+  filterRoles() {
+      // Define the allowed roles
+      const allowedRoles = ["judge", "admin", "participant"];
+
+      // Filter the userRoles array to keep only the allowed roles
+      this.roleName = this.userRoles.filter((role) => allowedRoles.includes(role));
+    },
     capitalizeFirstLetter(str) {
       if (!str) return ''; // Handle empty or undefined string
       return str.charAt(0).toUpperCase() + str.slice(1);
@@ -49,6 +57,7 @@ export default {
       if (this.authenticated) {
 
         this.checkAuthentication();
+         this.filterRoles();
       }
     },
     checkAuthentication() {
