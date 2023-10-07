@@ -3,7 +3,7 @@
     <nav class="top-menu">
       <router-link to="/" class="menu-item">Home</router-link>
       <router-link to="/registration" class="menu-item">Register Team</router-link>
-      <router-link v-if="authenticated && userRoles.includes('judge')" to="/mainScore" class="menu-item">Score</router-link>
+      <router-link v-if="authenticated && (userRoles.includes('judge') || userRoles.includes('admin'))" to="/mainScore" class="menu-item">Score</router-link>
       <router-link v-if="authenticated && userRoles.includes('participant')" to="/contestantProfile" class="menu-item">Team Profile</router-link>
       <router-link v-if="authenticated && userRoles.includes('admin')" to="/upload" class="menu-item">Admin Upload</router-link>
       <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageContestant" class="menu-item">Manage Contestant</router-link>
@@ -15,6 +15,12 @@
 
       <router-link v-else to="/login" v-on:click.native="login()" class="menu-item">Login</router-link>
     </nav>
+    <div>
+      <!-- Add a row for the welcome message -->
+      <div v-if="authenticated" class="welcome-message">
+       Hi, <span class="bold-text">{{ userName }}</span> &nbsp;&nbsp;&nbsp;Role: <span class="bold-text">{{ capitalizeFirstLetter(userRoles[3]) }}</span>
+      </div>
+    </div>
     <router-view @authenticated="setAuthenticated" />
   </div>
 </template>
@@ -23,17 +29,25 @@
 import Vue from 'vue';
 
 export default {
+
   name: 'App',
   data() {
     return {
       authenticated: false,
-      userRoles: []
+      userRoles: [],
+      userName:'',
     };
   },
   methods: {
+    capitalizeFirstLetter(str) {
+      if (!str) return ''; // Handle empty or undefined string
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+
     setAuthenticated(status) {
       this.authenticated = status;
       if (this.authenticated) {
+
         this.checkAuthentication();
       }
     },
@@ -41,6 +55,10 @@ export default {
       if (this.authenticated) {
         const tokenData = Vue.$keycloak.tokenParsed;
         this.userRoles = tokenData.realm_access.roles;
+        const userName = tokenData.preferred_username;
+
+        // Assign the user's name to a variable or use it as needed
+        this.userName = userName;
       }
     },
     logout() {
@@ -50,7 +68,7 @@ export default {
     login() {
       this.authenticated = true;
       Vue.$keycloak.login();
-    }
+    },
   },
   created() {
     this.checkAuthentication();
@@ -59,6 +77,9 @@ export default {
 </script>
 
 <style scoped>
+.bold-text {
+  font-weight: bold; /* Make the text bold */
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -110,5 +131,17 @@ export default {
     border-left: none;
     border-top: 1px solid #dcdcdc;
   }
+}
+
+.welcome-message {
+
+  padding: 5x; /* Padding around the message */
+  text-align: right; /* Center-align the text */
+  font-size: 15px; /* Font size */
+  color: #002c72; /* Text color */
+  margin-right:10px;
+  margin-bottom:10px;
+  margin-right:10px;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 </style>
