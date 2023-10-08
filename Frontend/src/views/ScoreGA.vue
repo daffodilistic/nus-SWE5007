@@ -368,6 +368,30 @@
         accordion="my-accordion"
         role="tabpanel"
       >
+        <table class="instruction-table">
+          <tr>
+            <u>Instructions :</u>
+          </tr>
+          <tr>
+            1. Click on
+            <b-icon icon="play-circle"></b-icon>
+            to start the match.
+          </tr>
+          <tr>
+            <td>
+              2. After the match is completed, enter score for participating
+              teams
+              <b-icon icon="arrow-right-circle-fill"></b-icon>
+              Click on
+              <b-icon icon="save"></b-icon>
+              to submit the score.
+            </td>
+          </tr>
+          <tr>
+            <td>3. Repeat steps 1 to 2 for all teams.</td>
+          </tr>
+        </table>
+
         <b-button
           @click="startElimination()"
           variant="outline-primary"

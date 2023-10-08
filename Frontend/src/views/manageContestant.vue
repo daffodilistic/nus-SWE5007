@@ -113,7 +113,16 @@
                     type="text"
                     v-model="user.editingUserName"
                     class="form-control editing-textbox"
+                    :class="{
+                      'is-invalid': !isUserNameAvailable(user.editingUserName),
+                    }"
                   />
+                  <div
+                    v-if="!isUserNameAvailable(user.editingUserName)"
+                    class="invalid-feedback"
+                  >
+                    Username is not available.
+                  </div>
                 </td>
                 <td v-if="!user.editing">
                   {{ user.firstName }}
@@ -442,6 +451,16 @@ export default {
     }
   },
   methods: {
+    isUserNameAvailable(username) {
+      // Check if the username exists in any user's firstname property in the users array
+
+      return !this.users.some(
+        (user) =>
+          user.firstName &&
+          username &&
+          user.firstName.toLowerCase() === username.toLowerCase()
+      );
+    },
     async toggleRow(index) {
       if (this.activeRow === index) {
         this.activeRow = null; // Collapse the row if it's already expanded

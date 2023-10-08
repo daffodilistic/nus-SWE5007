@@ -43,23 +43,29 @@
         <tr>
           2. Click on
           <b-icon icon="play-circle"></b-icon>
-          to start the match
+          to start the match.
         </tr>
         <tr>
-          <td>3. Click on the team name to declare the winner.</td>
           <td>
-            <b-button
-              id="addNewTechComp"
-              variant="outline-primary"
-              @click="addNewTechComp"
-              ><b-icon
-                icon="person-plus"
-                v-b-tooltip.hover="'Click to create new techComp'"
-              ></b-icon>
-            </b-button>
+            3. Click on either the <span style="color: red">Red</span> or
+            <span style="color: blue">Blue</span> team name to declare the
+            winner.
           </td>
         </tr>
       </table>
+      <div class="d-flex justify-content-end">
+        <b-button
+          id="addNewTechComp"
+          variant="outline-primary"
+          @click="addNewTechComp"
+        >
+          <b-icon
+            icon="person-plus"
+            v-b-tooltip.hover="'Click to create new techComp'"
+          ></b-icon>
+        </b-button>
+      </div>
+      <br />
       <table class="main-table">
         <thead>
           <tr>
@@ -131,7 +137,7 @@
                   <span v-if="techComp.gameOutcome === 'win'">
                     <i class="fas fa-star gold-star"></i><br />
                   </span>
-                  <span style="color: red">{{
+                  <span style="color: rgba(0, 0, 255, 0.744)">{{
                     techComp.gameTeamIdHostName
                   }}</span>
                 </template>

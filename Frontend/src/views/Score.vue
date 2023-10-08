@@ -90,6 +90,28 @@
         </tr>
       </table>
     </div>
+    <table class="instruction-table">
+      <tr>
+        <u>Instructions :</u>
+      </tr>
+      <tr>
+        1. Select the stage to be scored using the 'Select Stage Name' dropdown
+        box.
+      </tr>
+      <tr>
+        2. Click on
+        <b-icon icon="folder2-open"></b-icon>
+        to view team submission.
+      </tr>
+      <tr>
+        3. Click on
+        <i :class="'fas fa-plus'" class="expand-icon"></i>
+        to view scoring matrics of the team & follow the steps.
+      </tr>
+      <tr>
+        4. Repeat steps 1 to 3 for all teams.
+      </tr>
+    </table>
     <div v-if="teams && teams.length > 0">
       <p>Showing {{ totalRecords }} records</p>
 
@@ -993,5 +1015,14 @@ input.form-control.editing-textbox {
   content: "\f107"; /* Replace with the correct icon code */
   margin-left: 5px; /* Add some spacing between the text and the icon */
   color: #555; /* Set the color of the icon */
+}
+
+.instruction-table {
+  text-align: left;
+  font-size: 14px;
+  color: #120b51;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 </style>
