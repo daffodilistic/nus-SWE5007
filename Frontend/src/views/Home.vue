@@ -1,24 +1,27 @@
 <template>
   <div class="home">
     <div class="content">
-      <h1>Welcome to <br><br>Robotics Innovation Challenge (RIC) <br><br>Singapore Portal</h1>
-     <!-- <p class="construction-text">This page is still under construction</p>-->
+      <h1>
+        Welcome to <br /><br />Robotics Innovation Challenge (RIC)
+        <br /><br />Singapore Portal
+      </h1>
+      <!-- <p class="construction-text">This page is still under construction</p>-->
     </div>
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from "vue";
 export default {
   data() {
-    if (Vue.$keycloak.token.length>0){
-      console.log(Vue.$keycloak.token)
+    if (Vue.$keycloak.token.length > 0) {
+      console.log(Vue.$keycloak.token);
       this.$emit("authenticated", true);
       // this.$router.replace({ name: "Secure" });
     }
     return {};
   },
-  name: 'Home',
+  name: "Home",
   methods: {
     // Your methods here
   },
@@ -28,7 +31,7 @@ export default {
 <style scoped>
 /* Set the background image and adjust the background properties */
 .home {
-  background-image: url('../assets/BG.jpg'); /* Replace with your image path */
+  background-image: url("../assets/BG.jpg"); /* Replace with your image path */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

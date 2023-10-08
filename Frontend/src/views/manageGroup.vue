@@ -1,6 +1,14 @@
 <template>
-  <b-tabs >
-    <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadGroup()">
+  <b-tabs>
+    <b-tab
+      v-for="option in filteredCompetitionChoices"
+      :key="option.id"
+      :title="option.text"
+      @click="
+        selectedCompetition = option.text;
+        loadGroup();
+      "
+    >
       <div>
         <!-- Add Member Modal -->
         <b-modal
@@ -8,169 +16,288 @@
           modal-class="custom-modal"
           hide-footer
         >
-        <!-- Search bar for filtering users -->
-        <div class="search-container">
-            <p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p>&nbsp;&nbsp;
+          <!-- Search bar for filtering users -->
+          <div class="search-container">
+            <p class="h3 mb-2">
+              <b-icon icon="search" style="color: rgb(65, 127, 202)"></b-icon>
+            </p>
+            &nbsp;&nbsp;
             <input
               type="text"
               v-model="searchQueryModal"
               placeholder="Search team Name"
               class="search-box"
-            >
+            />
           </div>
           <p>
-            Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }}
-            to {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
+            Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }} to
+            {{
+              Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal)
+            }}
             of {{ totalRecordsModal }} records
           </p>
 
           <div class="pagination">
-            <button @click="gotoPageModal(currentPageModal - 1)" :disabled="currentPageModal === 1" class="page-button">
-              <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i>
+            <button
+              @click="gotoPageModal(currentPageModal - 1)"
+              :disabled="currentPageModal === 1"
+              class="page-button"
+            >
+              <i
+                class="fas fa-chevron-left icon"
+                style="color: rgb(65, 127, 202)"
+              ></i>
             </button>
             <span>Page {{ currentPageModal }} of {{ totalPagesModal }}</span>
-            <button @click="gotoPageModal(currentPageModal + 1)" :disabled="currentPageModal === totalPagesModal" class="page-button">
-              <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i>
+            <button
+              @click="gotoPageModal(currentPageModal + 1)"
+              :disabled="currentPageModal === totalPagesModal"
+              class="page-button"
+            >
+              <i
+                class="fas fa-chevron-right icon"
+                style="color: rgb(65, 127, 202)"
+              ></i>
             </button>
-          </div><br>
-            <!-- List of users to be displayed inside the modal -->
-            <table class="modal-table">
-                  <thead>
-                    <tr>
-                      <th>Select</th>
-                      <th>Team Name</th>
-                      <!--<th>Age Group</th>-->
-                     <!-- <th>Qualification Status</th>-->
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(team, userIndex) in paginatedModalTeamList" :key="team.id">
-
-                      <td>
-                      <input
-                        type="checkbox"
-                        :checked="selectedTeams.includes(team.id)"
-                        @change="toggleTeamSelection(team.id)"
-                      />
-                    </td>
-                      <!--<td>{{ userIndex + 1 }}</td>-->
-                      <td>{{ team.teamName }}</td>
-                      <!--<td>{{ team.ageGroup }}</td>-->
-                      <!--<td>Final 1st Stage</td>-->
-                    </tr>
-                    <tr></tr>
-                  </tbody>
-                </table>
-                <div class="text-center">
-                  <button @click="addTeamsToGroup" class="add-member-button" v-b-tooltip.hover="'Click to save entry'">Save</button>
-                </div>
+          </div>
+          <br />
+          <!-- List of users to be displayed inside the modal -->
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Team Name</th>
+                <!--<th>Age Group</th>-->
+                <!-- <th>Qualification Status</th>-->
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(team, userIndex) in paginatedModalTeamList"
+                :key="team.id"
+              >
+                <td>
+                  <input
+                    type="checkbox"
+                    :checked="selectedTeams.includes(team.id)"
+                    @change="toggleTeamSelection(team.id)"
+                  />
+                </td>
+                <!--<td>{{ userIndex + 1 }}</td>-->
+                <td>{{ team.teamName }}</td>
+                <!--<td>{{ team.ageGroup }}</td>-->
+                <!--<td>Final 1st Stage</td>-->
+              </tr>
+              <tr></tr>
+            </tbody>
+          </table>
+          <div class="text-center">
+            <button
+              @click="addTeamsToGroup"
+              class="add-member-button"
+              v-b-tooltip.hover="'Click to save entry'"
+            >
+              Save
+            </button>
+          </div>
         </b-modal>
-        <br><br>
+        <br /><br />
         <!--END OF MODAL-->
         <div class="search-container">
           <table>
             <tr>
-              <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
-              <td><input type="text" v-model="searchQuery" placeholder="Search group Name" class="search-box"></td>
+              <td>
+                <p class="h3 mb-2">
+                  <b-icon
+                    icon="search"
+                    style="color: rgb(65, 127, 202)"
+                  ></b-icon>
+                </p>
+              </td>
+              &nbsp;
+              <td>
+                <input
+                  type="text"
+                  v-model="searchQuery"
+                  placeholder="Search group Name"
+                  class="search-box"
+                />
+              </td>
             </tr>
           </table>
         </div>
-         <div class="add-button">
-          <b-button variant="outline-primary" size="lg" @click="addNewGroup"><b-icon icon="file-earmark-plus" v-b-tooltip.hover="'Click to create new group'"></b-icon>
-          </b-button><br>
+        <div class="add-button">
+          <b-button variant="outline-primary" size="lg" @click="addNewGroup"
+            ><b-icon
+              icon="file-earmark-plus"
+              v-b-tooltip.hover="'Click to create new group'"
+            ></b-icon> </b-button
+          ><br />
         </div>
         <div v-if="groups && groups.length > 0">
-        <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
-        <div class="pagination">
-          <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-            <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-          </button>
-          <span>Page {{ currentPage }} of {{ totalPages }}</span>
-          <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-            <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-          </button>
+          <p>
+            Showing {{ startIndex }} to {{ endIndex }} of
+            {{ totalRecords }} records
+          </p>
+          <div class="pagination">
+            <button
+              @click="gotoPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="page-button"
+            >
+              <i
+                class="fas fa-chevron-left icon"
+                style="color: rgb(65, 127, 202)"
+              ></i>
+              <!-- Font Awesome "Previous" icon -->
+            </button>
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+            <button
+              @click="gotoPage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="page-button"
+            >
+              <i
+                class="fas fa-chevron-right icon"
+                style="color: rgb(65, 127, 202)"
+              ></i>
+              <!-- Font Awesome "Next" icon -->
+            </button>
+          </div>
+          <table class="main-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>S/No</th>
+                <th>Group Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody v-for="(group, index) in paginatedTeams" :key="index">
+              <tr
+                :class="{
+                  'parent-row': true,
+                  'active-row': activeRow === index,
+                }"
+                @click="group.editing ? null : toggleRow(index)"
+              >
+                <td>
+                  <i
+                    :class="
+                      activeRow === index ? 'fas fa-minus' : 'fas fa-plus'
+                    "
+                    class="expand-icon"
+                  ></i>
+                </td>
+                <td>{{ startIndex + index }}</td>
+                <td v-if="!group.editing">
+                  {{ group.groupName }}
+                </td>
+                <td v-else>
+                  <input
+                    type="text"
+                    v-model="group.editingGroupName"
+                    class="form-control editing-textbox"
+                  />
+                </td>
+                <td>
+                  <b-button
+                    variant="outline-primary"
+                    @click="fetchTeams(group.id, group.groupName)"
+                    v-b-tooltip.hover="'Click to add / remove teams from group'"
+                  >
+                    <b-icon icon="person-plus"></b-icon>
+                  </b-button>
+                  <!-- Edit Icon -->
+                  <b-button
+                    @click="editGroup(startIndex + index - 1)"
+                    variant="outline-primary"
+                    class="delete-button"
+                    v-b-tooltip.hover="'Click to edit group details'"
+                  >
+                    <span v-if="!group.editing"
+                      ><b-icon icon="pencil"></b-icon
+                    ></span>
+                    <span v-else><b-icon icon="save"></b-icon></span>
+                  </b-button>
+                  <!-- Delete Icon -->
+                  <b-button
+                    class="delete-button"
+                    variant="outline-primary"
+                    @click="deleteGroup(startIndex + index - 1)"
+                    v-b-tooltip.hover="'Click to delete group'"
+                  >
+                    <b-icon icon="trash"></b-icon>
+                  </b-button>
+                </td>
+              </tr>
+              <!-- Child rows -->
+              <tr v-if="activeRow === index" class="child-row">
+                <td :colspan="10">
+                  <!-- Use colspan to span all columns in the row -->
+                  <table class="team-table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>No.</th>
+                        <th>Team Name</th>
+                        <th>Age Group</th>
+                        <!--<th>Qualification Status</th>-->
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-if="groupMembers.length === 0">
+                        <td colspan="11" style="color: red">
+                          0 team in the group
+                        </td>
+                      </tr>
+                      <tr
+                        v-else
+                        v-for="(team, userIndex) in groupMembers"
+                        :key="userIndex"
+                        class="child-row"
+                      >
+                        <td>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                        <td>{{ userIndex + 1 }}</td>
+                        <td>{{ team.teamName }}</td>
+                        <td>{{ ageGroupTextMap[team.ageGroup] }}</td>
+                        <!--<td> Final 1st Stage </td>-->
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button
+              @click="gotoPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="page-button"
+            >
+              <i
+                class="fas fa-chevron-left icon"
+                style="color: rgb(65, 127, 202)"
+              ></i>
+              <!-- Font Awesome "Previous" icon -->
+            </button>
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+            <button
+              @click="gotoPage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="page-button"
+            >
+              <i
+                class="fas fa-chevron-right icon"
+                style="color: rgb(65, 127, 202)"
+              ></i>
+              <!-- Font Awesome "Next" icon -->
+            </button>
+          </div>
         </div>
-        <table class="main-table">
-          <thead>
-            <tr>
-              <th></th>
-               <th>S/No</th>
-              <th>Group Name</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody v-for="(group, index) in paginatedTeams" :key="index">
-            <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="group.editing ? null : toggleRow(index)">
-              <td>
-                <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon"></i>
-              </td>
-              <td>{{ startIndex + index }}</td>
-              <td v-if="!group.editing">
-                {{ group.groupName }}
-              </td>
-              <td v-else>
-                <input type="text" v-model="group.editingGroupName" class="form-control editing-textbox" />
-              </td>
-              <td>
-                <b-button variant="outline-primary" @click="fetchTeams(group.id,group.groupName)" v-b-tooltip.hover="'Click to add / remove teams from group'">
-                  <b-icon icon="person-plus" ></b-icon>
-                </b-button>
-                <!-- Edit Icon -->
-                <b-button @click="editGroup(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit group details'">
-                  <span v-if="!group.editing"><b-icon icon="pencil"></b-icon></span>
-                  <span v-else><b-icon icon="save"></b-icon></span>
-                </b-button>
-                <!-- Delete Icon -->
-                <b-button
-                class="delete-button"
-                variant="outline-primary"
-                @click="deleteGroup(startIndex + index -1)" v-b-tooltip.hover="'Click to delete group'"
-                >
-                  <b-icon icon="trash"></b-icon>
-                </b-button>
-              </td>
-            </tr>
-            <!-- Child rows -->
-            <tr v-if="activeRow === index" class="child-row">
-              <td :colspan="10"> <!-- Use colspan to span all columns in the row -->
-                <table class="team-table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>No.</th>
-                      <th>Team Name</th>
-                      <th>Age Group</th>
-                       <!--<th>Qualification Status</th>-->
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="groupMembers.length === 0">
-                      <td colspan="11"  style="color: red;">0 team in the group</td>
-                    </tr>
-                    <tr v-else v-for="(team, userIndex) in groupMembers" :key="userIndex" class="child-row">
-                      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                      <td> {{ userIndex + 1 }} </td>
-                      <td> {{ team.teamName }} </td>
-                      <td> {{ ageGroupTextMap[team.ageGroup] }} </td>
-                      <!--<td> Final 1st Stage </td>-->
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="pagination">
-        <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-          <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-        </button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-          <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-        </button>
-      </div>
-      </div>
-      <div v-else>
+        <div v-else>
           <!-- Show a loading message or spinner while the data is being fetched -->
           <div class="loader-container">
             <i class="fas fa-spinner fa-spin"></i>
@@ -181,27 +308,39 @@
   </b-tabs>
 </template>
 
-
 <script>
 import axios from "axios";
-import { ageGroupOptions, competitionChoiceOptions} from "../dropdownOptions";
-import { DELETE_IDC_GROUP_BASE_URL, CREATE_IDC_GROUP_BASE_URL,UPDATE_IDC_GROUP_BASE_URL,VIEW_GAME_GROUP_BASE_URL,VIEW_IDC_GROUP_BASE_URL,GET_ALL_IDC_GROUP_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_IDC_TEAM_BASE_URL,ADD_TEAM_IDC_GROUP_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,ADD_TEAM_GAME_GROUP_BASE_URL} from '@/api';
-import Swal from 'sweetalert2';
-import Vue from 'vue'
+import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
+import {
+  DELETE_IDC_GROUP_BASE_URL,
+  CREATE_IDC_GROUP_BASE_URL,
+  UPDATE_IDC_GROUP_BASE_URL,
+  UPDATE_GAME_GROUP_BASE_URL,
+  VIEW_IDC_GROUP_BASE_URL,
+  GET_ALL_IDC_GROUP_BASE_URL,
+  GET_ALL_GAME_GROUP_BASE_URL,
+  GET_ALL_IDC_TEAM_BASE_URL,
+  ADD_TEAM_IDC_GROUP_BASE_URL,
+  GET_ALL_GAME_TEAM_BASE_URL,
+  ADD_TEAM_GAME_GROUP_BASE_URL,
+  CREATE_GAME_GROUP_BASE_URL,
+} from "@/api";
+import Swal from "sweetalert2";
+import Vue from "vue";
 
 export default {
   head() {
     return {
       link: [
         {
-          rel: 'stylesheet',
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
-          integrity: 'sha512-...',
-          crossorigin: 'anonymous',
-          referrerpolicy: 'no-referrer',
+          rel: "stylesheet",
+          href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+          integrity: "sha512-...",
+          crossorigin: "anonymous",
+          referrerpolicy: "no-referrer",
         },
       ],
-    }
+    };
   },
 
   data() {
@@ -212,17 +351,17 @@ export default {
       currentGroupId: "",
       currentGroupName: "",
       selectedTeams: [],
-      searchQuery: '',
-      searchQueryModal: '',
-      groups:[],
-      gameTeamResponses:[],
+      searchQuery: "",
+      searchQueryModal: "",
+      groups: [],
+      gameTeamResponses: [],
       activeRow: null,
       itemsPerPage: 10, // Number of groups per page
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       showAddTeamModal: false,
       teamList: [],
-      groupMembers:[],
+      groupMembers: [],
       newChildRow: {
         teamName: "",
         ageGroup: "",
@@ -231,25 +370,26 @@ export default {
   },
   computed: {
     totalRecordsModal() {
-      console.log('length',this.filteredModalTeamList.length)
+      console.log("length", this.filteredModalTeamList.length);
       return this.filteredModalTeamList.length;
-
     },
     filteredGroups() {
-    // If the groups data is not available yet, return an empty array
-    if (!this.groups || this.groups.length === 0) {
-      return [];
-    }
+      // If the groups data is not available yet, return an empty array
+      if (!this.groups || this.groups.length === 0) {
+        return [];
+      }
 
-    // If the search query is empty, show all groups
-    if (this.searchQuery.trim() === '') {
-      return this.groups;
-    }
+      // If the search query is empty, show all groups
+      if (this.searchQuery.trim() === "") {
+        return this.groups;
+      }
 
-    // Otherwise, filter groups based on the search query
-    const query = this.searchQuery.trim().toLowerCase();
-    return this.groups.filter((group) => group.groupName.toLowerCase().includes(query));
-  },
+      // Otherwise, filter groups based on the search query
+      const query = this.searchQuery.trim().toLowerCase();
+      return this.groups.filter((group) =>
+        group.groupName.toLowerCase().includes(query)
+      );
+    },
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
     },
@@ -282,46 +422,50 @@ export default {
         return [];
       }
 
-    // Apply search query filter
-    const query = this.searchQueryModal.trim().toLowerCase();
-    if (!query) {
-      return this.teamList; // Return the entire team list if the query is empty
-    }
+      // Apply search query filter
+      const query = this.searchQueryModal.trim().toLowerCase();
+      if (!query) {
+        return this.teamList; // Return the entire team list if the query is empty
+      }
 
-    return this.teamList.filter((team) => {
-      // Check if team.teamName and team.lastName are defined before using toLowerCase()
-      const teamName = team.teamName ? team.teamName.toLowerCase() : '';
-      const lastName = team.lastName ? team.lastName.toLowerCase() : '';
+      return this.teamList.filter((team) => {
+        // Check if team.teamName and team.lastName are defined before using toLowerCase()
+        const teamName = team.teamName ? team.teamName.toLowerCase() : "";
+        const lastName = team.lastName ? team.lastName.toLowerCase() : "";
 
-      return teamName.includes(query) || lastName.includes(query);
-    });
-  },
-  paginatedModalTeamList() {
-    const startIndex = (this.currentPageModal - 1) * this.itemsPerPageModal;
-    const endIndex = startIndex + this.itemsPerPageModal;
-    return this.filteredModalTeamList.slice(startIndex, endIndex);
-  },
-  totalPagesModal() {
-    console.log(this.filteredModalTeamList.length / this.itemsPerPageModal)
-    return Math.ceil(this.filteredModalTeamList.length / this.itemsPerPageModal);
-  },
-  ageGroupTextMap() {
-    // Define a mapping of age group values to their corresponding text
-    const ageGroupMap = {
-      'OC': 'Open Category: 8-15 years old',
-      'JC': 'Junior Category: 8-12 years old',
-      // Add more entries as needed for other age groups
-    };
-    return ageGroupMap;
-  },
+        return teamName.includes(query) || lastName.includes(query);
+      });
+    },
+    paginatedModalTeamList() {
+      const startIndex = (this.currentPageModal - 1) * this.itemsPerPageModal;
+      const endIndex = startIndex + this.itemsPerPageModal;
+      return this.filteredModalTeamList.slice(startIndex, endIndex);
+    },
+    totalPagesModal() {
+      console.log(this.filteredModalTeamList.length / this.itemsPerPageModal);
+      return Math.ceil(
+        this.filteredModalTeamList.length / this.itemsPerPageModal
+      );
+    },
+    ageGroupTextMap() {
+      // Define a mapping of age group values to their corresponding text
+      const ageGroupMap = {
+        OC: "Open Category: 8-15 years old",
+        JC: "Junior Category: 8-12 years old",
+        // Add more entries as needed for other age groups
+      };
+      return ageGroupMap;
+    },
   },
   async mounted() {
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${Vue.$keycloak.token}`,
     };
     try {
-      this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, { headers });
+      this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, {
+        headers,
+      });
       this.groups = this.groupsData.data.data;
     } catch (error) {
       // Handle any errors that might occur during the request
@@ -330,58 +474,62 @@ export default {
   },
   methods: {
     async editGroup(index) {
-        const group = this.filteredGroups[index];
-        if (group.editing) {
+      const group = this.filteredGroups[index];
+      if (group.editing) {
+        // Save the changes
+        group.groupName = group.editingGroupName;
 
-          // Save the changes
-          group.groupName = group.editingGroupName;
+        group.editing = false;
 
-          group.editing = false;
-
-          const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Vue.$keycloak.token}`
-          };
-          try {
-          let url = '';
-          let url2 = '';
-            if (this.selectedCompetition === "Game Arena") {
-              url = UPDATE_GAME_METRIC_BASE_URL;
-              url2 = CREATE_GAME_METRIC_BASE_URL;
-            } else if (this.selectedCompetition === "Innovation Design Challenge") {
-             url = UPDATE_IDC_GROUP_BASE_URL;
-             url2 = CREATE_IDC_GROUP_BASE_URL;
-            }
-            if (group.id) {
-              const requestBody = {
-                groupName: group.groupName,
-              };
-              // If the group has an ID, update the existing record using a PUT request
-              const response = await axios.post(`${url}`, requestBody, { headers });
-
-            } else {
-              const requestBody = {
-                groupName: group.groupName,
-              };
-              // If the group doesn't have an ID, create a new record using a POST request
-              const response = await axios.post(`${url2}`, requestBody, { headers });
-
-              // Add the newly created group to the beginning of the groups array
-              this.groups.unshift(response.data.data);
-              url ='';
-            }
-            this.loadGroup();
-            // Optional: Perform any additional actions, such as updating the UI.
-          } catch (error) {
-            // Handle errors, if any
-            console.error('Error saving group:', error);
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Vue.$keycloak.token}`,
+        };
+        try {
+          let url = "";
+          let url2 = "";
+          if (this.selectedCompetition === "Game Arena") {
+            url = UPDATE_GAME_GROUP_BASE_URL;
+            url2 = CREATE_GAME_GROUP_BASE_URL;
+          } else if (
+            this.selectedCompetition === "Innovation Design Challenge"
+          ) {
+            url = UPDATE_IDC_GROUP_BASE_URL;
+            url2 = CREATE_IDC_GROUP_BASE_URL;
           }
-        } else {
-          // Enter editing mode
-          group.editingGroupName = group.groupName;
-          group.editing = true;
+          if (group.id) {
+            const requestBody = {
+              groupName: group.groupName,
+            };
+            // If the group has an ID, update the existing record using a PUT request
+            const response = await axios.post(`${url}`, requestBody, {
+              headers,
+            });
+          } else {
+            const requestBody = {
+              groupName: group.groupName,
+            };
+            // If the group doesn't have an ID, create a new record using a POST request
+            const response = await axios.post(`${url2}`, requestBody, {
+              headers,
+            });
+
+            // Add the newly created group to the beginning of the groups array
+            this.groups.unshift(response.data.data);
+            url = "";
+          }
+          this.loadGroup();
+          // Optional: Perform any additional actions, such as updating the UI.
+        } catch (error) {
+          // Handle errors, if any
+          console.error("Error saving group:", error);
         }
-      },
+      } else {
+        // Enter editing mode
+        group.editingGroupName = group.groupName;
+        group.editing = true;
+      }
+    },
     async addNewGroup() {
       // Create a new group object and add it to the beginning of the groups array
       const newGroup = {
@@ -397,116 +545,126 @@ export default {
     },
     async loadGroup() {
       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-          if (this.selectedCompetition === "Game Arena") {
-            this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
-          } else if (this.selectedCompetition === "Innovation Design Challenge") {
-            this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, { headers });
-          }
-          this.groups = this.groupsData.data.data;
-        } catch (error) {
-          console.error("Error fetching data:", error);
+        if (this.selectedCompetition === "Game Arena") {
+          this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, {
+            headers,
+          });
+        } else if (this.selectedCompetition === "Innovation Design Challenge") {
+          this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, {
+            headers,
+          });
         }
+        this.groups = this.groupsData.data.data;
+        console.log("load group", this.groups);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     },
 
-    async fetchTeams(groupId,groupName) {
+    async fetchTeams(groupId, groupName) {
       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
-    let response = '';
-    try {
-      if(this.selectedCompetition === "Game Arena") {
-        response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
-         this.currentGroupName = '';
-      }else if (this.selectedCompetition === "Innovation Design Challenge") {
-        response = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
-         this.currentGroupName = groupName;
-      }
-        this.teamList = response.data.data
+      let response = "";
+      try {
+        if (this.selectedCompetition === "Game Arena") {
+          response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+            headers,
+          });
+          this.currentGroupName = "";
+        } else if (this.selectedCompetition === "Innovation Design Challenge") {
+          response = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, {
+            headers,
+          });
+          this.currentGroupName = groupName;
+        }
+        this.teamList = response.data.data;
         this.currentGroupId = groupId;
         //this.teamList = response.data.data.filter((team) => team.isQualifiedFinal );
 
         this.showAddTeamModal = true; // Show the modal after fetching the users
-      }catch (error) {
+      } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
     gotoPageModal(page) {
-    if (page >= 1 && page <= this.totalPagesModal) {
-      this.currentPageModal = page;
-    }
-  },
+      if (page >= 1 && page <= this.totalPagesModal) {
+        this.currentPageModal = page;
+      }
+    },
 
     async toggleRow(index) {
-    if (this.activeRow === index) {
-      this.activeRow = null; // Collapse the row if it's already expanded
-    } else {
-      this.activeRow = index;
-      const group = this.filteredGroups[index];
-      const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Vue.$keycloak.token}`
-        };
-      try {
-        // Make the API call here using the group ID as the request body
-        const requestBody = {
-          id: group.id,
-        };
-
-        // Make the HTTP PUT request to the API endpoint
-        const requestBodyJson = JSON.stringify(requestBody);
-
-        let  response
-
-        if (this.selectedCompetition === "Game Arena") {
-
-
-          console.log('this.groupsData',this.groups)
-
-          let groupFilteredObj = this.groups.filter(team => team.id === group.id);
-          console.log('teamObject AFTER1',groupFilteredObj)
-          this.groupMembers = groupFilteredObj[0].gameTeamResponses
-          console.log('GA',this.groupMembers)
-
-        } else if (this.selectedCompetition === "Innovation Design Challenge") {
-            response = await axios.post(`${VIEW_IDC_GROUP_BASE_URL}`, requestBodyJson, { headers });
-            this.groupMembers = response.data.data.idcTeamResponses;
-            console.log('IDC',this.groupMembers)
-        }
-
-
-        // Optional: Perform any additional actions, such as updating the UI.
-      } catch (error) {
-        // Handle errors, if any
-        console.error('Error calling API:', error);
-      }
-
-    }
-  },
-      gotoPage(page) {
-        if (page >= 1 && page <= this.totalPages) {
-          this.currentPage = page;
-        }
-      },
-
-      async deleteGroup(index) {
+      if (this.activeRow === index) {
+        this.activeRow = null; // Collapse the row if it's already expanded
+      } else {
+        this.activeRow = index;
         const group = this.filteredGroups[index];
         const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Vue.$keycloak.token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Vue.$keycloak.token}`,
         };
-        const confirmation = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'You won\'t be able to revert this!',
-        icon: 'warning',
+        try {
+          // Make the API call here using the group ID as the request body
+          const requestBody = {
+            id: group.id,
+          };
+
+          // Make the HTTP PUT request to the API endpoint
+          const requestBodyJson = JSON.stringify(requestBody);
+
+          let response;
+
+          if (this.selectedCompetition === "Game Arena") {
+            let groupFilteredObj = this.groups.filter(
+              (team) => team.id === group.id
+            );
+
+            this.groupMembers = groupFilteredObj[0].gameTeamResponses;
+          } else if (
+            this.selectedCompetition === "Innovation Design Challenge"
+          ) {
+            response = await axios.post(
+              `${VIEW_IDC_GROUP_BASE_URL}`,
+              requestBodyJson,
+              { headers }
+            );
+            this.groupMembers = response.data.data.idcTeamResponses;
+
+            this.loadGroup();
+          }
+
+          // Optional: Perform any additional actions, such as updating the UI.
+        } catch (error) {
+          // Handle errors, if any
+          console.error("Error calling API:", error);
+        }
+      }
+    },
+    gotoPage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+      }
+    },
+
+    async deleteGroup(index) {
+      const group = this.filteredGroups[index];
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Vue.$keycloak.token}`,
+      };
+      const confirmation = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
       });
 
       if (confirmation.isConfirmed) {
@@ -515,29 +673,45 @@ export default {
         };
         const requestBody2 = {
           id: group.id,
-          teamIds:[]
+          teamIds: [],
         };
 
         try {
-          if(this.selectedCompetition === "Game Arena") {
-                const response2 = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody2, { headers });
-                const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
+          if (this.selectedCompetition === "Game Arena") {
+            const response2 = await axios.put(
+              `${ADD_TEAM_IDC_GROUP_BASE_URL}`,
+              requestBody2,
+              { headers }
+            );
+            const response = await axios.delete(
+              `${DELETE_IDC_GROUP_BASE_URL}`,
+              {
                 data: requestBody,
-                headers: headers
-              });
-              }else if (this.selectedCompetition === "Innovation Design Challenge") {
-                const response2 = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody2, { headers });
-                const response = await axios.delete(`${DELETE_IDC_GROUP_BASE_URL}`, {
+                headers: headers,
+              }
+            );
+          } else if (
+            this.selectedCompetition === "Innovation Design Challenge"
+          ) {
+            const response2 = await axios.put(
+              `${ADD_TEAM_IDC_GROUP_BASE_URL}`,
+              requestBody2,
+              { headers }
+            );
+            const response = await axios.delete(
+              `${DELETE_IDC_GROUP_BASE_URL}`,
+              {
                 data: requestBody,
-                headers: headers
-           });
-           }
+                headers: headers,
+              }
+            );
+          }
 
           // Show a success message
           Swal.fire({
-            title: 'Deleted!',
-            text: 'The user has been deleted.',
-            icon: 'success'
+            title: "Deleted!",
+            text: "The user has been deleted.",
+            icon: "success",
           });
 
           this.loadGroup();
@@ -545,20 +719,22 @@ export default {
           console.error("Error fetching data:", error);
         }
       }
-      },
-      // Method to add a new child row
-      addChildRow(teamIndex) {
-        const group = this.filteredGroups[teamIndex];
-        group.idcTeamResponses.push({ ...this.newChildRow });
-        // Set the initial country and state values for the new child row
-        const newUserIndex = group.idcTeamResponses.length - 1;
-        const newUser = group.idcTeamResponses[newUserIndex];
-        newUser.country = null;
-        newUser.statesOptions = [];
-      },
-      toggleTeamSelection(groupId) {
+    },
+    // Method to add a new child row
+    addChildRow(teamIndex) {
+      const group = this.filteredGroups[teamIndex];
+      group.idcTeamResponses.push({ ...this.newChildRow });
+      // Set the initial country and state values for the new child row
+      const newUserIndex = group.idcTeamResponses.length - 1;
+      const newUser = group.idcTeamResponses[newUserIndex];
+      newUser.country = null;
+      newUser.statesOptions = [];
+    },
+    toggleTeamSelection(groupId) {
       if (this.selectedTeams.includes(groupId)) {
-        this.selectedTeams = this.selectedTeams.filter((selectedUserId) => selectedUserId !== groupId);
+        this.selectedTeams = this.selectedTeams.filter(
+          (selectedUserId) => selectedUserId !== groupId
+        );
       } else {
         this.selectedTeams.push(groupId);
       }
@@ -568,38 +744,46 @@ export default {
     },
 
     async addTeamsToGroup() {
-
-    if (!this.currentGroupId || this.selectedTeams.length === 0) {
-      console.error('group ID or selected users not available.');
-      return;
-    }
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
-    };
-    try {
-
-      if(this.selectedCompetition === "Game Arena") {
-        const requestBody = {
-          id: this.currentGroupId,
-          gameTeamIds: this.selectedTeams,
-        };
-        const response = await axios.put(`${ADD_TEAM_GAME_GROUP_BASE_URL}`, requestBody, { headers });
-      }else if (this.selectedCompetition === "Innovation Design Challenge") {
-        const requestBody = {
-          id: this.currentGroupId,
-          teamIds: this.selectedTeams,
-        };
-        const response = await axios.put(`${ADD_TEAM_IDC_GROUP_BASE_URL}`, requestBody, { headers });
+      if (!this.currentGroupId || this.selectedTeams.length === 0) {
+        console.error("group ID or selected users not available.");
+        return;
       }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Vue.$keycloak.token}`,
+      };
+      try {
+        if (this.selectedCompetition === "Game Arena") {
+          const requestBody = {
+            id: this.currentGroupId,
+            gameTeamIds: this.selectedTeams,
+          };
+          const response = await axios.put(
+            `${ADD_TEAM_GAME_GROUP_BASE_URL}`,
+            requestBody,
+            { headers }
+          );
+        } else if (this.selectedCompetition === "Innovation Design Challenge") {
+          const requestBody = {
+            id: this.currentGroupId,
+            teamIds: this.selectedTeams,
+          };
+          const response = await axios.put(
+            `${ADD_TEAM_IDC_GROUP_BASE_URL}`,
+            requestBody,
+            { headers }
+          );
+          console.log("response", requestBody);
+        }
 
-      // Close the modal after the request is successful
-      this.showAddTeamModal = false;
-      this.selectedTeams = [];
-    } catch (error) {
-      console.error('Error adding members to group:', error);
-    }
-  },
+        // Close the modal after the request is successful
+        this.showAddTeamModal = false;
+        this.selectedTeams = [];
+        this.loadGroup;
+      } catch (error) {
+        console.error("Error adding members to group:", error);
+      }
+    },
   },
 };
 </script>
@@ -607,7 +791,6 @@ export default {
 <style scoped>
 /* Main Table Styles */
 .main-table {
-
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -619,7 +802,7 @@ export default {
 
 .main-table th,
 .main-table td {
-padding: 8px;
+  padding: 8px;
   text-align: center;
   font-size: 14px;
   background-color: #f6f6f6;
@@ -628,7 +811,6 @@ padding: 8px;
   background-color: #d7e7f2;
   font-weight: bold;
 }
-
 
 /* Hover effect for clickable rows */
 .main-table tbody tr:hover {
@@ -642,7 +824,7 @@ padding: 8px;
   font-size: 14px;
 }
 
-.team-table th{
+.team-table th {
   padding: 8px 16px;
   border-bottom: 1px solid #ccc;
   text-align: center;
@@ -675,7 +857,7 @@ padding: 8px;
 }
 
 .active-row {
-  background-color: rgb(218, 234, 253)/* Light blue for active parent row */
+  background-color: rgb(218, 234, 253); /* Light blue for active parent row */
 }
 
 .child-row {
@@ -704,7 +886,7 @@ padding: 8px;
   display: flex;
   justify-content: flex-end; /* Aligns the search box to the right */
   margin-bottom: 20px;
-  margin-right:65px;
+  margin-right: 65px;
 }
 
 /* Search Box Styles */
@@ -752,10 +934,10 @@ input.form-control.editing-textbox {
 }
 
 /* Modal Styles */
-.custom-modal .modal-dialog  {
-    max-width: 1300px; /* Set the max width of the modal */
-    text-align: center;
-  }
+.custom-modal .modal-dialog {
+  max-width: 1300px; /* Set the max width of the modal */
+  text-align: center;
+}
 
 /* Center the modal title */
 .custom-modal .modal-header {
@@ -770,14 +952,13 @@ input.form-control.editing-textbox {
 
 .add-member-button {
   padding: 10px 20px;
-  background-color: #5DADE2;
+  background-color: #5dade2;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
   margin-top: 20px;
-
 }
 
 .text-center {
@@ -816,8 +997,8 @@ input.form-control.editing-textbox {
 
 /* Optionally, add styles for the dropdown arrow icon */
 .editing-dropdown .dropdown-toggle::after {
-  font-family: 'Font Awesome'; /* Assuming you're using Font Awesome for icons */
-  content: '\f107'; /* Replace with the correct icon code */
+  font-family: "Font Awesome"; /* Assuming you're using Font Awesome for icons */
+  content: "\f107"; /* Replace with the correct icon code */
   margin-left: 5px; /* Add some spacing between the text and the icon */
   color: #555; /* Set the color of the icon */
 }
@@ -834,6 +1015,4 @@ input.form-control.editing-textbox {
   margin-top: 10px;
   margin-right: 27px;
 }
-
-
 </style>

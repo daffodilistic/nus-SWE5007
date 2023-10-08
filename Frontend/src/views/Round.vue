@@ -1,13 +1,17 @@
 <template>
   <div class="round">
     <div v-for="match in roundMatches" :key="match.id">
-      <Match :match="match" :showStar="isFirstRound || isSecondRound" :showTrophy="isLastRound" />
+      <Match
+        :match="match"
+        :showStar="isSecondRound"
+        :showTrophy="isLastRound"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import Match from './Match.vue';
+import Match from "./Match.vue";
 
 export default {
   components: {

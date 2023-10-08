@@ -5,73 +5,126 @@
         <tr>
           <td>
             <div class="form-group select">
-              <label><i class="fas fa-trophy" style='color: rgb(65, 127, 202)'></i></label>
+              <label
+                ><i class="fas fa-trophy" style="color: rgb(65, 127, 202)"></i
+              ></label>
               <label class="red-asterisk">*</label>
               <label class="label-color">Competition Choice:&nbsp;&nbsp;</label>
-              <select v-model="competitionChoice" id="category" class="custom-select">
-                <option value="" disabled selected>Select Competition Choice</option>
-                <option v-for="option in competitionChoiceOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+              <select
+                v-model="competitionChoice"
+                id="category"
+                class="custom-select"
+              >
+                <option value="" disabled selected>
+                  Select Competition Choice
+                </option>
+                <option
+                  v-for="option in competitionChoiceOptions"
+                  :value="option.value"
+                  :key="option.value"
+                >
+                  {{ option.text }}
+                </option>
               </select>
             </div>
           </td>
           <td>
             <div class="form-group select">
-            <label><i class="fas fa-user-tag" style='color: rgb(65, 127, 202)'></i></label>
-            <label class="red-asterisk">*</label>
-            <label class="label-color">Age Group:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-            <select v-model="ageGroup" id="category" class="custom-select">
-              <option value="" disabled selected>Select Age Group</option>
-              <option v-for="option in ageGroupOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
-            </select>
+              <label
+                ><i class="fas fa-user-tag" style="color: rgb(65, 127, 202)"></i
+              ></label>
+              <label class="red-asterisk">*</label>
+              <label class="label-color"
+                >Age
+                Group:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label
+              >
+              <select v-model="ageGroup" id="category" class="custom-select">
+                <option value="" disabled selected>Select Age Group</option>
+                <option
+                  v-for="option in ageGroupOptions"
+                  :value="option.value"
+                  :key="option.value"
+                >
+                  {{ option.text }}
+                </option>
+              </select>
             </div>
           </td>
         </tr>
-        <tr>&nbsp;</tr>
+        <tr>
+          &nbsp;
+        </tr>
         <tr>
           <td>
             <div class="form-group">
-
-              <label><i class="fa fa-users fa-lg" style='color: rgb(65, 127, 202)'></i></label> <label class="red-asterisk">*</label>
-              <label class="label-color">Team Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-              <input v-model="teamName" type="text" placeholder="Enter Team Name" />
+              <label
+                ><i
+                  class="fa fa-users fa-lg"
+                  style="color: rgb(65, 127, 202)"
+                ></i
+              ></label>
+              <label class="red-asterisk">*</label>
+              <label class="label-color"
+                >Team
+                Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label
+              >
+              <input
+                v-model="teamName"
+                type="text"
+                placeholder="Enter Team Name"
+              />
             </div>
           </td>
           <td>
             <div class="form-group">
-              <label><i class="far fa-id-card fa-lg" style='color: rgb(65, 127, 202)'></i></label> <label class="red-asterisk">*</label>
+              <label
+                ><i
+                  class="far fa-id-card fa-lg"
+                  style="color: rgb(65, 127, 202)"
+                ></i
+              ></label>
+              <label class="red-asterisk">*</label>
               <label class="label-color">Teacher Name:&nbsp;&nbsp;</label>
-              <input v-model="teacherName" type="text" placeholder="Enter Teacher Name" />
+              <input
+                v-model="teacherName"
+                type="text"
+                placeholder="Enter Teacher Name"
+              />
             </div>
           </td>
         </tr>
       </table>
     </div>
 
-    <br>
+    <br />
     <EditableTable
       v-model="users"
       :fields="fields"
       @submit="handleUpdateUser($event)"
       @remove="handleRemoveUser($event)"
     ></EditableTable>
-    <br><br>
+    <br /><br />
     <button class="submit-button" v-on:click="register()">Register</button>
-
   </div>
 </template>
 
 <script>
-import Vue from 'vue';
+import Vue from "vue";
 import EditableTable from "@/components/RegisterEditableTable.vue";
-import VueSweetalert2 from 'vue-sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
 import axios from "axios";
-import {ADD_MEMBER_GAME_TEAM_BASE_URL,ADD_MEMBER_IDC_TEAM_BASE_URL,CREATE_IDC_TEAM_BASE_URL,CREATE_GAME_TEAM_BASE_URL,CREATE_USER_INFO_BASE_URL} from '@/api';
+import {
+  ADD_MEMBER_GAME_TEAM_BASE_URL,
+  ADD_MEMBER_IDC_TEAM_BASE_URL,
+  CREATE_IDC_TEAM_BASE_URL,
+  CREATE_GAME_TEAM_BASE_URL,
+  CREATE_USER_INFO_BASE_URL,
+} from "@/api";
 
 export default {
-
   components: {
     EditableTable,
   },
@@ -81,13 +134,19 @@ export default {
       ageGroup: "",
       competitionChoice: "",
       teacherName: "",
-      data:[],
+      data: [],
       country: null,
       fields: [
         { key: "userName", label: "User Name", type: "text", required: true },
         { key: "firstName", label: "First Name", type: "text", required: true },
         { key: "lastName", label: "Last Name", type: "text", required: true },
-        { key: "email", label: "Email", type: "email", required: true, pattern: ".+@bootstrapvue\\.com" },
+        {
+          key: "email",
+          label: "Email",
+          type: "email",
+          required: true,
+          pattern: ".+@bootstrapvue\\.com",
+        },
         { key: "phone", label: "Phone", type: "tel", required: true },
         { key: "country", label: "Country", type: "select", required: true },
         { key: "state", label: "State", type: "select", required: true },
@@ -97,8 +156,8 @@ export default {
         { key: "edit", label: "Actions", type: "edit" },
       ],
 
-      users:[],
-      newTeam:[],
+      users: [],
+      newTeam: [],
     };
   },
   computed: {
@@ -111,129 +170,147 @@ export default {
   },
   methods: {
     async handleUpdateUser(user) {
-
-    if (user.id) {
-      await updateUser(user);
-    } else {
-      await addUser(user);
-    }
-  },
+      if (user.id) {
+        await updateUser(user);
+      } else {
+        await addUser(user);
+      }
+    },
     async handleRemoveUser(user) {
       if (user.length > 0) {
         await user.map(async (item) => {
           await deleteUser(item.id);
-        })
+        });
       } else {
         await deleteUser(user.id);
       }
     },
 
     async register() {
-    // Create a new team object with form data
-    const userIDs = [];
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${Vue.$keycloak.token}`
-    };
-    // Create new user for each user in the users array
-    for (const user of this.users) {
-      const userData = {
-        userName: user.userName,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
-        country: user.country,
-        state: user.state,
-        dateOfBirth: user.dateOfBirth,
-        schoolName: user.schoolName,
-        yearsOfExp: user.yearsOfExp,
+      // Create a new team object with form data
+      const userIDs = [];
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
+      // Create new user for each user in the users array
+      for (const user of this.users) {
+        const userData = {
+          userName: user.userName,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          country: user.country,
+          state: user.state,
+          dateOfBirth: user.dateOfBirth,
+          schoolName: user.schoolName,
+          yearsOfExp: user.yearsOfExp,
+        };
 
         // Call the create new user API
-        const createUserResponse = await axios.post(`${CREATE_USER_INFO_BASE_URL}`, userData, { headers });
+        const createUserResponse = await axios.post(
+          `${CREATE_USER_INFO_BASE_URL}`,
+          userData,
+          { headers }
+        );
         // Push the user ID into the userIDs array
         userIDs.push(createUserResponse.data.data.id);
       }
 
-      let teamData = '';
-      let url = ''
-      let url2 = ''
+      let teamData = "";
+      let url = "";
+      let url2 = "";
 
-    if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
-      url = CREATE_IDC_TEAM_BASE_URL
-      url2 = ADD_MEMBER_IDC_TEAM_BASE_URL
-      teamData = {
+      if (
+        this.competitionChoice === "IDC" ||
+        this.competitionChoice === "Innovation Design Challenge"
+      ) {
+        url = CREATE_IDC_TEAM_BASE_URL;
+        url2 = ADD_MEMBER_IDC_TEAM_BASE_URL;
+        teamData = {
           teamName: this.teamName,
           ageGroup: this.ageGroup,
           //teacherName: this.teacherName,
           isQualifiedPromo: false,
           isQualifiedFinal: false,
           isQualifiedFinalSecondStage: false,
-      };
-    } else if (this.competitionChoice === 'GAC' || this.competitionChoice === 'Game Arena'){
-      teamData = {
+        };
+      } else if (
+        this.competitionChoice === "GAC" ||
+        this.competitionChoice === "Game Arena"
+      ) {
+        teamData = {
           teamName: this.teamName,
           ageGroup: this.ageGroup,
           //teacherName: this.teacherName,
           qualificationRoundScore: 0,
           qualificationRoundPoint: 0,
           qualificationRoundNumMatchesPlayed: 0,
-          isQualifiedForElimination:false
-      };
-      url = CREATE_GAME_TEAM_BASE_URL
-      url2 =ADD_MEMBER_GAME_TEAM_BASE_URL
-    }
-    try {
-
-        const createTeamResponse = await axios.post(`${url}`, teamData, { headers });
+          isQualifiedForElimination: false,
+        };
+        url = CREATE_GAME_TEAM_BASE_URL;
+        url2 = ADD_MEMBER_GAME_TEAM_BASE_URL;
+      }
+      try {
+        const createTeamResponse = await axios.post(`${url}`, teamData, {
+          headers,
+        });
         let RegisterTeamData = {};
-        if (this.competitionChoice === 'IDC' || this.competitionChoice === 'Innovation Design Challenge') {
+        if (
+          this.competitionChoice === "IDC" ||
+          this.competitionChoice === "Innovation Design Challenge"
+        ) {
           RegisterTeamData = {
             id: createTeamResponse.data.data,
             teamName: this.teamName,
-            userIds: userIDs
+            userIds: userIDs,
           };
-        }else if (this.competitionChoice === 'GAC' || this.competitionChoice === 'Game Arena'){
+        } else if (
+          this.competitionChoice === "GAC" ||
+          this.competitionChoice === "Game Arena"
+        ) {
           RegisterTeamData = {
             id: createTeamResponse.data.data,
-            userIds: userIDs
+            userIds: userIDs,
           };
         }
 
         //register created user to team
-        const registerTeamResponse = await axios.put(`${url2}`, RegisterTeamData, { headers });
-        console.log('Team Allocation successful:', registerTeamResponse.data);
+        const registerTeamResponse = await axios.put(
+          `${url2}`,
+          RegisterTeamData,
+          { headers }
+        );
+        console.log("Team Allocation successful:", registerTeamResponse.data);
 
         // Show a success message to the user using VueSweetalert2
         this.$swal({
-          title: 'Success!',
-          text: 'Team registration successful!',
-          icon: 'success',
+          title: "Success!",
+          text: "Team registration successful!",
+          icon: "success",
           timer: 2000, // Display the success message for 2 seconds
         });
-
       } catch (error) {
         // Handle any errors that occurred during the registration process
-        console.error('Error registering team:', error);
+        console.error("Error registering team:", error);
 
         // Show an error message to the user using VueSweetalert2
         this.$swal({
-          title: 'Error!',
-          text: 'Failed to register the team. Please try again later.',
-          icon: 'error',
+          title: "Error!",
+          text: "Failed to register the team. Please try again later.",
+          icon: "error",
           timer: 2000, // Display the error message for 2 seconds
         });
       }
 
-    // Reset the form data to clear the input fields after registration
-    //this.teamName = null;
-    //this.ageGroup = null;
-    //this.competitionChoice = null;
-    //this.teacherName = null;
-    //this.users = []; // Reset the users array as well
-  },
-
+      // Reset the form data to clear the input fields after registration
+      //this.teamName = null;
+      //this.ageGroup = null;
+      //this.competitionChoice = null;
+      //this.teacherName = null;
+      //this.users = []; // Reset the users array as well
+    },
   },
 };
 </script>
@@ -242,7 +319,6 @@ export default {
   padding: 20px;
   font-family: Arial, sans-serif;
   color: #333;
-
 }
 
 .form-container {
@@ -284,7 +360,7 @@ export default {
 
 .submit-button {
   padding: 10px 20px;
-  background-color: #5DADE2;
+  background-color: #5dade2;
   color: #fff;
   border: none;
   border-radius: 4px;
