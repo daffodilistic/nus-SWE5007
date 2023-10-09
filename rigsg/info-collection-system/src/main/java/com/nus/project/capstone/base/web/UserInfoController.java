@@ -51,11 +51,58 @@ public class UserInfoController {
     public ResponseEntity<GeneralMessageEntity> createUser(@RequestBody UserRequests userRequests,
                                                            @RequestHeader("Authorization") String bearerToken) {
         try{
-            ResponseEntity<JsonNode> keycloakResponse = createUserInKeycloak(keycloakUrl + KEYCLOAK_USER_CREATION, bearerToken, userRequests);
+            ResponseEntity<JsonNode> keycloakResponse = createUserInKeycloak(keycloakUrl + KEYCLOAK_USER_CREATION, bearerToken, userRequests, "participant");
+            userRequests.setUserType("participants");
             val u = userRepository.save(UserJpaEntities.toJpaEntity(userRequests));
             return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
         } catch (Exception e){
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data(e.toString()).build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data(e.toString()).build());
+        }
+    }
+
+    @PostMapping("/create-judge")
+    public ResponseEntity<GeneralMessageEntity> createJudge(@RequestBody UserRequests userRequests,
+                                                           @RequestHeader("Authorization") String bearerToken) {
+        try{
+            ResponseEntity<JsonNode> keycloakResponse = createUserInKeycloak(keycloakUrl + KEYCLOAK_USER_CREATION, bearerToken, userRequests, "judge");
+            userRequests.setUserType("judge");
+            val u = userRepository.save(UserJpaEntities.toJpaEntity(userRequests));
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data(e.toString()).build());
+        }
+    }
+
+    @PostMapping("/create-teacher")
+    public ResponseEntity<GeneralMessageEntity> createTeacher(@RequestBody UserRequests userRequests,
+                                                            @RequestHeader("Authorization") String bearerToken) {
+        try{
+            ResponseEntity<JsonNode> keycloakResponse = createUserInKeycloak(keycloakUrl + KEYCLOAK_USER_CREATION, bearerToken, userRequests, "participant");
+            userRequests.setUserType("teacher");
+            val u = userRepository.save(UserJpaEntities.toJpaEntity(userRequests));
+            return ResponseEntity.ok(GeneralMessageEntity.builder().data(u).build());
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data(e.toString()).build());
+        }
+    }
+
+    @PostMapping("/mark-attendance")
+    public ResponseEntity<GeneralMessageEntity> markAttendance(@RequestBody UserRequests userRequests) {
+        if (userRequests.getUserName() == null &&
+            userRequests.getCountry()== null &&
+            userRequests.getUserType() == null &&
+            userRequests.getEmail() == null &&
+            userRequests.getFirstName() == null &&
+            userRequests.getLastName() == null &&
+            userRequests.getDateOfBirth()== null &&
+            userRequests.getPhoneNumber() == null &&
+            userRequests.getSchoolName()== null &&
+            userRequests.getState()== null
+        ) {
+            return updateUser(userRequests);
+        } else {
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder()
+                    .data("Update failed. Request contains other illegal params. Pls check.").build());
         }
     }
 
@@ -70,12 +117,12 @@ public class UserInfoController {
     @PostMapping("/view-user-email")
     public ResponseEntity<GeneralMessageEntity> readUserUsingEmail(@RequestBody UserRequests userRequests) {
         if (userRequests.getEmail() == null) {
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data("User email must be provided").build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data("User email must be provided").build());
         }
         val users = userRepository.findAll();
         List<UserJpaEntities> matchedUser = users.stream().filter(u -> u.getEmail().equals(userRequests.getEmail())).toList();
         if(matchedUser.size() != 1){
-            return ResponseEntity.ok(GeneralMessageEntity.builder().data(String.format("No user email %s found in our database!", userRequests.getEmail())).build());
+            return ResponseEntity.badRequest().body(GeneralMessageEntity.builder().data(String.format("No user email %s found in our database!", userRequests.getEmail())).build());
         }
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(matchedUser.get(0).getId()).build());
     }
@@ -113,21 +160,21 @@ public class UserInfoController {
                 .data(String.format("Delete success for %s", userRequests.getId())).build());
     }
 
-    private ResponseEntity<JsonNode> createUserInKeycloak(String url, String token, UserRequests userRequests){
+    private ResponseEntity<JsonNode> createUserInKeycloak(String url, String token, UserRequests userRequests, String userType){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Content-Type", "application/json");
         httpHeaders.set("Authorization", token);
-        HttpEntity<JsonNode> httpEntity = new HttpEntity<>(constructJsonForKeycloak(userRequests), httpHeaders);
+        HttpEntity<JsonNode> httpEntity = new HttpEntity<>(constructJsonForKeycloak(userRequests, userType), httpHeaders);
         return restTemplate.exchange(url, HttpMethod.POST, httpEntity, JsonNode.class);
     }
 
-    private JsonNode constructJsonForKeycloak(UserRequests userRequests){
+    private JsonNode constructJsonForKeycloak(UserRequests userRequests, String userType){
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("enabled", true);
         List<String> groupList = new ArrayList<>();
-        groupList.add("participant");
+        groupList.add(userType);
         jsonMap.put("groups", groupList);
         jsonMap.put("email", userRequests.getEmail());
         jsonMap.put("emailVerified", "");
