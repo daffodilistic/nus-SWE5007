@@ -53,7 +53,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"firstName\": \"Donald\",\n    \"lastName\": \"Trump\",\n    \"email\": \"donald.trump@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"userName\":\"IamDonaldTrump\"\n}",
+					"raw": "{\n    \"firstName\": \"Paticipant\",\n    \"lastName\": \"I'm\",\n    \"email\": \"new_user2@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"userName\":\"IamParticipants\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -70,6 +70,213 @@
 					"path": [
 						"userinfo",
 						"create-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new judge",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Judge\",\n    \"lastName\": \"I'm\",\n    \"email\": \"new_user3@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"userName\":\"IamJudge\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/create-judge",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"create-judge"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new teacher",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Teacher\",\n    \"lastName\": \"I'm\",\n    \"email\": \"new_user5@gmail.com\",\n    \"country\": \"Singapore\",\n    \"state\": \"Singapore\",\n    \"dateOfBirth\": \"12 july 1993\",\n    \"phoneNumber\": \"999\",\n    \"schoolName\": \"nus\",\n    \"yearsOfExp\": 5,\n    \"userName\":\"IamTeacher5\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/create-teacher",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"create-teacher"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark Attandence",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessTokenUrl",
+							"value": "https://keycloak.ric-robotics.xyz/realms/ricsg/protocol/openid-connect/token",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "matthew",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "swe5007",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "Xuuk6jPrFcGV3jHTOjNlunpbBR7P2Sno",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ricsg",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "password_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"557d9613-dabe-423d-beaf-d8a803dcaa09\",\n    \"isRegistered\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/userinfo/mark-attendance",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"userinfo",
+						"mark-attendance"
 					]
 				}
 			},

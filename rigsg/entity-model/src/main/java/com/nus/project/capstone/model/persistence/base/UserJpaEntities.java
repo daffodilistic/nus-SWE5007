@@ -29,6 +29,8 @@ public class UserJpaEntities {
     private String phoneNumber;
     private String schoolName;
     private Integer yearsOfExp;
+    private Boolean isRegistered;
+    private String userType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idc_team_id", referencedColumnName = "idc_team_id")
@@ -50,6 +52,8 @@ public class UserJpaEntities {
                 .phoneNumber(u.getPhoneNumber())
                 .schoolName(u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp())
+                .isRegistered(u.getIsRegistered() == null ? false: u.getIsRegistered())
+                .userType(u.getUserType())
                 .build();
     }
 
@@ -66,6 +70,9 @@ public class UserJpaEntities {
                 .schoolName(u.getSchoolName() == null ? getSchoolName() : u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp() == null ? getYearsOfExp() : u.getYearsOfExp())
                 .idcTeam(getIdcTeam())
+                .gameTeam(getGameTeam())
+                .isRegistered(u.getIsRegistered() == null ? getIsRegistered() : u.getIsRegistered())
+                .userType(u.getUserType() == null ? getUserType() : u.getUserType())
                 .build();
     }
 }
