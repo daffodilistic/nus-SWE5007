@@ -80,7 +80,7 @@ public class GameGroupController {
     public ResponseEntity<GeneralMessageEntity> checkQualify(@RequestBody GameGroupRequests gameGroupRequests) {
         var allGameTeams = gameTeamRepository.findAll()
                 .stream()
-                .filter(t -> t.getGameGroup().getId().equals(gameGroupRequests.getId()))
+                .filter(t -> t.getGameGroup() != null && t.getGameGroup().getId().equals(gameGroupRequests.getId()))
                 .toList();
 
         if (allGameTeams.size() != DEFAULT_TEAM_SIZE){
