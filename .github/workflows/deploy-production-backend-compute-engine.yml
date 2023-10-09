@@ -12,7 +12,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        services: [demo, info-collection-system, game-system, idc-system]
+        services: [demo, game-system, idc-system, info-collection-system]
     continue-on-error: true
     permissions:
       contents: "read"
