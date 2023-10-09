@@ -1,0 +1,113 @@
+keycloak.ric-robotics.xyz {
+	handle {
+		reverse_proxy 10.148.0.2:8080 {
+			# header_up Host {host} # redundant
+			header_up X-Real-IP {remote}
+			# header_up X-Forwarded-For {remote}  # redundant
+			# header_up X-Forwarded-Port {server_port} # redundant
+			header_down -Server
+			header_down -X-Powered-By
+			header_down -X-Asp*
+		}
+		header X-Powered-By "Coffee"
+	}
+
+	log {
+		output file /var/log/caddy/keycloak.ric-robotics.xyz-access.log
+	}
+}
+
+register.ric-robotics.xyz {
+	handle {
+		reverse_proxy 10.148.0.47:8880 {
+			# header_up Host {host} # redundant
+			header_up X-Real-IP {remote}
+			# header_up X-Forwarded-For {remote}  # redundant
+			# header_up X-Forwarded-Port {server_port} # redundant
+			header_down -Server
+			header_down -X-Powered-By
+			header_down -X-Asp*
+		}
+		header X-Powered-By "Coffee"
+	}
+
+	log {
+		output file /var/log/caddy/register.ric-robotics.xyz-access.log
+	}
+}
+
+ric-robotics.xyz {
+	handle {
+		reverse_proxy 10.148.0.47:9990 {
+			# header_up Host {host} # redundant
+			header_up X-Real-IP {remote}
+			# header_up X-Forwarded-For {remote}  # redundant
+			# header_up X-Forwarded-Port {server_port} # redundant
+			header_down -Server
+			header_down -X-Powered-By
+			header_down -X-Asp*
+		}
+		header X-Powered-By "Coffee"
+	}
+
+	log {
+		output file /var/log/caddy/ric-robotics.xyz-access.log
+	}
+}
+
+game.ric-robotics.xyz {
+	handle {
+		reverse_proxy 10.148.0.47:9991 {
+			# header_up Host {host} # redundant
+			header_up X-Real-IP {remote}
+			# header_up X-Forwarded-For {remote}  # redundant
+			# header_up X-Forwarded-Port {server_port} # redundant
+			header_down -Server
+			header_down -X-Powered-By
+			header_down -X-Asp*
+		}
+		header X-Powered-By "Coffee"
+	}
+
+	log {
+		output file /var/log/caddy/game.ric-robotics.xyz-access.log
+	}
+}
+
+idc.ric-robotics.xyz {
+	handle {
+		reverse_proxy 10.148.0.47:9992 {
+			# header_up Host {host} # redundant
+			header_up X-Real-IP {remote}
+			# header_up X-Forwarded-For {remote}  # redundant
+			# header_up X-Forwarded-Port {server_port} # redundant
+			header_down -Server
+			header_down -X-Powered-By
+			header_down -X-Asp*
+		}
+		header X-Powered-By "Coffee"
+	}
+
+	log {
+		output file /var/log/caddy/idc.ric-robotics.xyz-access.log
+	}
+}
+
+info.ric-robotics.xyz {
+	handle {
+		reverse_proxy 10.148.0.47:9993 {
+			# header_up Host {host} # redundant
+			header_up X-Real-IP {remote}
+			# header_up X-Forwarded-For {remote}  # redundant
+			# header_up X-Forwarded-Port {server_port} # redundant
+			header_down -Server
+			header_down -X-Powered-By
+			header_down -X-Asp*
+		}
+		header X-Powered-By "Coffee"
+	}
+
+	log {
+		output file /var/log/caddy/info.ric-robotics.xyz-access.log
+	}
+}
