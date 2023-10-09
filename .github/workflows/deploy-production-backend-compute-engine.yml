@@ -13,7 +13,7 @@ jobs:
       max-parallel: 1
       matrix:
         services: [demo, info-collection-system, game-system, idc-system]
-    continue-on-error: false
+    continue-on-error: true
     permissions:
       contents: "read"
       id-token: "write"
