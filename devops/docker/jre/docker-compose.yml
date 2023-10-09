@@ -1,0 +1,12 @@
+version: "3"
+services:
+  demo:
+    image: eclipse-temurin:17-jre
+    environment:
+      - JAR_FILE=demo.jar
+    ports:
+      - "9990:8080"
+    volumes:
+      - "./docker/volumes/demo/:/application"
+    working_dir: /application
+    entrypoint: ["/bin/bash", "-c", "java -jar $${JAR_FILE}"]
