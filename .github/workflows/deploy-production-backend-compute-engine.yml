@@ -4,12 +4,15 @@ on:
     branches:
       - production/backend/compute-engine
 
+env:
+  DEPLOY_DIRECTORY: /var/containers
+
 jobs:
   deploy:
     strategy:
       max-parallel: 1
       matrix:
-        services: [demo, info-collection-system, game-system, idc-system]
+        services: [demo, game-system, idc-system, info-collection-system]
     continue-on-error: true
     permissions:
       contents: "read"
@@ -50,16 +53,53 @@ jobs:
           cd ${{ github.workspace }}/rigsg
           ./mvnw --projects ${{ matrix.services }} --also-make clean package spring-boot:repackage \
           -D skipTests=true
-      
-      - name: Install SSH key of bastion
-        uses: shimataro/ssh-key-action@v2
+
+      - name: Install SSH key of production server
+        uses: shimataro/ssh-key-action@v2.5.1
         with:
           key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
           name: id_rsa
-          known_hosts: ${{ secrets.PRODUCTION_SSH_FINGERPRINT }}
+          known_hosts: "unnecessary"
 
-      - name: Upload artifact to VM instance
+      - name: Adding Known Hosts
         run: |
-          # Test SSH connection by printing the hostname of the VM instance
+          ssh-keyscan -H ${{ secrets.PRODUCTION_SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: Fix SSH key
+        run: sed -i 's/\r$//g' ~/.ssh/id_rsa
+
+      - name: Stop running Docker containers
+        run: |
           ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
-          "hostname"
+          " \
+          cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
+          sudo docker compose down \
+          "
+
+      - name: Delete old JAR files
+        run: |
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
+          " \
+            cd $DEPLOY_DIRECTORY/${{ matrix.services }}/docker/volumes/${{ matrix.services }}/ && \
+            rm -rf *
+          "
+
+      - name: Upload JAR file to VM
+        run: |
+          rsync -avzb --delete ${{ github.workspace }}/rigsg/${{ matrix.services }}/target/${{ matrix.services }}.jar ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }}:$DEPLOY_DIRECTORY/${{ matrix.services }}/docker/volumes/${{ matrix.services }}/
+
+      - name: Start Docker containers
+        run: |
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
+          " \
+          cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
+          sudo docker compose up -d \
+          "
+
+      - name: Timestamping deployment
+        run: |
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
+          " \
+            cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
+            echo "Commit ${{ github.sha }} deployed at $(TZ=":Asia/Singapore" date)" > deployment_info.txt \
+          "

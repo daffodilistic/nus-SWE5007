@@ -1,0 +1,15 @@
+version: "3"
+services:
+  demo:
+    image: eclipse-temurin:17-jre
+    environment:
+      - PORT=8080
+      - JAR_FILE=demo.jar
+      - POSTGRESQL_USERNAME=username
+      - POSTGRESQL_PASSWORD=password
+    ports:
+      - "9990:8080"
+    volumes:
+      - "./docker/volumes/demo/:/application"
+    working_dir: /application
+    entrypoint: ["/bin/bash", "-c", "java -jar $${JAR_FILE}"]
