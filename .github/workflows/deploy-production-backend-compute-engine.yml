@@ -88,6 +88,14 @@ jobs:
         run: |
           rsync -avzb --delete ${{ github.workspace }}/rigsg/${{ matrix.services }}/target/${{ matrix.services }}.jar ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }}:$DEPLOY_DIRECTORY/${{ matrix.services }}/docker/volumes/${{ matrix.services }}/
 
+      - name: Start Docker containers
+        run: |
+          ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
+          " \
+          cd $DEPLOY_DIRECTORY/${{ matrix.services }}/ && \
+          sudo docker compose up -d \
+          "
+
       - name: Timestamping deployment
         run: |
           ssh ${{ secrets.PRODUCTION_SSH_USERNAME }}@${{ secrets.PRODUCTION_SSH_HOST }} \
