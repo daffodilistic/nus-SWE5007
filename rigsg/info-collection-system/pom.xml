@@ -41,4 +41,8 @@
             </plugin>
         </plugins> -->
     </build>
+
+    <build>
+		<finalName>info-collection-system</finalName>
+	</build>
 </project>
