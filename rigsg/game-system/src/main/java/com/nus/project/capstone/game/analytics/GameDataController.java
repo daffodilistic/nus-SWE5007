@@ -38,6 +38,7 @@ public class GameDataController {
     public ResponseEntity<GeneralMessageEntity> initiate() {
 
         gameService.setUpAndSaveGame();
+        gameService.setUpAndSaveTech();
 
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data("ok").build());
