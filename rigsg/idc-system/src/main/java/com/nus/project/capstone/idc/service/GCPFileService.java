@@ -49,14 +49,14 @@ public class GCPFileService {
 
     @Autowired
     public GCPFileService(
-            @Value("${spring.cloud.gcp.bucket.credential}") String gcpBucketCredential,
+            @Value("${spring.cloud.gcp.bucket.credential:#{null}}") String gcpBucketCredential,
             @Value("${spring.cloud.gcp.project-id}") String gcpProjectId,
             @Value("${spring.cloud.gcp.bucket.id}") String gcpBucketId,
             @Value("${spring.cloud.gcp.bucket.dirName}") String gcpDirectoryName) {
         this.gcpDirectoryName = gcpDirectoryName;
         this.gcpBucketId = gcpBucketId;
         this.gcpProjectId = gcpProjectId;
-        if (!Strings.isNullOrEmpty(gcpBucketCredential)) {
+        if (gcpBucketCredential.isPresent()) {
             loadGCPStorageAndBucket(gcpBucketCredential);
         } else {
             try {
