@@ -32,21 +32,15 @@ jobs:
         env: # Or as an environment variable
           POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_USERNAME }}
           POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD }}
+          GCP_CREDENTIALS_JSON: ${{ secrets.GCP_CREDENTIALS_JSON }}
         run: |
           sudo apt-get install -y moreutils
           echo "Using GCP-specific application.yml"
           cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/resources
           rm application.yml
           mv application_gcp.yml application.yml
-          echo "Setting app_version and envsubst-ing app.yaml"
-          cd ${{ github.workspace }}/rigsg
-          APP_VERSION=$(git rev-parse --short HEAD)
-          echo "app_version=$APP_VERSION" >> $GITHUB_ENV
-          cd ${{ github.workspace }}/rigsg/${{ matrix.services }}/src/main/appengine
-          envsubst < app.yaml | sponge app.yaml
-          echo "Creating github_actions.json"
-          cd ${{ github.workspace }}
-          echo ${{ secrets.GCP_CREDENTIALS_JSON }} | base64 --decode > github_actions.json
+          echo "envsubst-ing application.yml"
+          envsubst < application.yml | sponge application.yml
 
       - name: Build Spring Boot application
         run: |

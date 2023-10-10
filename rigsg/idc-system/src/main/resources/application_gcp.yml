@@ -3,9 +3,9 @@ server:
 spring:
   cloud:
     gcp:
-#      credentials:
-#        encoded-key: asdasdf
       project-id: shaped-splicer-397009
+      credentials:
+        encoded-key: ${GCP_CREDENTIALS_JSON}
       sql:
         enabled: false
       bucket:
