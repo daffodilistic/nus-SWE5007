@@ -60,7 +60,8 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                             "/games/update-game",
                             "/tech-comp/create-tech-comp",
                             "/tech-comp/update-tech-comp",
-                            "/analytics/generate").hasRole("admin")
+                            "/analytics/generate",
+                            "/analytics/initiate").hasRole("admin")
                     .antMatchers("/games/create-game",
                             "/**/update-ongoing-status",
                             "/**/update-scores",
