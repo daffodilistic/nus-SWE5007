@@ -18,10 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +33,7 @@ public class UserInfoController {
     private String keycloakUrl;
 
     private final String KEYCLOAK_USER_CREATION = "/admin/realms/ricsg/users";
+    private final HashMap<String, String> dataMap = new HashMap<>();
 
     @Autowired
     public UserInfoController(UserRepository userRepository) {
@@ -111,7 +109,7 @@ public class UserInfoController {
 
         val o = userRepository.findById(userRequests.getId());
         return ResponseEntity.ok(GeneralMessageEntity.builder()
-                .data(o.map(UserResponse::toUserResponse).orElse(null)).build());
+                .data(o.map(user -> UserResponse.toUserResponse(user, null)).orElse(null)).build());
     }
 
     @PostMapping("/view-user-email")
@@ -147,10 +145,15 @@ public class UserInfoController {
     }
 
     @GetMapping("/view-all-users")
-    public ResponseEntity<GeneralMessageEntity> getAllUsers() {
+    public ResponseEntity<GeneralMessageEntity> getAllUsers(@RequestHeader("Authorization") String bearerToken) {
+        JsonNode usersInKeycloak = getUserInKeycloak(keycloakUrl + KEYCLOAK_USER_CREATION, bearerToken).getBody();
+        for (JsonNode userNode : usersInKeycloak) {
+            dataMap.put(String.valueOf(userNode.get("email")).replaceAll("\"", ""),
+                    String.valueOf(userNode.get("username")).replaceAll("\"", ""));
+        }
         val users = userRepository.findAll();
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(users.stream()
-                .map(UserResponse::toUserResponse).collect(Collectors.toList())).build());
+                .map(user -> UserResponse.toUserResponse(user, dataMap)).collect(Collectors.toList())).build());
     }
 
     @DeleteMapping("/delete-user")
@@ -167,6 +170,15 @@ public class UserInfoController {
         httpHeaders.set("Authorization", token);
         HttpEntity<JsonNode> httpEntity = new HttpEntity<>(constructJsonForKeycloak(userRequests, userType), httpHeaders);
         return restTemplate.exchange(url, HttpMethod.POST, httpEntity, JsonNode.class);
+    }
+
+    private ResponseEntity<JsonNode> getUserInKeycloak(String url, String token){
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Content-Type", "application/json");
+        httpHeaders.set("Authorization", token);
+        HttpEntity<JsonNode> httpEntity = new HttpEntity<>(httpHeaders);
+        return restTemplate.exchange(url, HttpMethod.GET, httpEntity, JsonNode.class);
     }
 
     private JsonNode constructJsonForKeycloak(UserRequests userRequests, String userType){

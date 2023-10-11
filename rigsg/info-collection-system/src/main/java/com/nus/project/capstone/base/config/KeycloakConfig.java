@@ -53,7 +53,7 @@ class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
                     .authorizeRequests()
                     .antMatchers("/**/view**")
                     .hasAnyRole("participant", "judge")
-                    .antMatchers("/userinfo/create**", "/userinfo/update-user", "/**/delete**", "/userinfo/mark-attendance")
+                    .antMatchers("/userinfo/create**", "/userinfo/update-user", "/**/delete**", "/userinfo/mark-attendance", "/userinfo/view-all-users")
                     .hasRole("admin")
                     .anyRequest().denyAll();
         } else {

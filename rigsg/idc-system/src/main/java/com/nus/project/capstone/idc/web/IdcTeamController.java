@@ -64,7 +64,7 @@ public class IdcTeamController {
         val i = o.map(idcTeamJpa -> {
             val idcTeamResponse = IdcTeamResponse.toIdcTeamResponse(idcTeamJpa);
             idcTeamResponse.setUserResponses(idcTeamJpa.getUsers() == null ? null :
-                    idcTeamJpa.getUsers().stream().map(UserResponse::toUserResponse).collect(Collectors.toList()));
+                    idcTeamJpa.getUsers().stream().map(user -> UserResponse.toUserResponse(user, null)).collect(Collectors.toList()));
             return idcTeamResponse;
         }).orElse(null);
 
