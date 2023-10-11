@@ -53,7 +53,7 @@ public class GameTeamController {
         val i = o.map(gameTeamJpa -> {
             val gameTeamResponse = GameTeamResponse.toGameTeamResponse(gameTeamJpa);
             gameTeamResponse.setUserResponses(gameTeamJpa.getUsers() == null ? null :
-                    gameTeamJpa.getUsers().stream().map(UserResponse::toUserResponse).collect(Collectors.toList()));
+                    gameTeamJpa.getUsers().stream().map(user -> UserResponse.toUserResponse(user, null)).collect(Collectors.toList()));
             return gameTeamResponse;
         }).orElse(null);
 
