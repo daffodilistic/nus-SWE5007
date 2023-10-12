@@ -29,6 +29,7 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 
@@ -49,15 +50,15 @@ public class GCPFileService {
 
     @Autowired
     public GCPFileService(
-            @Value("${spring.cloud.gcp.bucket.credential:#{null}}") String gcpBucketCredential,
+            @Value("${spring.cloud.gcp.bucket.credential:#{null}}") Optional<String> gcpBucketCredential,
             @Value("${spring.cloud.gcp.project-id}") String gcpProjectId,
             @Value("${spring.cloud.gcp.bucket.id}") String gcpBucketId,
             @Value("${spring.cloud.gcp.bucket.dirName}") String gcpDirectoryName) {
         this.gcpDirectoryName = gcpDirectoryName;
         this.gcpBucketId = gcpBucketId;
         this.gcpProjectId = gcpProjectId;
-        if (gcpBucketCredential.isEmpty()) {
-            loadGCPStorageAndBucket(gcpBucketCredential);
+        if (gcpBucketCredential.isPresent()) {
+            loadGCPStorageAndBucket(gcpBucketCredential.get());
         } else {
             try {
             StorageOptions options = StorageOptions.newBuilder().build();
