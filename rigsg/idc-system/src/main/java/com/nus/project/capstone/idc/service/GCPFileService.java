@@ -56,7 +56,7 @@ public class GCPFileService {
         this.gcpDirectoryName = gcpDirectoryName;
         this.gcpBucketId = gcpBucketId;
         this.gcpProjectId = gcpProjectId;
-        if (gcpBucketCredential.isPresent()) {
+        if (gcpBucketCredential.isEmpty()) {
             loadGCPStorageAndBucket(gcpBucketCredential);
         } else {
             try {
