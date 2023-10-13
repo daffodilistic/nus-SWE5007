@@ -439,9 +439,9 @@ import {
   ADD_MEMBER_GAME_TEAM_BASE_URL,
   UPDATE_GAME_TEAM_BASE_URL,
   VIEW_GAME_TEAM_BASE_URL,
-  GET_ALL_USER_INFO_BASE_URL,
   GET_ALL_GAME_TEAM_BASE_URL,
   GET_ALL_GAME_GROUP_BASE_URL,
+  api
 } from "@/api";
 import Swal from "sweetalert2";
 import Vue from "vue";
@@ -655,7 +655,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, {
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
           headers,
         });
         this.currentTeamId = teamId;
@@ -745,7 +745,7 @@ export default {
         try {
           // Make the API call here using the team ID as the request body
 
-          const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, {
+          const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
             headers,
           });
           const allUsers = response.data.data;

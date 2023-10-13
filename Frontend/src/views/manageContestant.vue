@@ -313,10 +313,7 @@
 <script>
 import axios from "axios";
 import {
-  GET_ALL_USER_INFO_BASE_URL,
-  UPDATE_USER_INFO_BASE_URL,
-  CREATE_USER_INFO_BASE_URL,
-  DELETE_USER_INFO_BASE_URL,
+  api
 } from "@/api";
 import {
   competitionChoiceOptions,
@@ -441,7 +438,7 @@ export default {
       Authorization: `Bearer ${token}`,
     };
     try {
-      this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, {
+      this.usersData = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
         headers,
       });
       this.users = this.usersData.data.data;
@@ -485,11 +482,11 @@ export default {
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
-          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, {
+          this.usersData = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
             headers,
           });
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, {
+          this.usersData = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
             headers,
           });
         }
@@ -594,13 +591,13 @@ export default {
           let url = "";
           let url2 = "";
           if (this.selectedCompetition === "Game Arena") {
-            url = UPDATE_USER_INFO_BASE_URL;
-            url2 = CREATE_USER_INFO_BASE_URL;
+            url = api.UPDATE_USER_INFO_BASE_URL;
+            url2 = api.CREATE_USER_INFO_BASE_URL;
           } else if (
             this.selectedCompetition === "Innovation Design Challenge"
           ) {
-            url = UPDATE_USER_INFO_BASE_URL;
-            url2 = CREATE_USER_INFO_BASE_URL;
+            url = api.UPDATE_USER_INFO_BASE_URL;
+            url2 = api.CREATE_USER_INFO_BASE_URL;
           }
           // If the user has an ID, update the existing record using a PUT request
           if (user.id) {
@@ -699,7 +696,7 @@ export default {
         };
 
         try {
-          const response = await axios.delete(`${DELETE_USER_INFO_BASE_URL}`, {
+          const response = await axios.delete(`${api.DELETE_USER_INFO_BASE_URL}`, {
             data: requestBody,
             headers: headers,
           });

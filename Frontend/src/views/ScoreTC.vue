@@ -292,8 +292,6 @@ import {
   VIEW_ALL_TC_BASE_URL,
   GET_ALL_GAME_TEAM_BASE_URL,
   CREATE_TC_BASE_URL,
-  DELETE_USER_INFO_BASE_URL,
-  UPDATE_USER_INFO_BASE_URL,
   UPDATE_TC_STATUS_BASE_URL,
   UPDATE_TC_OUTCOME_BASE_URL,
 } from "@/api";
@@ -593,7 +591,7 @@ export default {
           Authorization: `Bearer ${token}`,
         };
         try {
-          const url = UPDATE_USER_INFO_BASE_URL;
+          const url = api.UPDATE_USER_INFO_BASE_URL;
           const url2 = CREATE_TC_BASE_URL;
 
           // If the techComp has an ID, update the existing record using a PUT request
@@ -681,7 +679,7 @@ export default {
         };
 
         try {
-          const response = await axios.delete(`${DELETE_USER_INFO_BASE_URL}`, {
+          const response = await axios.delete(`${api.DELETE_USER_INFO_BASE_URL}`, {
             data: requestBody,
             headers: headers,
           });

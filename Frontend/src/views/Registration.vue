@@ -121,7 +121,7 @@ import {
   ADD_MEMBER_IDC_TEAM_BASE_URL,
   CREATE_IDC_TEAM_BASE_URL,
   CREATE_GAME_TEAM_BASE_URL,
-  CREATE_USER_INFO_BASE_URL,
+  api
 } from "@/api";
 
 export default {
@@ -210,7 +210,7 @@ export default {
 
         // Call the create new user API
         const createUserResponse = await axios.post(
-          `${CREATE_USER_INFO_BASE_URL}`,
+          `${api.CREATE_USER_INFO_BASE_URL}`,
           userData,
           { headers }
         );

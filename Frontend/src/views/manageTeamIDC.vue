@@ -439,10 +439,10 @@ import {
   ADD_MEMBER_IDC_TEAM_BASE_URL,
   UPDATE_IDC_TEAM_BASE_URL,
   VIEW_IDC_TEAM_BASE_URL,
-  GET_ALL_USER_INFO_BASE_URL,
   GET_ALL_IDC_TEAM_BASE_URL,
   GET_ALL_GAME_TEAM_BASE_URL,
   GET_ALL_GAME_GROUP_BASE_URL,
+  api
 } from "@/api";
 import Swal from "sweetalert2";
 import Vue from "vue";
@@ -657,7 +657,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, {
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
           headers,
         });
         this.currentTeamId = teamId;

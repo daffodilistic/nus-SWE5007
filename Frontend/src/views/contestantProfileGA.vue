@@ -230,7 +230,7 @@ import {
   VIEW_ALL_ADMIN_FILES_BASE_URL,
   GET_ALL_GAME_TEAM_BASE_URL,
   GET_ALL_GAME_GROUP_BASE_URL,
-  GET_ALL_USER_INFO_BASE_URL,
+  api
 } from "@/api";
 import axios from "axios";
 import Vue from "vue";
@@ -289,7 +289,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, {
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
           headers,
         });
         const team = response.data.data;
