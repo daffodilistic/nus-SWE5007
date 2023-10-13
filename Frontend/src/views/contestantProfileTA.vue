@@ -218,7 +218,6 @@
 import { competitionChoiceOptions } from "../dropdownOptions";
 import {
   VIEW_ALL_TC_BASE_URL,
-  DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,
   VIEW_ALL_ADMIN_FILES_BASE_URL,
   GET_ALL_GAME_TEAM_BASE_URL,
   api
@@ -469,7 +468,7 @@ export default {
         console.error("Error fetching users:", error);
       }
       axios({
-        url: `${DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
+        url: `${api.DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
         method: "POST",
         responseType: "blob",
         headers: {

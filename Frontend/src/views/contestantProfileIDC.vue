@@ -326,11 +326,7 @@ import contestantProfileGA from "./contestantProfileGA.vue"; // Import your Tab1
 import { competitionChoiceOptions } from "../dropdownOptions";
 import {
   VIEW_IDC_TEAM_BASE_URL,
-  UPLOAD_PRIM_FILE_IDC_BASE_URL,
-  UPLOAD_PROMO_FILE_IDC_BASE_URL,
-  DOWNLOAD_FILE_IDC_BASE_URL,
   VIEW_ALL_FILES_BASE_URL,
-  DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,
   VIEW_ALL_ADMIN_FILES_BASE_URL,
   api
 } from "@/api";
@@ -656,7 +652,7 @@ export default {
             !team.isQualifiedFinalSecondStage
           ) {
             response = await axios.post(
-              `${UPLOAD_PROMO_FILE_IDC_BASE_URL}`,
+              `${api.UPLOAD_PROMO_FILE_IDC_BASE_URL}`,
               formData,
               {
                 //video .mp4
@@ -672,7 +668,7 @@ export default {
             !team.isQualifiedFinalSecondStage
           ) {
             response = await axios.post(
-              `${UPLOAD_PRIM_FILE_IDC_BASE_URL}`,
+              `${api.UPLOAD_PRIM_FILE_IDC_BASE_URL}`,
               formData,
               {
                 //pdf
@@ -705,7 +701,7 @@ export default {
 
     downloadFile(file) {
       axios({
-        url: `${DOWNLOAD_FILE_IDC_BASE_URL}/${file}`,
+        url: `${api.DOWNLOAD_FILE_IDC_BASE_URL}/${file}`,
         method: "POST",
         responseType: "blob",
         headers: {
@@ -785,7 +781,7 @@ export default {
         console.error("Error fetching users:", error);
       }
       axios({
-        url: `${DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
+        url: `${api.DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
         method: "POST",
         responseType: "blob",
         headers: {

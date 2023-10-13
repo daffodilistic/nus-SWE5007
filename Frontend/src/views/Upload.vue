@@ -274,8 +274,7 @@ import {
 } from "../dropdownOptions";
 import {
   UPLOAD_ADMIN_FILES_BASE_URL,
-  VIEW_ALL_ADMIN_FILES_BASE_URL,
-  DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,
+  VIEW_ALL_ADMIN_FILES_BASE_URL
 } from "@/api";
 import axios from "axios";
 import Vue from "vue";
@@ -432,7 +431,7 @@ export default {
     },
     downloadFile(file) {
       axios({
-        url: `${DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${file}`,
+        url: `${api.DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${file}`,
         method: "POST",
         responseType: "blob",
         headers: {
