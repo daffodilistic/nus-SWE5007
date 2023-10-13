@@ -230,7 +230,7 @@
 <script>
 import contestantProfileGA from './contestantProfileGA.vue'; // Import your Tab1 component
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {VIEW_IDC_TEAM_BASE_URL,UPLOAD_PRIM_FILE_IDC_BASE_URL,UPLOAD_PROMO_FILE_IDC_BASE_URL,DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL,GET_ALL_USER_INFO_BASE_URL} from '@/api';
+import { api } from '../api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -290,7 +290,7 @@ export default {
         'Authorization': `Bearer ${token}`
       };
       try {
-        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, { headers });
         const team = response.data.data;
         const filteredUser = team.filter((record) => record.firstName===userName);
         this.idcTeamId = filteredUser[0].idcTeam;
@@ -298,7 +298,7 @@ export default {
         const requestBody = {
           id: this.idcTeamId,
         };
-         this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+         this.teamsData = await axios.post(`${api.VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
          this.team  = this.teamsData.data.data;
       } catch (error) {
         // Handle any errors that might occur during the request
@@ -327,15 +327,14 @@ export default {
       const seconds = String(date.getSeconds()).padStart(2, '0');
 
       return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-  },
+    },
     async viewScore(teamId) {
-
-       let token='';
-       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+      let token='';
+      if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+          token = Vue.$keycloak.token;
+        } else {
+          token = "mockedToken";//for unit test
+        }
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -344,7 +343,7 @@ export default {
         id: teamId,
       };
       try {
-        const response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+        const response = await axios.post(`${api.VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
         const teamObject = response.data.data
         this.presentationList = teamObject.presentationResponses
         //this.showHistoryModal = true; // Show the modal after fetching the users
@@ -353,7 +352,6 @@ export default {
         console.error("Error fetching users:", error);
       }
     },
-
     async viewDownload(teamName) {
        let token='';
        if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
@@ -366,7 +364,7 @@ export default {
         'Authorization': `Bearer ${token}`
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_FILES_BASE_URL}`, { headers });
+        const response = await axios.get(`${api.VIEW_ALL_FILES_BASE_URL}`, { headers });
         const originalArray = response.data.data;
         const prefix = teamName;
 
@@ -425,7 +423,7 @@ export default {
         id: this.idcTeamId,
       };
       try {
-            this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+            this.teamsData = await axios.post(`${api.VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
             this.team  = this.teamsData.data.data;
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -439,7 +437,6 @@ export default {
         return "Please Upload Video";
       }
     },
-
     displayGuideline(team) {
       if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
         return `
@@ -457,7 +454,6 @@ export default {
           e) Max file size of 20MB.</span>`;
       }
     },
-
     onFileChange(event) {
       // Handle the file change event here
       this.selectedFile = event.target.files[0];
@@ -500,14 +496,14 @@ export default {
           let response = '';
 
              if (team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-                 response = await axios.post(`${UPLOAD_PROMO_FILE_IDC_BASE_URL}`, formData, { //video .mp4
+                 response = await axios.post(`${api.UPLOAD_PROMO_FILE_IDC_BASE_URL}`, formData, { //video .mp4
                   headers: {
                   "Content-Type": "multipart/form-data",
                   "Authorization": `Bearer ${token}`
                 }});
 
               } else if (!team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage) {
-                response = await axios.post(`${UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, { //pdf
+                response = await axios.post(`${api.UPLOAD_PRIM_FILE_IDC_BASE_URL}`, formData, { //pdf
                 headers: {
                   "Content-Type": "multipart/form-data",
                   "Authorization": `Bearer ${token}`
@@ -532,64 +528,62 @@ export default {
         console.error('Error calling API:', error);
       }
     },
-
     downloadFile(file) {
       axios({
-  url: `${DOWNLOAD_FILE_IDC_BASE_URL}/${file}`,
-  method: 'POST',
-  responseType: 'blob',
-  headers: {
-    'Authorization': `Bearer ${Vue.$keycloak.token}`
-  },
-})
-.then((res) => {
-  // Get the file type (MIME type) from the response Blob
-  const fileType = res.data.type;
+        url: `${api.DOWNLOAD_FILE_IDC_BASE_URL}/${file}`,
+        method: 'POST',
+        responseType: 'blob',
+        headers: {
+          'Authorization': `Bearer ${Vue.$keycloak.token}`
+        },
+      })
+      .then((res) => {
+        // Get the file type (MIME type) from the response Blob
+        const fileType = res.data.type;
 
-  // Extract the filename from the URL or generate it dynamically
-  const urlParts = res.config.url.split('/');
-  const filename = urlParts[urlParts.length - 1];
+        // Extract the filename from the URL or generate it dynamically
+        const urlParts = res.config.url.split('/');
+        const filename = urlParts[urlParts.length - 1];
 
-  // Create a Blob from the response data
-  const blob = new Blob([res.data], { type: fileType });
+        // Create a Blob from the response data
+        const blob = new Blob([res.data], { type: fileType });
 
-  // Create a URL for the Blob
-  const url = window.URL.createObjectURL(blob);
+        // Create a URL for the Blob
+        const url = window.URL.createObjectURL(blob);
 
-  // Create a link element
-  const link = document.createElement('a');
-  link.href = url;
+        // Create a link element
+        const link = document.createElement('a');
+        link.href = url;
 
-  // Set the download attribute to the extracted/generated filename
-  link.setAttribute('download', filename);
+        // Set the download attribute to the extracted/generated filename
+        link.setAttribute('download', filename);
 
-  // Trigger the download
-  document.body.appendChild(link);
-  link.click();
+        // Trigger the download
+        document.body.appendChild(link);
+        link.click();
 
-  // Clean up
-  window.URL.revokeObjectURL(url);
-  document.body.removeChild(link);
-})
-.catch((error) => {
-  console.error('Error downloading file:', error);
-  // Handle the error here (e.g., show an error message to the user)
-});
+        // Clean up
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error('Error downloading file:', error);
+        // Handle the error here (e.g., show an error message to the user)
+      });
     },
-     async downloadAdminFile(compType,docType) {
-
-       let token='';
-       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+    async downloadAdminFile(compType,docType) {
+      let token='';
+      if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken";//for unit test
+      }
       const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_ADMIN_FILES_BASE_URL}`, { headers });
+        const response = await axios.get(`${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`, { headers });
         const originalArray = response.data.data;
 
         // Remove the "participants/" prefix from each item
@@ -599,26 +593,24 @@ export default {
         });
 
         this.downloadAdminFileList = interimArray.filter((item) => {
-        const parts = item.split('-');
-        if (parts.length >= 2) {
-          // Check if the first part of the filename matches the prefix
-          return parts[0] === 'IDC' && parts[1] === docType;;
-        }
-        return false;
-      });
-
+          const parts = item.split('-');
+          if (parts.length >= 2) {
+            // Check if the first part of the filename matches the prefix
+            return parts[0] === 'IDC' && parts[1] === docType;;
+          }
+          return false;
+        });
       }
       catch (error) {
         console.error("Error fetching users:", error);
       }
-       axios({
-        url: `${DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
+      axios({
+        url: `${api.DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
         method: 'POST',
         responseType: 'blob',
         headers: {
           'Authorization': `Bearer ${Vue.$keycloak.token}`
         },
-
       })
       .then((res) => {
         // Get the file type (MIME type) from the response Blob

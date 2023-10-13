@@ -163,7 +163,7 @@
 
 <script>
 import {competitionChoiceOptions,} from "../dropdownOptions";
-import {DOWNLOAD_FILE_IDC_BASE_URL,VIEW_ALL_FILES_BASE_URL,DOWNLOAD_ADMIN_FILE_IDC_BASE_URL,VIEW_ALL_ADMIN_FILES_BASE_URL,GET_ALL_GAME_TEAM_BASE_URL,GET_ALL_GAME_GROUP_BASE_URL,GET_ALL_USER_INFO_BASE_URL} from '@/api';
+import { api } from '../api';
 import axios from "axios";
 import Vue from 'vue';
 
@@ -217,7 +217,7 @@ export default {
         'Authorization': `Bearer ${token}`
       };
       try {
-        const response = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, { headers });
         const team = response.data.data;
          console.log(userName,'team',team)
 
@@ -234,7 +234,7 @@ export default {
         const requestBody = {
           id: this.gameTeamId,
         };
-         this.teamsData = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+         this.teamsData = await axios.post(`${api.VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
          this.team  = this.teamsData.data.data;
          console.log('this.team',this.team)
       } catch (error) {
@@ -269,7 +269,7 @@ export default {
         id: teamId,
       };
       try {
-        const response = await axios.post(`${VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
+        const response = await axios.post(`${api.VIEW_IDC_TEAM_BASE_URL}`,requestBody, { headers });
         const teamObject = response.data.data
         this.presentationList = teamObject.presentationResponses
         //this.showHistoryModal = true; // Show the modal after fetching the users
@@ -291,7 +291,7 @@ export default {
         'Authorization': `Bearer ${token}`
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_FILES_BASE_URL}`, { headers });
+        const response = await axios.get(`${api.VIEW_ALL_FILES_BASE_URL}`, { headers });
         const originalArray = response.data.data;
         const prefix = teamName;
 
@@ -342,7 +342,7 @@ export default {
       };
 
       try {
-            const response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
+            const response = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, { headers });
             const teamObj = response.data.data.filter(team => team.id === this.gameTeamId)
             this.team = teamObj[0]
 
@@ -364,7 +364,7 @@ export default {
         'Authorization': `Bearer ${token}`
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_ADMIN_FILES_BASE_URL}`, { headers });
+        const response = await axios.get(`${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`, { headers });
         const originalArray = response.data.data;
 
         // Remove the "participants/" prefix from each item
@@ -387,7 +387,7 @@ export default {
         console.error("Error fetching users:", error);
       }
        axios({
-        url: `${DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
+        url: `${api.DOWNLOAD_ADMIN_FILE_IDC_BASE_URL}/${this.downloadAdminFileList}`,
         method: 'POST',
         responseType: 'blob',
         headers: {
@@ -436,7 +436,7 @@ export default {
         'Authorization': `Bearer ${Vue.$keycloak.token}`
       };
       try {
-          const groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
+          const groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, { headers });
           const groups = groupsData.data.data;
 
         let groupId = '';
