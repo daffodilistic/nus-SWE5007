@@ -8,6 +8,8 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import authentication from "@/plugins/authentication"
 
+import { api } from './api'
+
 Vue.use(authentication)
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue)
@@ -18,7 +20,7 @@ Vue.config.productionTip = false
 Vue.$keycloak
   .init({
     // onLoad: 'login-required',
-    redirectUri:'http://localhost:8080/',
+    redirectUri: api.BASE_URL,
     pkceMethod: 'S256',
     checkLoginIframe: false,
   })

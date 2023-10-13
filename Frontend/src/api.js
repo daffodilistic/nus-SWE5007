@@ -1,9 +1,21 @@
+// console.log("NODE_ENV is " + process.env.NODE_ENV);
+
+// Base URL declarations
+const INFO_SERVICE_URL = process.env.NODE_ENV === 'production' ? 'info.ric-robotics.xyz' : 'localhost:8081';
+const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://ric-robotics.xyz/' : 'http://localhost:8080/';
+
+const apiObject = Object.freeze({
+    BASE_URL: BASE_URL
+});
+
+export const api = apiObject;
+
 //CONTESTANTS
-export const GET_ALL_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/view-all-users'
-export const UPDATE_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/update-user'
-export const CREATE_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/create-user'
-export const DELETE_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/delete-user'
-export const VIEW_USER_INFO_BASE_URL ='http://localhost:8081/userinfo/view-user'
+export const GET_ALL_USER_INFO_BASE_URL = `${INFO_SERVICE_URL}/userinfo/view-all-users`;
+export const UPDATE_USER_INFO_BASE_URL  = `${INFO_SERVICE_URL}/userinfo/update-user`;
+export const CREATE_USER_INFO_BASE_URL  = `${INFO_SERVICE_URL}/userinfo/create-user`;
+export const DELETE_USER_INFO_BASE_URL  = `${INFO_SERVICE_URL}/userinfo/delete-user`;
+export const VIEW_USER_INFO_BASE_URL    = `${INFO_SERVICE_URL}/userinfo/view-user`;
 
 //IDC TEAM
 export const GET_ALL_IDC_TEAM_BASE_URL ='http://localhost:8082/idcteam/view-all-teams'
@@ -71,4 +83,3 @@ export const VIEW_ALL_TC_BASE_URL = 'http://localhost:8083/tech-comp/view-all-te
 export const CREATE_TC_BASE_URL = 'http://localhost:8083/tech-comp/create-tech-comp'
 export const UPDATE_TC_STATUS_BASE_URL = 'http://localhost:8083/tech-comp/update-ongoing-status'
 export const UPDATE_TC_OUTCOME_BASE_URL = 'http://localhost:8083/tech-comp/update-outcome'
-
