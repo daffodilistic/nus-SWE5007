@@ -433,17 +433,7 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
-import {
-  VIEW_GAME_GROUP_BASE_URL,
-  GET_ALL_GAME_GROUP_BASE_URL,
-  GET_ALL_GAME_TEAM_BASE_URL,
-  CREATE_GAME_BASE_URL,
-  GET_ALL_GAMES_BASE_URL,
-  UPDATE_GAME_ONGOING_STATUS_BASE_URL,
-  UPDATE_GAME_SCORE_BASE_URL,
-  CHECK_GAME_QUALIFICATION_STATUS_BASE_URL,
-  QUALIFY_GAME_TEAM_BASE_URL,
-} from "@/api";
+import { api } from "../api";
 import Swal from "sweetalert2";
 import Vue from "vue";
 import Round from "./Round.vue";
@@ -630,13 +620,13 @@ export default {
       Authorization: `Bearer ${Vue.$keycloak.token}`,
     };
     try {
-      this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, {
+      this.groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
         headers,
       });
       this.groups = this.groupsData.data.data;
 
       //poc start
-      const allGames = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, {
+      const allGames = await axios.get(`${api.GET_ALL_GAMES_BASE_URL}`, {
         headers,
       });
 
@@ -750,7 +740,7 @@ export default {
 
         try {
           const response = await axios.put(
-            `${UPDATE_GAME_SCORE_BASE_URL}`,
+            `${api.UPDATE_GAME_SCORE_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -783,7 +773,7 @@ export default {
       };
       try {
         const response = await axios.put(
-          `${UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,
+          `${api.UPDATE_GAME_ONGOING_STATUS_BASE_URL}`,
           requestBody,
           { headers }
         );
@@ -823,7 +813,7 @@ export default {
         try {
           // If the group has an ID, update the existing record using a PUT request
           // const response = await axios.post(
-          //`${CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`,
+          //`${api.CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`,
           //requestBody,
           //{ headers }
           // );
@@ -834,7 +824,7 @@ export default {
           //" is ready for qualification")
           // ) {
           const response = await axios.post(
-            `${QUALIFY_GAME_TEAM_BASE_URL}`,
+            `${api.QUALIFY_GAME_TEAM_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -909,7 +899,7 @@ export default {
             try {
               // If the group has an ID, update the existing record using a PUT request
               const response = await axios.post(
-                `${CREATE_GAME_BASE_URL}`,
+                `${api.CREATE_GAME_BASE_URL}`,
                 requestBody,
                 { headers }
               );
@@ -973,7 +963,7 @@ export default {
           };
 
           const response = await axios.post(
-            `${CREATE_GAME_BASE_URL}`,
+            `${api.CREATE_GAME_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -1001,13 +991,13 @@ export default {
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-        this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, {
+        this.groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
           headers,
         });
         this.groups = this.groupsData.data.data;
 
         //poc start
-        const allGames = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, {
+        const allGames = await axios.get(`${api.GET_ALL_GAMES_BASE_URL}`, {
           headers,
         });
 
@@ -1139,7 +1129,7 @@ export default {
 
           try {
             const response = await axios.post(
-              `${CREATE_GAME_BASE_URL}`,
+              `${api.CREATE_GAME_BASE_URL}`,
               requestBody,
               { headers }
             );
@@ -1185,7 +1175,7 @@ export default {
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-        const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, {
+        const response = await axios.get(`${api.GET_ALL_GAMES_BASE_URL}`, {
           headers,
         });
         this.allGameData = response.data.data;
@@ -1257,7 +1247,7 @@ export default {
       };
       let response = "";
       try {
-        response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+        response = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
           headers,
         });
         this.teamList = response.data.data;
@@ -1283,7 +1273,7 @@ export default {
           Authorization: `Bearer ${Vue.$keycloak.token}`,
         };
         try {
-          const response = await axios.get(`${GET_ALL_GAMES_BASE_URL}`, {
+          const response = await axios.get(`${api.GET_ALL_GAMES_BASE_URL}`, {
             headers,
           });
 
@@ -1353,7 +1343,7 @@ export default {
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-        this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, {
+        this.groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
           headers,
         });
         this.groups = this.groupsData.data.data;

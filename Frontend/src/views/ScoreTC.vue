@@ -288,13 +288,7 @@
 
 <script>
 import axios from "axios";
-import {
-  VIEW_ALL_TC_BASE_URL,
-  GET_ALL_GAME_TEAM_BASE_URL,
-  CREATE_TC_BASE_URL,
-  UPDATE_TC_STATUS_BASE_URL,
-  UPDATE_TC_OUTCOME_BASE_URL,
-} from "@/api";
+import { api } from "../api";
 import { tcGameOptions } from "../dropdownOptions";
 import Swal from "sweetalert2";
 import Vue from "vue";
@@ -403,12 +397,12 @@ export default {
       Authorization: `Bearer ${token}`,
     };
     try {
-      const techCompsData = await axios.get(`${VIEW_ALL_TC_BASE_URL}`, {
+      const techCompsData = await axios.get(`${api.VIEW_ALL_TC_BASE_URL}`, {
         headers,
       });
       const techComp = techCompsData.data.data;
 
-      const response2 = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+      const response2 = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
         headers,
       });
       this.teamList = response2.data.data;
@@ -443,7 +437,7 @@ export default {
       };
       try {
         const response = await axios.put(
-          `${UPDATE_TC_STATUS_BASE_URL}`,
+          `${api.UPDATE_TC_STATUS_BASE_URL}`,
           requestBody,
           { headers }
         );
@@ -487,7 +481,7 @@ export default {
             gameOutcome: result,
           };
           const response = await axios.put(
-            `${UPDATE_TC_OUTCOME_BASE_URL}`,
+            `${api.UPDATE_TC_OUTCOME_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -519,12 +513,12 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const techCompsData = await axios.get(`${VIEW_ALL_TC_BASE_URL}`, {
+        const techCompsData = await axios.get(`${api.VIEW_ALL_TC_BASE_URL}`, {
           headers,
         });
         const techComp = techCompsData.data.data;
 
-        const response2 = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+        const response2 = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
           headers,
         });
         this.teamList = response2.data.data;
@@ -592,7 +586,7 @@ export default {
         };
         try {
           const url = api.UPDATE_USER_INFO_BASE_URL;
-          const url2 = CREATE_TC_BASE_URL;
+          const url2 = api.CREATE_TC_BASE_URL;
 
           // If the techComp has an ID, update the existing record using a PUT request
           if (techComp.id) {

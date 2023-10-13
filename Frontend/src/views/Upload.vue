@@ -272,10 +272,7 @@ import {
   competitionChoiceOptions,
   adminUploadTypeOptions,
 } from "../dropdownOptions";
-import {
-  UPLOAD_ADMIN_FILES_BASE_URL,
-  VIEW_ALL_ADMIN_FILES_BASE_URL
-} from "@/api";
+import { api } from "@/api";
 import axios from "axios";
 import Vue from "vue";
 import Swal from "sweetalert2";
@@ -362,7 +359,7 @@ export default {
           console.log("requestBody:", requestBody.fileContent);
 
           const response = await axios.post(
-            `${UPLOAD_ADMIN_FILES_BASE_URL}`,
+            `${api.UPLOAD_ADMIN_FILES_BASE_URL}`,
             formData,
             {
               headers: {
@@ -405,7 +402,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_ADMIN_FILES_BASE_URL}`, {
+        const response = await axios.get(`${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`, {
           headers,
         });
         const originalArray = response.data.data;

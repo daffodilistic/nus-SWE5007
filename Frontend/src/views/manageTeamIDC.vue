@@ -434,16 +434,7 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
-import {
-  DELETE_IDC_TEAM_BASE_URL,
-  ADD_MEMBER_IDC_TEAM_BASE_URL,
-  UPDATE_IDC_TEAM_BASE_URL,
-  VIEW_IDC_TEAM_BASE_URL,
-  GET_ALL_IDC_TEAM_BASE_URL,
-  GET_ALL_GAME_TEAM_BASE_URL,
-  GET_ALL_GAME_GROUP_BASE_URL,
-  api
-} from "@/api";
+import { api } from "../api";
 import Swal from "sweetalert2";
 import Vue from "vue";
 
@@ -592,7 +583,7 @@ export default {
       Authorization: `Bearer ${token}`,
     };
     try {
-      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, {
+      this.teamsData = await axios.get(`${api.GET_ALL_IDC_TEAM_BASE_URL}`, {
         headers,
       });
       this.teams = this.teamsData.data.data;
@@ -631,7 +622,7 @@ export default {
       };
 
       try {
-        this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, {
+        this.teamsData = await axios.get(`${api.GET_ALL_IDC_TEAM_BASE_URL}`, {
           headers,
         });
 
@@ -691,7 +682,7 @@ export default {
       };
       try {
         const response = await axios.post(
-          `${VIEW_IDC_TEAM_BASE_URL}`,
+          `${api.VIEW_IDC_TEAM_BASE_URL}`,
           requestBody,
           { headers }
         );
@@ -722,7 +713,7 @@ export default {
       };
       console.log("teamObj", teamObj.id, teamObj.teamName);
       try {
-        const response = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, {
+        const response = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
           headers,
         });
         const teamObject = response.data.data;
@@ -782,7 +773,7 @@ export default {
           };
 
           const response = await axios.post(
-            `${VIEW_IDC_TEAM_BASE_URL}`,
+            `${api.VIEW_IDC_TEAM_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -848,7 +839,7 @@ export default {
 
         try {
           const response = await axios.put(
-            `${UPDATE_IDC_TEAM_BASE_URL}`,
+            `${api.UPDATE_IDC_TEAM_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -906,11 +897,11 @@ export default {
 
         try {
           const response2 = await axios.put(
-            `${ADD_MEMBER_IDC_TEAM_BASE_URL}`,
+            `${api.ADD_MEMBER_IDC_TEAM_BASE_URL}`,
             requestBody2,
             { headers }
           );
-          const response = await axios.delete(`${DELETE_IDC_TEAM_BASE_URL}`, {
+          const response = await axios.delete(`${api.DELETE_IDC_TEAM_BASE_URL}`, {
             data: requestBody,
             headers: headers,
           });
@@ -973,7 +964,7 @@ export default {
       try {
         // Make the HTTP POST request to the API endpoint
         const response = await axios.put(
-          `${ADD_MEMBER_IDC_TEAM_BASE_URL}`,
+          `${api.ADD_MEMBER_IDC_TEAM_BASE_URL}`,
           requestBody,
           { headers }
         );

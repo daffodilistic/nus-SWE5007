@@ -312,9 +312,7 @@
 
 <script>
 import axios from "axios";
-import {
-  api
-} from "@/api";
+import { api } from "../api";
 import {
   competitionChoiceOptions,
   countriesOptions,

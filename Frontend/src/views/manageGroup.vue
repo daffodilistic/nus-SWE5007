@@ -311,20 +311,7 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
-import {
-  DELETE_IDC_GROUP_BASE_URL,
-  CREATE_IDC_GROUP_BASE_URL,
-  UPDATE_IDC_GROUP_BASE_URL,
-  UPDATE_GAME_GROUP_BASE_URL,
-  VIEW_IDC_GROUP_BASE_URL,
-  GET_ALL_IDC_GROUP_BASE_URL,
-  GET_ALL_GAME_GROUP_BASE_URL,
-  GET_ALL_IDC_TEAM_BASE_URL,
-  ADD_TEAM_IDC_GROUP_BASE_URL,
-  GET_ALL_GAME_TEAM_BASE_URL,
-  ADD_TEAM_GAME_GROUP_BASE_URL,
-  CREATE_GAME_GROUP_BASE_URL,
-} from "@/api";
+import { api } from "../api";
 import Swal from "sweetalert2";
 import Vue from "vue";
 
@@ -463,7 +450,7 @@ export default {
       Authorization: `Bearer ${Vue.$keycloak.token}`,
     };
     try {
-      this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, {
+      this.groupsData = await axios.get(`${api.GET_ALL_IDC_GROUP_BASE_URL}`, {
         headers,
       });
       this.groups = this.groupsData.data.data;
@@ -489,13 +476,13 @@ export default {
           let url = "";
           let url2 = "";
           if (this.selectedCompetition === "Game Arena") {
-            url = UPDATE_GAME_GROUP_BASE_URL;
-            url2 = CREATE_GAME_GROUP_BASE_URL;
+            url = api.UPDATE_GAME_GROUP_BASE_URL;
+            url2 = api.CREATE_GAME_GROUP_BASE_URL;
           } else if (
             this.selectedCompetition === "Innovation Design Challenge"
           ) {
-            url = UPDATE_IDC_GROUP_BASE_URL;
-            url2 = CREATE_IDC_GROUP_BASE_URL;
+            url = api.UPDATE_IDC_GROUP_BASE_URL;
+            url2 = api.CREATE_IDC_GROUP_BASE_URL;
           }
           if (group.id) {
             const requestBody = {
@@ -550,11 +537,11 @@ export default {
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
-          this.groupsData = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, {
+          this.groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
             headers,
           });
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.groupsData = await axios.get(`${GET_ALL_IDC_GROUP_BASE_URL}`, {
+          this.groupsData = await axios.get(`${api.GET_ALL_IDC_GROUP_BASE_URL}`, {
             headers,
           });
         }
@@ -573,12 +560,12 @@ export default {
       let response = "";
       try {
         if (this.selectedCompetition === "Game Arena") {
-          response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+          response = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
             headers,
           });
           this.currentGroupName = "";
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          response = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, {
+          response = await axios.get(`${api.GET_ALL_IDC_TEAM_BASE_URL}`, {
             headers,
           });
           this.currentGroupName = groupName;
@@ -629,7 +616,7 @@ export default {
             this.selectedCompetition === "Innovation Design Challenge"
           ) {
             response = await axios.post(
-              `${VIEW_IDC_GROUP_BASE_URL}`,
+              `${api.VIEW_IDC_GROUP_BASE_URL}`,
               requestBodyJson,
               { headers }
             );
@@ -679,12 +666,12 @@ export default {
         try {
           if (this.selectedCompetition === "Game Arena") {
             const response2 = await axios.put(
-              `${ADD_TEAM_IDC_GROUP_BASE_URL}`,
+              `${api.ADD_TEAM_IDC_GROUP_BASE_URL}`,
               requestBody2,
               { headers }
             );
             const response = await axios.delete(
-              `${DELETE_IDC_GROUP_BASE_URL}`,
+              `${api.DELETE_IDC_GROUP_BASE_URL}`,
               {
                 data: requestBody,
                 headers: headers,
@@ -694,12 +681,12 @@ export default {
             this.selectedCompetition === "Innovation Design Challenge"
           ) {
             const response2 = await axios.put(
-              `${ADD_TEAM_IDC_GROUP_BASE_URL}`,
+              `${api.ADD_TEAM_IDC_GROUP_BASE_URL}`,
               requestBody2,
               { headers }
             );
             const response = await axios.delete(
-              `${DELETE_IDC_GROUP_BASE_URL}`,
+              `${api.DELETE_IDC_GROUP_BASE_URL}`,
               {
                 data: requestBody,
                 headers: headers,
@@ -759,7 +746,7 @@ export default {
             gameTeamIds: this.selectedTeams,
           };
           const response = await axios.put(
-            `${ADD_TEAM_GAME_GROUP_BASE_URL}`,
+            `${api.ADD_TEAM_GAME_GROUP_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -769,7 +756,7 @@ export default {
             teamIds: this.selectedTeams,
           };
           const response = await axios.put(
-            `${ADD_TEAM_IDC_GROUP_BASE_URL}`,
+            `${api.ADD_TEAM_IDC_GROUP_BASE_URL}`,
             requestBody,
             { headers }
           );

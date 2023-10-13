@@ -310,14 +310,7 @@
 
 <script>
 import axios from "axios";
-import {
-  CALCULATE_IDC_SCORE_BASE_URL,
-  UPDATE_IDC_TEAM_BASE_URL,
-  QUALIFY_IDC_TEAM_BASE_URL,
-  GET_ALL_IDC_METRIC_BASE_URL,
-  GET_ALL_IDC_TEAM_BASE_URL,
-  VIEW_ALL_FILES_BASE_URL,
-} from "@/api";
+import { api } from "../api";
 import { competitionChoiceOptions, stageNameOptions } from "../dropdownOptions";
 import Vue from "vue";
 
@@ -455,7 +448,7 @@ export default {
       Authorization: `Bearer ${token}`,
     };
     try {
-      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, {
+      this.teamsData = await axios.get(`${api.GET_ALL_IDC_TEAM_BASE_URL}`, {
         headers,
       });
       const allTeams = this.teamsData.data.data;
@@ -486,7 +479,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_FILES_BASE_URL}`, {
+        const response = await axios.get(`${api.VIEW_ALL_FILES_BASE_URL}`, {
           headers,
         });
         const originalArray = response.data.data;
@@ -545,7 +538,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, {
+        this.teamsData = await axios.get(`${api.GET_ALL_IDC_TEAM_BASE_URL}`, {
           headers,
         });
 
@@ -624,13 +617,13 @@ export default {
           isQualifiedFinalSecondStage: qualifiedFinalSec,
         };
         CalScoreResponse = await axios.post(
-          `${CALCULATE_IDC_SCORE_BASE_URL}`,
+          `${api.CALCULATE_IDC_SCORE_BASE_URL}`,
           this.metricRequestBody,
           { headers }
         );
-        updateTeamURL = UPDATE_IDC_TEAM_BASE_URL;
+        updateTeamURL = api.UPDATE_IDC_TEAM_BASE_URL;
         response = await axios.put(
-          `${QUALIFY_IDC_TEAM_BASE_URL}`,
+          `${api.QUALIFY_IDC_TEAM_BASE_URL}`,
           requestBody,
           { headers }
         );
@@ -699,7 +692,7 @@ export default {
       let CalScoreResponse = "";
       try {
         CalScoreResponse = await axios.post(
-          `${CALCULATE_IDC_SCORE_BASE_URL}`,
+          `${api.CALCULATE_IDC_SCORE_BASE_URL}`,
           this.metricRequestBody,
           { headers }
         );
@@ -762,7 +755,7 @@ export default {
           Authorization: `Bearer ${token}`,
         };
         try {
-          this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, {
+          this.metricData = await axios.get(`${api.GET_ALL_IDC_METRIC_BASE_URL}`, {
             headers,
           });
           this.metrics = this.metricData.data.data;

@@ -216,12 +216,7 @@
 
 <script>
 import { competitionChoiceOptions } from "../dropdownOptions";
-import {
-  VIEW_ALL_TC_BASE_URL,
-  VIEW_ALL_ADMIN_FILES_BASE_URL,
-  GET_ALL_GAME_TEAM_BASE_URL,
-  api
-} from "@/api";
+import { api } from "../api";
 import axios from "axios";
 import Vue from "vue";
 
@@ -332,12 +327,12 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const techCompsData = await axios.get(`${VIEW_ALL_TC_BASE_URL}`, {
+        const techCompsData = await axios.get(`${api.VIEW_ALL_TC_BASE_URL}`, {
           headers,
         });
         const techComp = techCompsData.data.data;
 
-        const response2 = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+        const response2 = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
           headers,
         });
         const teamList = response2.data.data;
@@ -416,7 +411,7 @@ export default {
       };
 
       try {
-        const response = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+        const response = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
           headers,
         });
         const teamObj = response.data.data.filter(
@@ -445,7 +440,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_ADMIN_FILES_BASE_URL}`, {
+        const response = await axios.get(`${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`, {
           headers,
         });
         const originalArray = response.data.data;

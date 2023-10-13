@@ -116,13 +116,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 Vue.use(VueSweetalert2);
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
 import axios from "axios";
-import {
-  ADD_MEMBER_GAME_TEAM_BASE_URL,
-  ADD_MEMBER_IDC_TEAM_BASE_URL,
-  CREATE_IDC_TEAM_BASE_URL,
-  CREATE_GAME_TEAM_BASE_URL,
-  api
-} from "@/api";
+import { api } from "../api";
 
 export default {
   components: {
@@ -226,8 +220,8 @@ export default {
         this.competitionChoice === "IDC" ||
         this.competitionChoice === "Innovation Design Challenge"
       ) {
-        url = CREATE_IDC_TEAM_BASE_URL;
-        url2 = ADD_MEMBER_IDC_TEAM_BASE_URL;
+        url = api.CREATE_IDC_TEAM_BASE_URL;
+        url2 = api.ADD_MEMBER_IDC_TEAM_BASE_URL;
         teamData = {
           teamName: this.teamName,
           ageGroup: this.ageGroup,
@@ -249,8 +243,8 @@ export default {
           qualificationRoundNumMatchesPlayed: 0,
           isQualifiedForElimination: false,
         };
-        url = CREATE_GAME_TEAM_BASE_URL;
-        url2 = ADD_MEMBER_GAME_TEAM_BASE_URL;
+        url = api.CREATE_GAME_TEAM_BASE_URL;
+        url2 = api.ADD_MEMBER_GAME_TEAM_BASE_URL;
       }
       try {
         const createTeamResponse = await axios.post(`${url}`, teamData, {

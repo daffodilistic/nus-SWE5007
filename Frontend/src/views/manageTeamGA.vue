@@ -435,14 +435,7 @@
 <script>
 import axios from "axios";
 import { ageGroupOptions, competitionChoiceOptions } from "../dropdownOptions";
-import {
-  ADD_MEMBER_GAME_TEAM_BASE_URL,
-  UPDATE_GAME_TEAM_BASE_URL,
-  VIEW_GAME_TEAM_BASE_URL,
-  GET_ALL_GAME_TEAM_BASE_URL,
-  GET_ALL_GAME_GROUP_BASE_URL,
-  api
-} from "@/api";
+import { api } from "../api";
 import Swal from "sweetalert2";
 import Vue from "vue";
 
@@ -591,7 +584,7 @@ export default {
       Authorization: `Bearer ${token}`,
     };
     try {
-      this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+      this.teamsData = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
         headers,
       });
       this.teams = this.teamsData.data.data;
@@ -630,7 +623,7 @@ export default {
       };
 
       try {
-        this.teamsData = await axios.get(`${GET_ALL_GAME_TEAM_BASE_URL}`, {
+        this.teamsData = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
           headers,
         });
         this.teams = this.teamsData.data.data;
@@ -690,7 +683,7 @@ export default {
       };
       console.log("teamObj", teamObj.id, teamObj.teamName);
       try {
-        const response = await axios.get(`${GET_ALL_GAME_GROUP_BASE_URL}`, {
+        const response = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
           headers,
         });
         const teamObject = response.data.data;
@@ -816,7 +809,7 @@ export default {
 
         try {
           const response = await axios.put(
-            `${UPDATE_GAME_TEAM_BASE_URL}`,
+            `${api.UPDATE_GAME_TEAM_BASE_URL}`,
             requestBody,
             { headers }
           );
@@ -938,7 +931,7 @@ export default {
         // Make the HTTP POST request to the API endpoint
 
         const response = await axios.put(
-          `${ADD_MEMBER_GAME_TEAM_BASE_URL}`,
+          `${api.ADD_MEMBER_GAME_TEAM_BASE_URL}`,
           requestBody,
           { headers }
         );

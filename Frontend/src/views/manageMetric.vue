@@ -216,18 +216,11 @@
 
 <script>
 import axios from "axios";
-import {
-  DELETE_IDC_METRIC_BASE_URL,
-  CREATE_GAME_METRIC_BASE_URL,
-  UPDATE_GAME_METRIC_BASE_URL,
-  GET_ALL_IDC_METRIC_BASE_URL,
-  GET_ALL_GAME_METRIC_BASE_URL,
-  CREATE_IDC_METRIC_BASE_URL,
-  UPDATE_IDC_METRIC_BASE_URL,
-} from "@/api";
+import { api } from "../api";
 import { competitionChoiceOptions, stageNameOptions } from "../dropdownOptions";
 import Swal from "sweetalert2";
 import Vue from "vue";
+
 export default {
   head() {
     return {
@@ -342,7 +335,7 @@ export default {
       Authorization: `Bearer ${token}`,
     };
     try {
-      this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, {
+      this.metricsData = await axios.get(`${api.GET_ALL_IDC_METRIC_BASE_URL}`, {
         headers,
       });
       this.metrics = this.metricsData.data.data;
@@ -377,11 +370,11 @@ export default {
       try {
         if (this.selectedCompetition === "Game Arena") {
           this.metricsData = await axios.get(
-            `${GET_ALL_GAME_METRIC_BASE_URL}`,
+            `${api.GET_ALL_GAME_METRIC_BASE_URL}`,
             { headers }
           );
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.metricsData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, {
+          this.metricsData = await axios.get(`${api.GET_ALL_IDC_METRIC_BASE_URL}`, {
             headers,
           });
         }
@@ -446,13 +439,13 @@ export default {
           let url = "";
           let url2 = "";
           if (this.selectedCompetition === "Game Arena") {
-            url = UPDATE_GAME_METRIC_BASE_URL;
-            url2 = CREATE_GAME_METRIC_BASE_URL;
+            url = api.UPDATE_GAME_METRIC_BASE_URL;
+            url2 = api.CREATE_GAME_METRIC_BASE_URL;
           } else if (
             this.selectedCompetition === "Innovation Design Challenge"
           ) {
-            url = UPDATE_IDC_METRIC_BASE_URL;
-            url2 = CREATE_IDC_METRIC_BASE_URL;
+            url = api.UPDATE_IDC_METRIC_BASE_URL;
+            url2 = api.CREATE_IDC_METRIC_BASE_URL;
           }
 
           if (metric.id) {
@@ -531,14 +524,14 @@ export default {
 
         try {
           if (this.selectedCompetition === "Game Arena") {
-            response = await axios.delete(`${DELETE_GAME_METRIC_BASE_URL}`, {
+            response = await axios.delete(`${api.DELETE_GAME_METRIC_BASE_URL}`, {
               data: requestBody,
               headers: headers,
             });
           } else if (
             this.selectedCompetition === "Innovation Design Challenge"
           ) {
-            response = await axios.delete(`${DELETE_IDC_METRIC_BASE_URL}`, {
+            response = await axios.delete(`${api.DELETE_IDC_METRIC_BASE_URL}`, {
               data: requestBody,
               headers: headers,
             });
