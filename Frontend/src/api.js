@@ -1,7 +1,7 @@
 // console.log("NODE_ENV is " + process.env.NODE_ENV);
 
 // Base URL declarations
-const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://ric-robotics.xyz/' : 'http://localhost:8080/';
+const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://register.ric-robotics.xyz/' : 'http://localhost:8080/';
 const GAME_SERVICE_URL = process.env.NODE_ENV === 'production' ? 'https://game.ric-robotics.xyz' : 'http://localhost:8081';
 const IDC_SERVICE_URL = process.env.NODE_ENV === 'production' ? 'https://idc.ric-robotics.xyz' : 'http://localhost:8082';
 const INFO_SERVICE_URL = process.env.NODE_ENV === 'production' ? 'https://info.ric-robotics.xyz' : 'http://localhost:8003';
