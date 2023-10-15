@@ -16,6 +16,9 @@ const apiObject = Object.freeze({
     CREATE_USER_INFO_BASE_URL:  `${INFO_SERVICE_URL}/userinfo/create-user`,
     UPDATE_USER_INFO_BASE_URL:  `${INFO_SERVICE_URL}/userinfo/update-user`,
     DELETE_USER_INFO_BASE_URL:  `${INFO_SERVICE_URL}/userinfo/delete-user`,
+    CREATE_TEACHER_INFO_BASE_URL:`${INFO_SERVICE_URL}/userinfo/create-teacher`,
+    CREATE_JUDGE_INFO_BASE_URL: `${INFO_SERVICE_URL}/userinfo/create-judge`,
+    MARK_ATTENDANCE_BASE_URL:   `${INFO_SERVICE_URL}/userinfo/mark-attendance`,
     //IDC TEAM
     GET_ALL_IDC_TEAM_BASE_URL:      `${IDC_SERVICE_URL}/idcteam/view-all-teams`,
     VIEW_IDC_TEAM_BASE_URL:         `${IDC_SERVICE_URL}/idcteam/view-team`,
