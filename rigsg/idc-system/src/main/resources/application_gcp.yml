@@ -15,7 +15,7 @@ spring:
     init:
       platform: postgres
   datasource:
-    url: jdbc:postgresql://10.21.176.3:5432/prd-ric-database
+    url: jdbc:postgresql://10.21.176.3:5432/ric-database
     username: ${POSTGRESQL_USERNAME}
     password: ${POSTGRESQL_PASSWORD}
     driverClassName: org.postgresql.Driver
