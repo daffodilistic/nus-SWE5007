@@ -699,7 +699,7 @@
                   alt="Versus"
                   width="35px"
                   height="30px"
-                />&nbsp; Participants
+                />&nbsp; Students
               </b-button>
             </b-card-header>
             <b-collapse
@@ -1186,9 +1186,9 @@ export default {
 
       return !this.users.some(
         (user) =>
-          user.firstName &&
+          user.userName &&
           username &&
-          user.firstName.toLowerCase() === username.toLowerCase()
+          user.userName.toLowerCase() === username.toLowerCase()
       );
     },
     async toggleRow(index) {

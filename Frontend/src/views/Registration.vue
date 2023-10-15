@@ -135,7 +135,7 @@
             alt="Versus"
             width="35px"
             height="30px"
-          />&nbsp; Participants
+          />&nbsp; Students
         </b-button>
       </b-card-header>
       <b-collapse
