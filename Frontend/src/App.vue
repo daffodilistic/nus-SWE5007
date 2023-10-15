@@ -2,23 +2,83 @@
   <div id="app">
     <nav class="top-menu">
       <router-link to="/" class="menu-item">Home</router-link>
-      <router-link to="/registration" class="menu-item">Register Team</router-link>
-      <router-link v-if="authenticated && (userRoles.includes('judge') || userRoles.includes('admin'))" to="/mainScore" class="menu-item">Score</router-link>
-      <router-link v-if="authenticated && (userRoles.includes('participant') && !userRoles.includes('judge') && !userRoles.includes('admin'))" to="/contestantProfile" class="menu-item">Team Profile</router-link>
-      <router-link v-if="authenticated && userRoles.includes('admin')" to="/upload" class="menu-item">Admin Upload</router-link>
-      <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageContestant" class="menu-item">Manage Contestant</router-link>
-        <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageTeam" class="menu-item">Manage Team</router-link>
-      <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageGroup" class="menu-item">Manage Group</router-link>
+      <router-link to="/registration" class="menu-item"
+        >Register Team</router-link
+      >
+      <router-link
+        v-if="
+          authenticated &&
+          (userRoles.includes('judge') || userRoles.includes('admin'))
+        "
+        to="/mainScore"
+        class="menu-item"
+        >Score</router-link
+      >
+      <router-link
+        v-if="
+          authenticated &&
+          userRoles.includes('participant') &&
+          !userRoles.includes('judge') &&
+          !userRoles.includes('admin')
+        "
+        to="/contestantProfile"
+        class="menu-item"
+        >Team Profile</router-link
+      >
+      <router-link
+        v-if="authenticated && userRoles.includes('admin')"
+        to="/upload"
+        class="menu-item"
+        >Admin Upload</router-link
+      >
+      <router-link
+        v-if="authenticated && userRoles.includes('admin')"
+        to="/manageContestant"
+        class="menu-item"
+        >Manage User</router-link
+      >
+      <router-link
+        v-if="authenticated && userRoles.includes('admin')"
+        to="/manageTeam"
+        class="menu-item"
+        >Manage Team</router-link
+      >
+      <router-link
+        v-if="authenticated && userRoles.includes('admin')"
+        to="/manageGroup"
+        class="menu-item"
+        >Manage Group</router-link
+      >
 
-      <router-link v-if="authenticated && userRoles.includes('admin')" to="/manageMetric" class="menu-item">Manage Metric</router-link>
-      <router-link v-if="authenticated" to="/login" v-on:click.native="logout()" replace class="menu-item">Logout</router-link>
+      <router-link
+        v-if="authenticated && userRoles.includes('admin')"
+        to="/manageMetric"
+        class="menu-item"
+        >Manage Metric</router-link
+      >
+      <router-link
+        v-if="authenticated"
+        to="/login"
+        v-on:click.native="logout()"
+        replace
+        class="menu-item"
+        >Logout</router-link
+      >
 
-      <router-link v-else to="/login" v-on:click.native="login()" class="menu-item">Login</router-link>
+      <router-link
+        v-else
+        to="/login"
+        v-on:click.native="login()"
+        class="menu-item"
+        >Login</router-link
+      >
     </nav>
     <div>
       <!-- Add a row for the welcome message -->
       <div v-if="authenticated" class="welcome-message">
-       Hi, <span class="bold-text">{{ userName }}</span> &nbsp;&nbsp;&nbsp;Role: <span class="bold-text">{{  capitalizeFirstLetter(roleName[0])}}</span>
+        Hi,
+        <span class="bold-text">{{ userName }}</span> &nbsp;&nbsp;&nbsp;Role:
+        <span class="bold-text">{{ capitalizeFirstLetter(roleName[0]) }}</span>
       </div>
     </div>
     <router-view @authenticated="setAuthenticated" />
@@ -26,38 +86,38 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import Vue from "vue";
 
 export default {
-
-  name: 'App',
+  name: "App",
   data() {
     return {
       authenticated: false,
       userRoles: [],
-      userName:'',
-      roleName:[]
+      userName: "",
+      roleName: [],
     };
   },
   methods: {
-  filterRoles() {
+    filterRoles() {
       // Define the allowed roles
       const allowedRoles = ["judge", "admin", "participant"];
 
       // Filter the userRoles array to keep only the allowed roles
-      this.roleName = this.userRoles.filter((role) => allowedRoles.includes(role));
+      this.roleName = this.userRoles.filter((role) =>
+        allowedRoles.includes(role)
+      );
     },
     capitalizeFirstLetter(str) {
-      if (!str) return ''; // Handle empty or undefined string
+      if (!str) return ""; // Handle empty or undefined string
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
 
     setAuthenticated(status) {
       this.authenticated = status;
       if (this.authenticated) {
-
         this.checkAuthentication();
-         this.filterRoles();
+        this.filterRoles();
       }
     },
     checkAuthentication() {
@@ -81,7 +141,7 @@ export default {
   },
   created() {
     this.checkAuthentication();
-  }
+  },
 };
 </script>
 
@@ -107,7 +167,6 @@ export default {
   border-radius: 4px;
   font-size: 16px;
   margin-bottom: 15px;
-
 }
 
 .menu-item {
@@ -143,14 +202,13 @@ export default {
 }
 
 .welcome-message {
-
   padding: 5x; /* Padding around the message */
   text-align: right; /* Center-align the text */
   font-size: 15px; /* Font size */
   color: #002c72; /* Text color */
-  margin-right:10px;
-  margin-bottom:10px;
-  margin-right:10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  margin-right: 10px;
   font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 </style>
