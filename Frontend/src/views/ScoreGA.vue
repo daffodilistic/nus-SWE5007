@@ -1,5 +1,113 @@
 <template>
   <div>
+    <!-- Show Member Modal START-->
+    <b-modal
+      v-model="showMemberModal"
+      modal-class="modal"
+      hide-footer
+      id="showUserModal"
+      title="Mark Attendance"
+    >
+      <!-- List of users to be displayed inside the modal -->
+      <table class="modal-table">
+        <thead>
+          <tr>
+            <th>S/No</th>
+            <th>User Name</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Attendance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, userIndex) in userList" :key="user.id">
+            <td>{{ userIndex + 1 }}</td>
+            <td>{{ user.userName }}</td>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+
+            <td>
+              <b-button
+                id="edit-button"
+                @click="markAttendance(user.id, user.isRegistered)"
+                variant="outline-primary"
+                class="delete-button"
+                v-b-tooltip.hover="
+                  'Click to update attendance for this participant!'
+                "
+              >
+                <span v-if="user.isRegistered === true"
+                  ><b-icon icon="check-lg"></b-icon
+                ></span>
+                <span v-else><b-icon icon="x-lg"></b-icon></span>
+              </b-button>
+            </td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </table>
+    </b-modal>
+    <!-- Show Member Modal END-->
+    <!-- show GA history Modal START-->
+    <b-modal
+      v-model="showCreateQualiModal"
+      id="showCreateQualiModal"
+      modal-class="modal-lg"
+      title=""
+      hide-footer
+    >
+      <!-- List of users to be displayed inside the modal -->
+      <div
+        class="container mt-3 d-flex flex-column align-items-center justify-content-center"
+      >
+        <h3 class="text-center" style="font-size: 18px">
+          Select Start Date/Time of 1st Match
+        </h3>
+        <br />
+        <form class="text-center">
+          Venue :
+          <div class="form-group">
+            <input
+              type="text"
+              v-model="venue"
+              class="form-control"
+              placeholder="Input venue"
+            />
+          </div>
+
+          <br />
+          Date :
+          <div class="form-group">
+            <input
+              type="date"
+              v-model="selectedDate"
+              class="form-control"
+              placeholder="Select date"
+            />
+          </div>
+          <br />
+          Time :
+          <div class="form-group">
+            <input
+              type="time"
+              v-model="selectedTime"
+              class="form-control"
+              placeholder="Select time"
+            />
+          </div>
+
+          <br />
+          <button
+            type="button"
+            class="btn btn-primary mt-2"
+            @click="createQualiGame"
+          >
+            Create Matchups!
+          </button>
+        </form>
+      </div>
+    </b-modal>
+    <!-- show GA history Modal END-->
     <!-- show GA history Modal START-->
     <b-modal
       v-model="showGAHistoryModal"
@@ -168,6 +276,14 @@
                 </td>
                 <td>
                   <b-button
+                    id="viewDownload"
+                    @click="showTeam(group.id)"
+                    variant="outline-primary"
+                    v-b-tooltip.hover="'Click to view team members'"
+                  >
+                    <b-icon icon="card-checklist"></b-icon>
+                  </b-button>
+                  <b-button
                     @click="viewGAScore(group)"
                     id="viewGAScore"
                     variant="outline-primary"
@@ -178,8 +294,9 @@
                   >
                     <b-icon icon="eye"></b-icon>
                   </b-button>
+                  <!-- @click="createQualiGame(startIndex + index - 1)"-->
                   <b-button
-                    @click="createQualiGame(startIndex + index - 1)"
+                    @click="showDataTimeModal(startIndex + index - 1)"
                     variant="outline-primary"
                     class="delete-button"
                     v-b-tooltip.hover="
@@ -217,7 +334,9 @@
                         <th></th>
                         <th>Team Score</th>
                         <th class="longer-td">Team Name</th>
-                        <th>Game Status</th>
+                        <th>Estimated Start Date/Time</th>
+                        <th>Venue</th>
+                        <!-- <th>Game Status</th>-->
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -292,8 +411,9 @@
                               <i class="fas fa-star gold-star"></i><br /> </span
                             >{{ item.oppoTeamName }}
                           </td>
-
-                          <td>{{ gameStatusTextMap[item.gameStatus] }}</td>
+                          <td>{{ formattedDateTime(item.datetime) }}</td>
+                          <td>{{ item.venue }}</td>
+                          <!--<td>{{ gameStatusTextMap[item.gameStatus] }}</td>-->
                           <td
                             v-if="
                               gameStatusTextMap[item.gameStatus] ===
@@ -439,6 +559,8 @@ import Vue from "vue";
 import Round from "./Round.vue";
 import eventBus from "../utils/eventBus.js";
 import { delay } from "../utils/utils.js";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
 export default {
   components: {
@@ -479,11 +601,21 @@ export default {
       objectsWithIdAndTeamArray: [],
       gameTeamList: [],
       showGAHistoryModal: false,
+      showCreateQualiModal: false,
       allGameData: [], //all game objects
       filteredStages: [], //distinc stages of elimination rd
       rounds: [],
       filteredGames: [],
       counterArray: [],
+      attendanceArray: [],
+      selectedDate: "",
+      selectedTime: "",
+      selectedIndex: "",
+      venue: "",
+      showMemberModal: false,
+
+      userList: [],
+      currentTeamName: "",
     };
   },
   created() {
@@ -495,6 +627,14 @@ export default {
     eventBus.$on("check-advance", this.checkAdvanceRound);
   },
   computed: {
+    totalRecordsModal() {
+      return this.userList.length;
+    },
+    paginatedModalUserList() {
+      const startIndex = (this.currentPageModal - 1) * this.itemsPerPageModal;
+      const endIndex = startIndex + this.itemsPerPageModal;
+      return this.userList.slice(startIndex, endIndex);
+    },
     shouldShowStartButton() {
       // Calculate whether to show the start button
       const elim01Count = this.allGameData.filter(
@@ -613,6 +753,9 @@ export default {
     },
   },
   async mounted() {
+    flatpickr("#date", {
+      dateFormat: "d/m/Y", // Set the format to dd/mm/yyyy
+    });
     this.fetchTeams();
 
     const headers = {
@@ -633,7 +776,7 @@ export default {
       const allGamesData = allGames.data.data.filter(
         (game) => game.stage === "Quali"
       );
-      console.log("Quali only array", allGamesData);
+
       let teamArray = [];
 
       this.groups.forEach((groupObj) => {
@@ -657,7 +800,6 @@ export default {
 
         // Check if either gameTeamIdHost or gameTeamIdOppo is in the teamIdsSet
         if (teamIdsSet.has(gameTeamIdHost) || teamIdsSet.has(gameTeamIdOppo)) {
-          console.log("match found");
           const newBody = {
             gameID: gameObj.id,
             groupID: teamIdsSet.has(gameTeamIdHost)
@@ -670,6 +812,7 @@ export default {
             gameTeamIdHost: gameTeamIdHost,
             gameTeamIdOppo: gameTeamIdOppo,
             stage: gameObj.stage,
+            datetime: gameObj.datetime,
           };
           this.counterArray.push(newBody);
         }
@@ -680,11 +823,6 @@ export default {
       // Display the results
       for (const groupID in result) {
         const { gameIDs, count } = result[groupID];
-        console.log(
-          `groupID: ${groupID} - gameIDs: [${Array.from(gameIDs).join(
-            ", "
-          )}] - count of gameID: ${count}`
-        );
       }
 
       //poc end
@@ -694,6 +832,103 @@ export default {
     }
   },
   methods: {
+    async markAttendance(userId, userRegStatus) {
+      console.log("userId", userId, "userRegStatus", userRegStatus);
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      let isRegistered = "false";
+      if (userRegStatus) {
+        //true
+        isRegistered = "false";
+      } else {
+        isRegistered = "true";
+      }
+
+      const requestBody = {
+        id: userId,
+        isRegistered: isRegistered,
+      };
+
+      console.log("requestBody", requestBody);
+
+      try {
+        const response = await axios.post(
+          `${api.MARK_ATTENDANCE_BASE_URL}`,
+          requestBody,
+          {
+            headers,
+          }
+        );
+        this.loadTeam();
+        this.showMemberModal = true; // Show the modal after fetching the users
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    async showTeam(groupId) {
+      this.attendanceArray = this.counterArray.filter((record) => {
+        return record.groupID === groupId;
+      });
+      console.log(
+        groupId,
+        " group id for this.attendanceArray ",
+        this.attendanceArray
+      );
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      try {
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
+          headers,
+        });
+
+        const allUsers = response.data.data;
+        this.userList = allUsers.filter(
+          (record) =>
+            !record.hasOwnProperty("gameTeam") && record.idcTeam === teamId
+        );
+        this.currentTeamName = teamName;
+        this.showMemberModal = true; // Show the modal after fetching the users
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    formattedDateTime(isoDateTime) {
+      const date = new Date(isoDateTime);
+
+      // Format the date as "dd/mmm/yy hh:mm"
+      const day = date.getDate();
+      const month = date.toLocaleString("default", { month: "short" });
+      const year = date.getFullYear().toString().slice(-2);
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+
+      return `${day} ${month} ${year}, ${hours}:${minutes}`;
+    },
     countGameIDForGroupID(targetGroupID) {
       let count = 0;
 
@@ -762,8 +997,6 @@ export default {
     },
 
     async startGame(gameId, groupIndex) {
-      console.log("startGame Called");
-
       const requestBody = {
         id: gameId,
       };
@@ -861,62 +1094,68 @@ export default {
         }
       }
     },
+    showDataTimeModal(index) {
+      this.selectedIndex = index;
 
-    async createQualiGame(index) {
-      const confirmation = await Swal.fire({
-        title: "Are you sure?",
-        text: "Matchups will be created for all teams!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, create matchups!",
-      });
+      this.showCreateQualiModal = true;
+    },
+    async createQualiGame() {
+      const selectedDate = this.selectedDate;
+      const selectedTime = this.selectedTime;
+      const datetimeString = `${selectedDate}T${selectedTime}`;
+      const selectedDateTime = new Date(datetimeString);
 
-      if (confirmation.isConfirmed) {
-        const group = this.filteredGroups[index];
-        const headers = {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Vue.$keycloak.token}`,
-        };
-        const teams = group.gameTeamResponses; // Assuming your group object has a 'teams' property containing an array of teams
-        const currentDate = new Date();
-        const isoDateTime = currentDate.toISOString(); // Generates date-time in "YYYY-MM-DDTHH:mm:ss.sssZ" format
+      const group = this.filteredGroups[this.selectedIndex];
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Vue.$keycloak.token}`,
+      };
+      const teams = group.gameTeamResponses; // Assuming your group object has a 'teams' property containing an array of teams
 
-        // Now, format it to "YYYY-MM-DDTHH:mm:ssZ" format
-        const formattedDateTime = isoDateTime.slice(0, 19) + "Z";
-        // Loop through each team in the group
-        for (let i = 0; i < teams.length; i++) {
-          for (let j = i + 1; j < teams.length; j++) {
-            // Create a matchup object with two teams
-            const requestBody = {
-              gameTeamIdHost: teams[i].id,
-              gameTeamIdOppo: teams[j].id,
-              datetime: formattedDateTime,
-              stage: "Quali",
-            };
+      const isoDateTime = selectedDateTime.toISOString(); // Generates date-time in "YYYY-MM-DDTHH:mm:ss.sssZ" format
 
-            try {
-              // If the group has an ID, update the existing record using a PUT request
-              const response = await axios.post(
-                `${api.CREATE_GAME_BASE_URL}`,
-                requestBody,
-                { headers }
-              );
+      // Now, format it to "YYYY-MM-DDTHH:mm:ssZ" format
+      let formattedDateTime = isoDateTime.slice(0, 19) + "Z";
 
-              Swal.fire({
-                title: "Game Set!",
-                text: `Matchup created successfully.`,
-                icon: "success",
-              });
-            } catch (error) {
-              // Handle errors, if any
-              console.error("Error saving group:", error);
-            }
+      // Loop through each team in the group
+      for (let i = 0; i < teams.length; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+          // Create a matchup object with two teams
+          const requestBody = {
+            gameTeamIdHost: teams[i].id,
+            gameTeamIdOppo: teams[j].id,
+            datetime: formattedDateTime,
+            venue: this.venue,
+            stage: "Quali",
+          };
+
+          try {
+            // If the group has an ID, update the existing record using a PUT request
+            const response = await axios.post(
+              `${api.CREATE_GAME_BASE_URL}`,
+              requestBody,
+              { headers }
+            );
+
+            Swal.fire({
+              title: "Game Set!",
+              text: `Matchup created successfully.`,
+              icon: "success",
+            });
+          } catch (error) {
+            // Handle errors, if any
+            console.error("Error saving group:", error);
           }
+          let originalDate = new Date(formattedDateTime);
+          originalDate.setMinutes(originalDate.getMinutes() + 5);
+          formattedDateTime = originalDate.toISOString().slice(0, 19) + "Z";
         }
-        this.loadGroup();
       }
+      this.showCreateQualiModal = false;
+      this.loadGroup();
+      this.selectedDate = "";
+      this.selectedTime = "";
+      this.venue = "";
     },
     async startElimination() {
       let firstPlaceArray = [];
@@ -1004,7 +1243,7 @@ export default {
         const allGamesData = allGames.data.data.filter(
           (game) => game.stage === "Quali"
         );
-        console.log("Quali only array", allGamesData);
+
         let teamArray = [];
 
         this.groups.forEach((groupObj) => {
@@ -1031,7 +1270,6 @@ export default {
             teamIdsSet.has(gameTeamIdHost) ||
             teamIdsSet.has(gameTeamIdOppo)
           ) {
-            console.log("match found");
             const newBody = {
               gameID: gameObj.id,
               groupID: teamIdsSet.has(gameTeamIdHost)
@@ -1045,6 +1283,7 @@ export default {
               gameTeamIdHost: gameTeamIdHost,
               gameTeamIdOppo: gameTeamIdOppo,
               stage: gameObj.stage,
+              datetime: gameObj.datetime,
             };
             this.counterArray.push(newBody);
           }
@@ -1055,11 +1294,6 @@ export default {
         // Display the results
         for (const groupID in result) {
           const { gameIDs, count } = result[groupID];
-          console.log(
-            `groupID: ${groupID} - gameIDs: [${Array.from(gameIDs).join(
-              ", "
-            )}] - count of gameID: ${count}`
-          );
         }
 
         //poc end
@@ -1083,7 +1317,7 @@ export default {
       const totalGameArr = this.filteredGames.filter(
         (game) => game.stage === `Elim-0${largestNumber}`
       );
-      console.log("doneGameArr", doneGameArr);
+
       //get all winners in the team.
       let winnerArray = [];
       for (let index = 0; index < doneGameArr.length; index++) {
@@ -1095,12 +1329,6 @@ export default {
           winnerArray.push(winner.gameTeamIdOppo);
         }
       }
-      console.log(
-        "totalGameArr.length",
-        totalGameArr.length,
-        "-doneGameArr.length-",
-        doneGameArr.length
-      );
 
       //check if completed, is the game for next round created
       if (
@@ -1113,7 +1341,6 @@ export default {
 
         let index1 = 0;
         let index2 = 1;
-        console.log("loop entered");
 
         const headers = {
           "Content-Type": "application/json",
@@ -1148,9 +1375,6 @@ export default {
           }
           index1 += 2;
           index2 += 2;
-
-          console.log("index1 - ", index1, " index2 - ", index2);
-          console.log("requestBody ", requestBody);
         }
         this.loadElimination();
       } else if (
@@ -1315,6 +1539,8 @@ export default {
                   gameOutcome: item.gameOutcome,
                   hostTeamName: gameTeamIdHost.teamName,
                   oppoTeamName: gameTeamIdOppo.teamName,
+                  datetime: item.datetime,
+                  venue: item.venue,
                 };
                 this.objectsWithIdAndTeamArray.push(objectWithIdAndOppoArray);
               }

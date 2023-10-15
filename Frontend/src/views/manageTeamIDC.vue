@@ -22,9 +22,7 @@
       </div>
       <p class="pagination-info">
         Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }} to
-        {{
-          Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal)
-        }}
+        {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
         of {{ totalRecordsModal }} records
       </p>
       <div class="pagination">
@@ -653,8 +651,8 @@ export default {
         });
         this.currentTeamId = teamId;
         const allUsers = response.data.data;
-        this.userList = allUsers.filter((record) =>
-          record.hasOwnProperty("idcTeam")
+        this.userList = allUsers.filter(
+          (record) => !record.hasOwnProperty("gameTeam")
         );
         this.currentTeamName = teamName;
         this.showAddMemberModal = true; // Show the modal after fetching the users
@@ -901,10 +899,13 @@ export default {
             requestBody2,
             { headers }
           );
-          const response = await axios.delete(`${api.DELETE_IDC_TEAM_BASE_URL}`, {
-            data: requestBody,
-            headers: headers,
-          });
+          const response = await axios.delete(
+            `${api.DELETE_IDC_TEAM_BASE_URL}`,
+            {
+              data: requestBody,
+              headers: headers,
+            }
+          );
 
           // Show a success message
           Swal.fire({

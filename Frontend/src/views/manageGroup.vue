@@ -170,6 +170,9 @@
                 <th></th>
                 <th>S/No</th>
                 <th>Group Name</th>
+                <th v-if="selectedCompetition === 'Game Arena'">
+                  Match Date/time
+                </th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -537,13 +540,19 @@ export default {
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
-          this.groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
-            headers,
-          });
+          this.groupsData = await axios.get(
+            `${api.GET_ALL_GAME_GROUP_BASE_URL}`,
+            {
+              headers,
+            }
+          );
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.groupsData = await axios.get(`${api.GET_ALL_IDC_GROUP_BASE_URL}`, {
-            headers,
-          });
+          this.groupsData = await axios.get(
+            `${api.GET_ALL_IDC_GROUP_BASE_URL}`,
+            {
+              headers,
+            }
+          );
         }
         this.groups = this.groupsData.data.data;
         console.log("load group", this.groups);

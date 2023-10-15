@@ -216,9 +216,9 @@
 
 <script>
 import { competitionChoiceOptions } from "../dropdownOptions";
-import { api } from "../api";
 import axios from "axios";
 import Vue from "vue";
+import { api } from "../api";
 
 export default {
   data() {
@@ -440,9 +440,12 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`, {
-          headers,
-        });
+        const response = await axios.get(
+          `${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`,
+          {
+            headers,
+          }
+        );
         const originalArray = response.data.data;
 
         // Remove the "participants/" prefix from each item

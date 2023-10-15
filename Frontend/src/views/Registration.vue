@@ -84,26 +84,75 @@
                 ></i
               ></label>
               <label class="red-asterisk">*</label>
-              <label class="label-color">Teacher Name:&nbsp;&nbsp;</label>
+              <label class="label-color">School Name:&nbsp;&nbsp;&nbsp;</label>
               <input
-                v-model="teacherName"
+                v-model="schoolName"
                 type="text"
-                placeholder="Enter Teacher Name"
+                placeholder="Enter School Name"
               />
             </div>
           </td>
         </tr>
       </table>
     </div>
-
     <br />
-    <EditableTable
-      v-model="users"
-      :fields="fields"
-      @submit="handleUpdateUser($event)"
-      @remove="handleRemoveUser($event)"
-    ></EditableTable>
-    <br /><br />
+    <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.first-accordion
+          variant="info"
+          class="accordion-button"
+        >
+          &nbsp;&nbsp;<img
+            src="../assets/teacher.jpg"
+            alt="Versus"
+            width="35px"
+            height="30px"
+          />&nbsp; Teachers
+        </b-button>
+      </b-card-header>
+      <b-collapse id="first-accordion" accordion="my-accordion" role="tabpanel">
+        <br />
+        <EditableTable
+          v-model="teachers"
+          :fields="fields"
+          @submit="handleUpdateUser($event)"
+          @remove="handleRemoveUser($event)"
+        ></EditableTable>
+      </b-collapse>
+    </b-card>
+    <b-card no-body class="mb-2">
+      <b-card-header header-tag="header" class="p-2" role="tab">
+        <b-button
+          block
+          v-b-toggle.second-accordion
+          variant="info"
+          class="accordion-button"
+        >
+          &nbsp;&nbsp;<img
+            src="../assets/student.png"
+            alt="Versus"
+            width="35px"
+            height="30px"
+          />&nbsp; Participants
+        </b-button>
+      </b-card-header>
+      <b-collapse
+        id="second-accordion"
+        accordion="my-accordion"
+        role="tabpanel"
+      >
+        <br />
+        <EditableTable
+          v-model="users"
+          :fields="fields"
+          @submit="handleUpdateUser($event)"
+          @remove="handleRemoveUser($event)"
+        ></EditableTable>
+      </b-collapse>
+    </b-card>
+    <br />
     <button class="submit-button" v-on:click="register()">Register</button>
   </div>
 </template>
@@ -127,7 +176,7 @@ export default {
       teamName: "",
       ageGroup: "",
       competitionChoice: "",
-      teacherName: "",
+      schoolName: "",
       data: [],
       country: null,
       fields: [
@@ -145,13 +194,14 @@ export default {
         { key: "country", label: "Country", type: "select", required: true },
         { key: "state", label: "State", type: "select", required: true },
         { key: "dateOfBirth", label: "Birthday", type: "date", required: true },
-        { key: "schoolName", label: "School Name", type: "text" },
         { key: "yearsOfExp", label: "Experience (Year)", type: "number" },
         { key: "edit", label: "Actions", type: "edit" },
       ],
 
       users: [],
+      teachers: [],
       newTeam: [],
+      allUsers: [],
     };
   },
   computed: {
@@ -162,6 +212,7 @@ export default {
       return competitionChoiceOptions;
     },
   },
+
   methods: {
     async handleUpdateUser(user) {
       if (user.id) {
@@ -187,6 +238,28 @@ export default {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
+
+      for (const teacher of this.teachers) {
+        const userData = {
+          userName: teacher.userName,
+          firstName: teacher.firstName,
+          lastName: teacher.lastName,
+          email: teacher.email,
+          phone: teacher.phone,
+          country: teacher.country,
+          state: teacher.state,
+          dateOfBirth: teacher.dateOfBirth,
+          schoolName: this.schoolName,
+          yearsOfExp: teacher.yearsOfExp,
+        };
+
+        // Call the create new user API
+        const createUserResponse = await axios.post(
+          `${api.CREATE_TEACHER_INFO_BASE_URL}`,
+          userData,
+          { headers }
+        );
+      }
       // Create new user for each user in the users array
       for (const user of this.users) {
         const userData = {
@@ -198,7 +271,7 @@ export default {
           country: user.country,
           state: user.state,
           dateOfBirth: user.dateOfBirth,
-          schoolName: user.schoolName,
+          schoolName: this.schoolName,
           yearsOfExp: user.yearsOfExp,
         };
 
@@ -326,7 +399,7 @@ export default {
 .form-group {
   display: flex;
   align-items: center;
-  margin-right: 50px;
+  margin-right: 30px;
 }
 
 .form-group label {
@@ -340,7 +413,7 @@ export default {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 18px;
+  font-size: 15px;
   width: 300px;
 }
 
@@ -379,5 +452,23 @@ export default {
 /* Style the option elements to set the color when an option is selected */
 .custom-select option {
   color: #000000; /* Selected option text color */
+}
+
+.instruction-table {
+  text-align: left;
+  font-size: 14px;
+  color: #120b51;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.accordion-button {
+  color: #100101;
+}
+
+.accordion-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
 }
 </style>

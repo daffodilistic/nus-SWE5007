@@ -220,7 +220,6 @@ import { api } from "../api";
 import { competitionChoiceOptions, stageNameOptions } from "../dropdownOptions";
 import Swal from "sweetalert2";
 import Vue from "vue";
-
 export default {
   head() {
     return {
@@ -374,9 +373,12 @@ export default {
             { headers }
           );
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.metricsData = await axios.get(`${api.GET_ALL_IDC_METRIC_BASE_URL}`, {
-            headers,
-          });
+          this.metricsData = await axios.get(
+            `${api.GET_ALL_IDC_METRIC_BASE_URL}`,
+            {
+              headers,
+            }
+          );
         }
         this.metrics = this.metricsData.data.data;
       } catch (error) {
@@ -524,10 +526,13 @@ export default {
 
         try {
           if (this.selectedCompetition === "Game Arena") {
-            response = await axios.delete(`${api.DELETE_GAME_METRIC_BASE_URL}`, {
-              data: requestBody,
-              headers: headers,
-            });
+            response = await axios.delete(
+              `${api.DELETE_GAME_METRIC_BASE_URL}`,
+              {
+                data: requestBody,
+                headers: headers,
+              }
+            );
           } else if (
             this.selectedCompetition === "Innovation Design Challenge"
           ) {

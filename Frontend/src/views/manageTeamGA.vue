@@ -22,9 +22,7 @@
       </div>
       <p class="pagination-info">
         Showing {{ (currentPageModal - 1) * itemsPerPageModal + 1 }} to
-        {{
-          Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal)
-        }}
+        {{ Math.min(currentPageModal * itemsPerPageModal, totalRecordsModal) }}
         of {{ totalRecordsModal }} records
       </p>
       <div class="pagination">
@@ -654,8 +652,8 @@ export default {
         this.currentTeamId = teamId;
         const allUsers = response.data.data;
 
-        this.userList = allUsers.filter((record) =>
-          record.hasOwnProperty("gameTeam")
+        this.userList = allUsers.filter(
+          (record) => !record.hasOwnProperty("idcTeam")
         );
         console.log("this.userList", this.userList);
         this.currentTeamName = teamName;
@@ -738,9 +736,12 @@ export default {
         try {
           // Make the API call here using the team ID as the request body
 
-          const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
-            headers,
-          });
+          const response = await axios.get(
+            `${api.GET_ALL_USER_INFO_BASE_URL}`,
+            {
+              headers,
+            }
+          );
           const allUsers = response.data.data;
 
           this.teamMembers = allUsers.filter((record) => {

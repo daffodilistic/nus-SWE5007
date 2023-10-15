@@ -46,6 +46,54 @@
       </table>
     </b-modal>
     <!-- show download Modal END-->
+    <!-- Show Member Modal START-->
+    <b-modal
+      v-model="showMemberModal"
+      modal-class="modal"
+      hide-footer
+      id="showUserModal"
+      title="Mark Attendance"
+    >
+      <!-- List of users to be displayed inside the modal -->
+      <table class="modal-table">
+        <thead>
+          <tr>
+            <th>S/No</th>
+            <th>User Name</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Attendance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, userIndex) in userList" :key="user.id">
+            <td>{{ userIndex + 1 }}</td>
+            <td>{{ user.userName }}</td>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+
+            <td>
+              <b-button
+                id="edit-button"
+                @click="markAttendance(user.id, user.isRegistered)"
+                variant="outline-primary"
+                class="delete-button"
+                v-b-tooltip.hover="
+                  'Click to update attendance for this participant!'
+                "
+              >
+                <span v-if="user.isRegistered === true"
+                  ><b-icon icon="check-lg"></b-icon
+                ></span>
+                <span v-else><b-icon icon="x-lg"></b-icon></span>
+              </b-button>
+            </td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </table>
+    </b-modal>
+    <!-- Show Member Modal END-->
     <div class="search-container">
       <table>
         <tr>
@@ -100,16 +148,21 @@
       </tr>
       <tr>
         2. Click on
+        <b-icon icon="card-checklist"></b-icon>
+        to mark team attendance.
+      </tr>
+      <tr>
+        3. Click on
         <b-icon icon="folder2-open"></b-icon>
         to view team submission.
       </tr>
       <tr>
-        3. Click on
+        4. Click on
         <i :class="'fas fa-plus'" class="expand-icon"></i>
         to view scoring matrics of the team & follow the steps.
       </tr>
       <tr>
-        4. Repeat steps 1 to 3 for all teams.
+        5. Repeat steps 1 to 3 for all teams.
       </tr>
     </table>
     <div v-if="teams && teams.length > 0">
@@ -122,7 +175,6 @@
             <th>S/No</th>
             <th>Team Name</th>
             <th>Age Group</th>
-            <th>Teacher Name</th>
             <th>Score</th>
             <th>Qualification Status</th>
             <th>Action</th>
@@ -147,7 +199,6 @@
             <td>{{ startIndex + index }}</td>
             <td>{{ team.teamName }}</td>
             <td>{{ ageGroupTextMap[team.ageGroup] }}</td>
-            <td>{{ team.teacherName }}</td>
             <td v-if="team.presentationResponses.length === 0">Not Scored</td>
             <td
               v-else
@@ -167,7 +218,16 @@
             <td>
               {{ getQualificationStatus(team) }}
             </td>
+
             <td>
+              <b-button
+                id="viewDownload"
+                @click="showTeam(team.id)"
+                variant="outline-primary"
+                v-b-tooltip.hover="'Click to view team members'"
+              >
+                <b-icon icon="card-checklist"></b-icon> </b-button
+              >&nbsp;
               <b-button
                 id="viewDownload"
                 @click="viewDownload(team.teamName)"
@@ -313,6 +373,9 @@ import axios from "axios";
 import { api } from "../api";
 import { competitionChoiceOptions, stageNameOptions } from "../dropdownOptions";
 import Vue from "vue";
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+Vue.use(VueSweetalert2);
 
 export default {
   name: "Page1",
@@ -347,9 +410,22 @@ export default {
       metrics: [],
       showDownloadModal: false,
       downloadFileList: [],
+      teamToScore: "",
+      showMemberModal: false,
+
+      userList: [],
+      currentTeamName: "",
     };
   },
   computed: {
+    totalRecordsModal() {
+      return this.userList.length;
+    },
+    paginatedModalUserList() {
+      const startIndex = (this.currentPageModal - 1) * this.itemsPerPageModal;
+      const endIndex = startIndex + this.itemsPerPageModal;
+      return this.userList.slice(startIndex, endIndex);
+    },
     stageNameOptions() {
       return stageNameOptions;
     },
@@ -374,6 +450,7 @@ export default {
     filteredTeamsByQualification() {
       if (!this.selectedQualification) {
         // If no qualification is selected, return only not qualified teams.
+
         return this.filteredTeams.filter((team) => {
           let result = false;
           result = !team.isQualifiedPromo;
@@ -463,6 +540,83 @@ export default {
     }
   },
   methods: {
+    async markAttendance(userId, userRegStatus) {
+      console.log("userId", userId, "userRegStatus", userRegStatus);
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      let isRegistered = "false";
+      if (userRegStatus) {
+        //true
+        isRegistered = "false";
+      } else {
+        isRegistered = "true";
+      }
+
+      const requestBody = {
+        id: userId,
+        isRegistered: isRegistered,
+      };
+
+      console.log("requestBody", requestBody);
+
+      try {
+        const response = await axios.post(
+          `${api.MARK_ATTENDANCE_BASE_URL}`,
+          requestBody,
+          {
+            headers,
+          }
+        );
+        this.loadTeam();
+        this.showMemberModal = true; // Show the modal after fetching the users
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    async showTeam(teamId, teamName) {
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      try {
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
+          headers,
+        });
+
+        const allUsers = response.data.data;
+        this.userList = allUsers.filter(
+          (record) =>
+            !record.hasOwnProperty("gameTeam") && record.idcTeam === teamId
+        );
+        this.currentTeamName = teamName;
+        this.showMemberModal = true; // Show the modal after fetching the users
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
     async viewDownload(teamName) {
       let token = "";
       if (
@@ -543,7 +697,7 @@ export default {
         });
 
         this.teams = this.teamsData.data.data;
-        console.log("this.teams", this.teams);
+
         //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
 
         this.totalRecords = this.teams.length;
@@ -572,6 +726,7 @@ export default {
       // Loop through each metric and add the required data to the array
       const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
       const team = this.filteredTeams[index];
+
       const metricIdsArray = [];
       const metricScoreArray = [];
 
@@ -611,7 +766,7 @@ export default {
       let updateTeamURL = "";
       try {
         requestBody = {
-          id: team.id,
+          id: this.teamToScore,
           isQualifiedPromo: qualifiedPromo,
           isQualifiedFinal: qualifiedFinal,
           isQualifiedFinalSecondStage: qualifiedFinalSec,
@@ -627,6 +782,12 @@ export default {
           requestBody,
           { headers }
         );
+        this.$swal({
+          title: "Success!",
+          text: "Team updated successfully!",
+          icon: "success",
+          timer: 2000, // Display the success message for 2 seconds
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -641,7 +802,7 @@ export default {
 
       presentationArray.push(presentationObject);
       const updateTeamRequestBody = {
-        id: team.id,
+        id: this.teamToScore,
         presentationRequestsList: presentationArray,
       };
 
@@ -651,7 +812,7 @@ export default {
           updateTeamRequestBody,
           { headers }
         );
-
+        this.teamToScore = "";
         this.loadTeam();
       } catch (error) {
         console.error("Error updating team:", error);
@@ -739,6 +900,8 @@ export default {
 
         const team = this.filteredTeamsByQualification[index];
 
+        this.teamToScore = team.id;
+
         let token = "";
         if (
           Vue.$keycloak &&
@@ -755,9 +918,12 @@ export default {
           Authorization: `Bearer ${token}`,
         };
         try {
-          this.metricData = await axios.get(`${api.GET_ALL_IDC_METRIC_BASE_URL}`, {
-            headers,
-          });
+          this.metricData = await axios.get(
+            `${api.GET_ALL_IDC_METRIC_BASE_URL}`,
+            {
+              headers,
+            }
+          );
           this.metrics = this.metricData.data.data;
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -1017,5 +1183,13 @@ input.form-control.editing-textbox {
   margin-left: 20px;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  height: 100%; /* Fill the height of the modal */
 }
 </style>

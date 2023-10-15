@@ -272,7 +272,7 @@ import {
   competitionChoiceOptions,
   adminUploadTypeOptions,
 } from "../dropdownOptions";
-import { api } from "@/api";
+import { api } from "../api";
 import axios from "axios";
 import Vue from "vue";
 import Swal from "sweetalert2";
@@ -402,9 +402,12 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`, {
-          headers,
-        });
+        const response = await axios.get(
+          `${api.VIEW_ALL_ADMIN_FILES_BASE_URL}`,
+          {
+            headers,
+          }
+        );
         const originalArray = response.data.data;
 
         // Remove the "participants/" prefix from each item

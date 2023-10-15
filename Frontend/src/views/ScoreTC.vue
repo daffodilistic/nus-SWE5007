@@ -75,7 +75,11 @@
             <th>Team Name</th>
             <th></th>
             <th>Team Name</th>
+            <th>Estimated Start Date/Time</th>
+            <th>Venue</th>
+            <!--
             <th>Game Status</th>
+            -->
             <th>Actions</th>
           </tr>
         </thead>
@@ -209,9 +213,39 @@
                 ></v-select>
               </div>
             </td>
+
+            <td v-if="!techComp.editing" class="normal-td">
+              {{ formattedDateTime(techComp.datetime) }}
+            </td>
+            <td v-else>
+              <div class="form-group select">
+                <input
+                  type="date"
+                  v-model="selectedDate"
+                  class="form-control"
+                  placeholder="Select date"
+                />
+                <input
+                  type="time"
+                  v-model="selectedTime"
+                  class="form-control"
+                  placeholder="Select time"
+                />
+              </div>
+            </td>
+
+            <td v-if="!techComp.editing" class="normal-td">
+              {{ techComp.venue }}
+            </td>
+            <td v-else>
+              <div class="form-group select">
+                <input type="text" v-model="venue" class="form-control" />
+              </div>
+            </td>
+            <!--
             <td>
               {{ gameStatusTextMap[techComp.gameStatus] }}
-            </td>
+            </td>-->
             <td v-if="techComp.gameStatus === ''">
               <!-- Edit Icon -->
               <b-button
@@ -324,6 +358,9 @@ export default {
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       teamList: [],
+      selectedDate: "",
+      selectedTime: "",
+      venue: "",
     };
   },
   computed: {
@@ -425,6 +462,18 @@ export default {
     }
   },
   methods: {
+    formattedDateTime(isoDateTime) {
+      const date = new Date(isoDateTime);
+
+      // Format the date as "dd/mmm/yy hh:mm"
+      const day = date.getDate();
+      const month = date.toLocaleString("default", { month: "short" });
+      const year = date.getFullYear().toString().slice(-2);
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+
+      return `${day} ${month} ${year}, ${hours}:${minutes}`;
+    },
     async startGame(gameId) {
       console.log("startGame Called");
 
@@ -607,11 +656,19 @@ export default {
                 text: "Please select 2 different teams.",
               });
             } else {
+              const selectedDate = this.selectedDate;
+              const selectedTime = this.selectedTime;
+              const datetimeString = `${selectedDate}T${selectedTime}`;
+              const selectedDateTime = new Date(datetimeString);
+              const isoDateTime = selectedDateTime.toISOString();
+              const formattedDateTime = isoDateTime.slice(0, 19) + "Z";
+
               const requestBody = {
                 gameTeamIdHost: this.selectedHostTeam.id,
                 gameTeamIdOppo: this.selectedOppoTeam.id,
                 gameName: this.selectedTechComp,
-                gameVenue: "some venue",
+                venue: this.venue,
+                datetime: formattedDateTime,
               };
               console.log(requestBody);
               const response = await axios.post(`${url2}`, requestBody, {
@@ -621,6 +678,9 @@ export default {
               // Add the newly created techComp to the beginning of the techComps array
               this.loadTechComp();
               url = "";
+              this.selectedDate = "";
+              this.selectedTime = "";
+              this.venue = "";
             }
           }
 
@@ -673,10 +733,13 @@ export default {
         };
 
         try {
-          const response = await axios.delete(`${api.DELETE_USER_INFO_BASE_URL}`, {
-            data: requestBody,
-            headers: headers,
-          });
+          const response = await axios.delete(
+            `${api.DELETE_USER_INFO_BASE_URL}`,
+            {
+              data: requestBody,
+              headers: headers,
+            }
+          );
 
           // Show a success message
           Swal.fire({
