@@ -5,47 +5,68 @@
       v-model="showMemberModal"
       modal-class="modal"
       hide-footer
-      id="showUserModal"
+      id="showMemberModal"
       title="Mark Attendance"
     >
-      <!-- List of users to be displayed inside the modal -->
-      <table class="modal-table">
-        <thead>
-          <tr>
-            <th>S/No</th>
-            <th>User Name</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Attendance</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(user, userIndex) in userList" :key="user.id">
-            <td>{{ userIndex + 1 }}</td>
-            <td>{{ user.userName }}</td>
-            <td>{{ user.firstName }}</td>
-            <td>{{ user.lastName }}</td>
+      <div>
+        <b-card
+          no-body
+          class="mb-2"
+          v-for="team in this.filteredTeams"
+          :key="team.id"
+        >
+          <b-card-header header-tag="header" class="p-2" role="tab">
+            <b-button
+              block
+              v-b-toggle="team.id"
+              variant="info"
+              class="accordion-button"
+              @click="getTeamates(team.id)"
+            >
+              {{ team.teamName }}
+            </b-button>
+          </b-card-header>
+          <b-collapse :id="team.id" accordion="my-accordion" role="tabpanel">
+            <table class="modal-table">
+              <thead>
+                <tr>
+                  <th>S/No</th>
+                  <th>User Name</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Attendance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(user, userIndex) in userList" :key="user.id">
+                  <td>{{ userIndex + 1 }}</td>
+                  <td>{{ user.userName }}</td>
+                  <td>{{ user.firstName }}</td>
+                  <td>{{ user.lastName }}</td>
 
-            <td>
-              <b-button
-                id="edit-button"
-                @click="markAttendance(user.id, user.isRegistered)"
-                variant="outline-primary"
-                class="delete-button"
-                v-b-tooltip.hover="
-                  'Click to update attendance for this participant!'
-                "
-              >
-                <span v-if="user.isRegistered === true"
-                  ><b-icon icon="check-lg"></b-icon
-                ></span>
-                <span v-else><b-icon icon="x-lg"></b-icon></span>
-              </b-button>
-            </td>
-          </tr>
-          <tr></tr>
-        </tbody>
-      </table>
+                  <td>
+                    <b-button
+                      id="edit-button"
+                      @click="markAttendance(user.id, user.isRegistered)"
+                      variant="outline-primary"
+                      class="delete-button"
+                      v-b-tooltip.hover="
+                        'Click to update attendance for this participant!'
+                      "
+                    >
+                      <span v-if="user.isRegistered === true"
+                        ><b-icon icon="check-lg"></b-icon
+                      ></span>
+                      <span v-else><b-icon icon="x-lg"></b-icon></span>
+                    </b-button>
+                  </td>
+                </tr>
+                <tr></tr>
+              </tbody>
+            </table>
+          </b-collapse>
+        </b-card>
+      </div>
     </b-modal>
     <!-- Show Member Modal END-->
     <!-- show GA history Modal START-->
@@ -172,8 +193,12 @@
           v-b-toggle.first-accordion
           variant="info"
           class="accordion-button"
-        >
-          Click to view Qualification Round
+          >&nbsp;&nbsp;<img
+            src="../assets/qualiRound.png"
+            alt="Versus"
+            width="35px"
+            height="30px"
+          />&nbsp; Qualification Round
         </b-button>
       </b-card-header>
       <b-collapse id="first-accordion" accordion="my-accordion" role="tabpanel">
@@ -189,6 +214,11 @@
             </tr>
             <tr>
               2. Click on
+              <b-icon icon="card-checklist"></b-icon>
+              to mark team attendance.
+            </tr>
+            <tr>
+              3. Click on
               <i :class="'fas fa-plus'" class="expand-icon"></i>
               to view team matchups
               <b-icon icon="arrow-right-circle-fill"></b-icon>
@@ -197,7 +227,7 @@
               to start the match
             </tr>
             <tr>
-              3. After the match is completed, enter score for participating
+              4. After the match is completed, enter score for participating
               teams
               <b-icon icon="arrow-right-circle-fill"></b-icon>
               Click on
@@ -205,12 +235,12 @@
               to submit the score
             </tr>
             <tr>
-              4. After scores are submitted for all the matchups, click on
+              5. After scores are submitted for all the matchups, click on
               <b-icon icon="star"></b-icon>
               to qualify the top 2 teams in the group
             </tr>
             <tr>
-              5. Repeat steps 1 to 4 for all groups
+              6. Repeat steps 1 to 4 for all groups
             </tr>
           </table>
 
@@ -480,7 +510,12 @@
           class="accordion-button"
           @click="loadElimination"
         >
-          Click to view Elimination Round
+          &nbsp;&nbsp;<img
+            src="../assets/elimination.png"
+            alt="Versus"
+            width="35px"
+            height="30px"
+          />&nbsp; Elimination Round
         </b-button>
       </b-card-header>
       <b-collapse
@@ -613,7 +648,7 @@ export default {
       selectedIndex: "",
       venue: "",
       showMemberModal: false,
-
+      filteredTeams: [],
       userList: [],
       currentTeamName: "",
     };
@@ -753,9 +788,6 @@ export default {
     },
   },
   async mounted() {
-    flatpickr("#date", {
-      dateFormat: "d/m/Y", // Set the format to dd/mm/yyyy
-    });
     this.fetchTeams();
 
     const headers = {
@@ -832,6 +864,7 @@ export default {
     }
   },
   methods: {
+    async fetchTeamMembers(teamId) {},
     async markAttendance(userId, userRegStatus) {
       console.log("userId", userId, "userRegStatus", userRegStatus);
       let token = "";
@@ -879,43 +912,15 @@ export default {
       }
     },
     async showTeam(groupId) {
-      this.attendanceArray = this.counterArray.filter((record) => {
-        return record.groupID === groupId;
-      });
-      console.log(
-        groupId,
-        " group id for this.attendanceArray ",
-        this.attendanceArray
-      );
-      let token = "";
-      if (
-        Vue.$keycloak &&
-        Vue.$keycloak.token &&
-        Vue.$keycloak.token.length > 0
-      ) {
-        token = Vue.$keycloak.token;
-      } else {
-        token = "mockedToken"; //for unit test
-      }
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-      try {
-        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
-          headers,
-        });
+      console.log("groupId ", groupId, " this.groups ", this.groups);
 
-        const allUsers = response.data.data;
-        this.userList = allUsers.filter(
-          (record) =>
-            !record.hasOwnProperty("gameTeam") && record.idcTeam === teamId
-        );
-        this.currentTeamName = teamName;
-        this.showMemberModal = true; // Show the modal after fetching the users
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
+      let groupFilteredObj = this.groups.filter(
+        (group) => group.id === groupId
+      );
+
+      this.filteredTeams = groupFilteredObj[0].gameTeamResponses;
+      console.log("this.filteredTeams ", this.filteredTeams);
+      this.showMemberModal = true; // Show the modal after fetching the users
     },
     formattedDateTime(isoDateTime) {
       const date = new Date(isoDateTime);
@@ -943,6 +948,35 @@ export default {
       });
 
       return count;
+    },
+    async getTeamates(teamId) {
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      try {
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
+          headers,
+        });
+
+        const allUsers = response.data.data;
+        this.userList = allUsers.filter(
+          (record) =>
+            !record.hasOwnProperty("idcTeam") && record.gameTeam === teamId
+        );
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     },
 
     getRoundMatches(stage) {
@@ -1230,9 +1264,12 @@ export default {
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-        this.groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
-          headers,
-        });
+        this.groupsData = await axios.get(
+          `${api.GET_ALL_GAME_GROUP_BASE_URL}`,
+          {
+            headers,
+          }
+        );
         this.groups = this.groupsData.data.data;
 
         //poc start
@@ -1569,9 +1606,12 @@ export default {
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-        this.groupsData = await axios.get(`${api.GET_ALL_GAME_GROUP_BASE_URL}`, {
-          headers,
-        });
+        this.groupsData = await axios.get(
+          `${api.GET_ALL_GAME_GROUP_BASE_URL}`,
+          {
+            headers,
+          }
+        );
         this.groups = this.groupsData.data.data;
       } catch (error) {
         console.error("Error fetching data:", error);
