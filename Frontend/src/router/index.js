@@ -13,18 +13,9 @@ const routes = [
   {
     path: '/manageContestant',
     name: 'ManageContestant',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/manageContestant.vue')
-    }
-  },
-  {
-    path: '/registration',
-    name: 'Registration',
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/Registration.vue')
     }
   },
   {
@@ -42,6 +33,13 @@ const routes = [
     }
   },
   {
+    path: '/registration',
+    name: 'Registration',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/Registration.vue')
+    }
+  },
+  {
     path: '/manageMetric',
     name: 'ManageMetric',
     component: function () {
@@ -56,20 +54,6 @@ const routes = [
     }
   },
   {
-    path: '/score',
-    name: 'Score',
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/Score.vue')
-    },
-  },
-  {
-    path: '/scoreGA',
-    name: 'ScoreGA',
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/ScoreGA.vue')
-    },
-  },
-  {
     path: '/manageGroup',
     name: 'ManageGroup',
     component: function () {
@@ -82,13 +66,6 @@ const routes = [
     name: 'upload',
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/Upload.vue')
-    }
-  },
-  {
-    path: '/scoreTC',
-    name: 'scoreTC',
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/ScoreTC.vue')
     }
   },
   {
