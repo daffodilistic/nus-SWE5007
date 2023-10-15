@@ -3,13 +3,13 @@ server:
 spring:
   cloud:
     gcp:
-      project-id: shaped-splicer-397009
+      project-id: apt-terrain-401911
       credentials:
         encoded-key: ${GCP_CREDENTIALS_JSON}
       sql:
         enabled: false
       bucket:
-        id: idc-system-resources
+        id: idc-system-resources-prd
         dirName: participants
   sql:
     init:
