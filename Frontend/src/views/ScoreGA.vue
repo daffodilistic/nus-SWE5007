@@ -12,7 +12,7 @@
         <b-card
           no-body
           class="mb-2"
-          v-for="team in this.filteredTeams"
+          v-for="team in filteredTeams"
           :key="team.id"
         >
           <b-card-header header-tag="header" class="p-2" role="tab">
@@ -47,7 +47,9 @@
                   <td>
                     <b-button
                       id="edit-button"
-                      @click="markAttendance(user.id, user.isRegistered)"
+                      @click="
+                        markAttendance(user.id, user.isRegistered, team.id)
+                      "
                       variant="outline-primary"
                       class="delete-button"
                       v-b-tooltip.hover="
@@ -864,8 +866,7 @@ export default {
     }
   },
   methods: {
-    async fetchTeamMembers(teamId) {},
-    async markAttendance(userId, userRegStatus) {
+    async markAttendance(userId, userRegStatus, teamID) {
       console.log("userId", userId, "userRegStatus", userRegStatus);
       let token = "";
       if (
@@ -905,7 +906,7 @@ export default {
             headers,
           }
         );
-        this.loadTeam();
+        this.getTeamates(teamID);
         this.showMemberModal = true; // Show the modal after fetching the users
       } catch (error) {
         console.error("Error fetching users:", error);
