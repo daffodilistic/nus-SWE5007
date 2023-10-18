@@ -270,7 +270,7 @@
                   'parent-row': true,
                   'active-row': activeRow === index,
                 }"
-                @click="group.editing ? null : toggleRow(index,'')"
+                @click="group.editing ? null : toggleRow(index, '')"
               >
                 <td>
                   <i
@@ -1015,8 +1015,6 @@ export default {
             requestBody,
             { headers }
           );
-
-          this.loadGroup();
           if (groupIndex !== "na") {
             this.toggleRow(this.toggledRow, "refresh");
           } else {
