@@ -653,6 +653,7 @@ export default {
       filteredTeams: [],
       userList: [],
       currentTeamName: "",
+      toggledRow: 0,
     };
   },
   created() {
@@ -1017,7 +1018,7 @@ export default {
 
           this.loadGroup();
           if (groupIndex !== "na") {
-            this.toggleRow(groupIndex);
+            this.toggleRow(toggledRow);
           } else {
             await delay(1000);
             this.loadElimination();
@@ -1045,10 +1046,8 @@ export default {
           requestBody,
           { headers }
         );
-        if (groupIndex !== "na") {
-          this.loadGroup();
-          this.activeRow = this.activeRow === groupIndex ? null : groupIndex;
-        }
+
+        this.toggleRow(this.toggledRow);
       } catch (error) {
         // Handle errors, if any
         console.error("Error calling API:", error);
@@ -1524,6 +1523,7 @@ export default {
     },
 
     async toggleRow(index) {
+      this.toggledRow = index;
       this.objectsWithIdAndTeamArray = [];
       if (this.activeRow === index) {
         this.activeRow = null; // Collapse the row if it's already expanded
@@ -1584,11 +1584,6 @@ export default {
               }
             }
           }
-          const jsonArray = JSON.stringify(
-            this.objectsWithIdAndTeamArray,
-            null,
-            2
-          );
         } catch (error) {
           // Handle errors, if any
           console.error("Error calling API:", error);
