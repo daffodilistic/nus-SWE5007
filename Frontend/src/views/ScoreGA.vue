@@ -270,7 +270,7 @@
                   'parent-row': true,
                   'active-row': activeRow === index,
                 }"
-                @click="group.editing ? null : toggleRow(index)"
+                @click="group.editing ? null : toggleRow(index,'')"
               >
                 <td>
                   <i
@@ -1018,7 +1018,7 @@ export default {
 
           this.loadGroup();
           if (groupIndex !== "na") {
-            this.toggleRow(toggledRow);
+            this.toggleRow(this.toggledRow, "refresh");
           } else {
             await delay(1000);
             this.loadElimination();
@@ -1047,7 +1047,7 @@ export default {
           { headers }
         );
 
-        this.toggleRow(this.toggledRow);
+        this.toggleRow(this.toggledRow, "refresh");
       } catch (error) {
         // Handle errors, if any
         console.error("Error calling API:", error);
@@ -1522,10 +1522,10 @@ export default {
       }
     },
 
-    async toggleRow(index) {
+    async toggleRow(index, flag) {
       this.toggledRow = index;
       this.objectsWithIdAndTeamArray = [];
-      if (this.activeRow === index) {
+      if (this.activeRow === index && flag !== "refresh") {
         this.activeRow = null; // Collapse the row if it's already expanded
       } else {
         this.activeRow = index;
