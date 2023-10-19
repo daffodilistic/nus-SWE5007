@@ -1,5 +1,6 @@
 package com.nus.project.capstone.idc.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.core.env.Environment;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.spring.core.DefaultGcpProjectIdProvider;
@@ -48,24 +50,34 @@ public class GCPFileService {
     private Storage storage;
 
     @Autowired
+    private Environment env;
+
+    @Autowired
     public GCPFileService(
-            @Value("${spring.cloud.gcp.bucket.credential:#{null}}") Optional<String> gcpBucketCredential,
             @Value("${spring.cloud.gcp.project-id}") String gcpProjectId,
+            @Value("${spring.cloud.gcp.credentials.encoded-key}") Optional<String> gcpCredential,
+            @Value("${spring.cloud.gcp.bucket.credential:#{null}}") Optional<String> gcpBucketCredential,
             @Value("${spring.cloud.gcp.bucket.id}") String gcpBucketId,
             @Value("${spring.cloud.gcp.bucket.dirName}") String gcpDirectoryName) {
         this.gcpDirectoryName = gcpDirectoryName;
         this.gcpBucketId = gcpBucketId;
         this.gcpProjectId = gcpProjectId;
         if (gcpBucketCredential.isPresent()) {
+            logger.warn("[GCPFileService] WARNING: Credential not found, falling back to default settings...");
             loadGCPStorageAndBucket(gcpBucketCredential.get());
         } else {
             try {
-            StorageOptions options = StorageOptions.newBuilder().build();
-            storage = options.getService();
-            bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
+                // Decode base64 encoded credential
+                InputStream inputStream = new ByteArrayInputStream(gcpCredential.get().getBytes());
+                Base64InputStream credential = new Base64InputStream(inputStream, false);
+                // Create GCP Storage and Bucket instance
+                StorageOptions options = StorageOptions.newBuilder().setProjectId(gcpProjectId)
+                    .setCredentials(GoogleCredentials.fromStream(credential)).build();
+                storage = options.getService();
+                bucket = storage.get(gcpBucketId, Storage.BucketGetOption.fields());
             } catch (Exception e) {
                 logger.warn("[GCPFileService] WARNING: Unable to auto-configure GCP Bucket credential!");
-                logger.error(e.getMessage());
+                e.printStackTrace();
             }
         }
         
@@ -94,6 +106,7 @@ public class GCPFileService {
                         .data("Failed. Unknown error happened.").build());
             }
         } catch (Exception e){
+            logger.error(e.getMessage());
             return ResponseEntity.ok(GeneralMessageEntity.builder()
                     .data(e.getMessage()).build());
         }
