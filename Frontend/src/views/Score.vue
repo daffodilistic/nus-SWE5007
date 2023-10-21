@@ -260,7 +260,7 @@
                     </th>
                     <th>
                       <span class="step-text">Step 3:</span> <br />
-                      <span class="grey-font"> Update Qualification</span>
+                      <span class="grey-font"> Can Team Advance?</span>
                     </th>
                   </tr>
                 </thead>
@@ -311,7 +311,6 @@
                       :rowspan="filteredMetricsForTeam(index).length"
                     >
                       <b-button
-                        v-if="!teamToScoreFinSec"
                         id="reject-button"
                         @click="editMetric(index, 'reject')"
                         variant="outline-primary"
@@ -320,18 +319,27 @@
                           'Team will not advance to next round'
                         "
                       >
-                        <b-icon icon="x-lg"></b-icon>
+                        <img
+                          src="../assets/cross.jpg"
+                          alt="Versus"
+                          width="40px"
+                          height="40px"
+                        />
                       </b-button>
                       &nbsp;
                       <b-button
-                        v-if="!teamToScoreFinSec"
                         id="advance-button"
                         @click="editMetric(index, 'advance')"
                         variant="outline-primary"
                         class="delete-button"
                         v-b-tooltip.hover="'Team will advance to next round'"
                       >
-                        <b-icon icon="check-lg"></b-icon>
+                        <img
+                          src="../assets/tick.jpg"
+                          alt="Versus"
+                          width="40px"
+                          height="40px"
+                        />
                       </b-button>
                     </td>
                   </tr>
@@ -770,6 +778,15 @@ export default {
           }
         }
 
+        if (this.teamToScoreFinSec) {
+          this.qualification = "Final 2nd Stage";
+        } else if (this.teamToScoreFinFirst) {
+          this.qualification = "Final 1st Stage";
+        } else if (this.teamToScorePro) {
+          this.qualification = "Promotional Round";
+        } else {
+          this.qualification = "Preliminary Round";
+        }
         for (const metric of metricsForTeam) {
           metricIdsArray.push(metric.id);
           metricScoreArray.push(metric.enteredScore);
