@@ -16,71 +16,70 @@
         <div class="upload">
           <form @submit.prevent="onSubmit" class="upload-type">
             <div class="form-row">
-              <label for="game-type"
-                ><i class="fas fa-trophy" style="color: rgb(65, 127, 202)"></i>
-                &nbsp;&nbsp;&nbsp;Competition Choice</label
-              >
-              <select
-                v-model="selectedComp"
-                name="game-type"
-                id="game-type"
-                class="white-background"
-              >
-                <option value="" disabled selected>Select an option</option>
-                <!-- Use v-for to loop through competitionChoiceOptions -->
-                <option
-                  v-for="option in competitionChoiceOptions"
-                  :value="option.value"
-                  :key="option.value"
+              <div class="form-group">
+                <label for="game-type">
+                  <i class="fas fa-trophy" style="color: rgb(65, 127, 202)"></i>
+                  &nbsp;&nbsp;&nbsp;Competition Choice
+                </label>
+                <select
+                  v-model="selectedComp"
+                  name="game-type"
+                  id="game-type"
+                  class="white-background"
                 >
-                  {{ option.text }}
-                </option>
-              </select>
-            </div>
-            <br />
-            <div class="form-row">
-              <label for="upload-type"
-                ><i class="fas fa-file" style="color: rgb(65, 127, 202)"></i>
-                &nbsp;&nbsp;&nbsp;Document Category</label
-              >
-              <select
-                v-model="selectedUploadType"
-                name="upload-type"
-                id="upload-type"
-                class="white-background"
-              >
-                <option value="" disabled selected>Select an option</option>
-                <option
-                  v-for="option in adminUploadTypeOptions"
-                  :value="option.value"
-                  :key="option.value"
+                  <option value="" disabled selected>Select an option</option>
+                  <option
+                    v-for="option in competitionChoiceOptions"
+                    :value="option.value"
+                    :key="option.value"
+                  >
+                    {{ option.text }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="upload-type">
+                  <i class="fas fa-file" style="color: rgb(65, 127, 202)"></i>
+                  &nbsp;&nbsp;&nbsp;Document Category
+                </label>
+                <select
+                  v-model="selectedUploadType"
+                  name="upload-type"
+                  id="upload-type"
+                  class="white-background"
                 >
-                  {{ option.text }}
-                </option>
-              </select>
+                  <option value="" disabled selected>Select an option</option>
+                  <option
+                    v-for="option in adminUploadTypeOptions"
+                    :value="option.value"
+                    :key="option.value"
+                  >
+                    {{ option.text }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="file-upload">
+                  <i
+                    class="fas fa-file-upload"
+                    style="color: rgb(65, 127, 202)"
+                  ></i>
+                  &nbsp;&nbsp;&nbsp;Upload File
+                </label>
+                <input
+                  type="file"
+                  name="file-upload"
+                  id="file-upload"
+                  @change="onFileChange"
+                  accept=".pdf,.doc,.docx,.xlsx,.csv"
+                />
+              </div>
             </div>
-            <br />
-
             <div class="form-row">
-              <label for="file-upload"
-                ><i
-                  class="fas fa-file-upload"
-                  style="color: rgb(65, 127, 202)"
-                ></i>
-                &nbsp;&nbsp;&nbsp;Upload File</label
-              >
-              <input
-                type="file"
-                name="file-upload"
-                id="file-upload"
-                @change="onFileChange"
-                accept=".pdf,.doc,.docx,.xlsx,.csv"
-              />
+              <button type="submit" @click="upload">
+                <i class="fas fa-upload"></i> Upload
+              </button>
             </div>
-            <br />
-            <button type="submit" @click="upload()">
-              <i class="fas fa-upload"></i> Upload
-            </button>
           </form>
         </div>
       </b-collapse>

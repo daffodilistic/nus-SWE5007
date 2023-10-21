@@ -580,7 +580,7 @@ export default {
           }
         );
         this.showTeam(this.currentTeamID);
-        this.showMemberModal = true; // Show the modal after fetching the users
+        console.log("this.currentTeamID", this.currentTeamID);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
