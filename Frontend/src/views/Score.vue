@@ -187,13 +187,13 @@
         >
           <tr
             :class="{ 'parent-row': true, 'active-row': activeRow === index }"
-            @click="toggleRow(index, getQualificationStatus(team))"
+            @click="toggleRow(index)"
           >
             <td>
               <i
                 :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'"
                 class="expand-icon"
-                @click="toggleRow(index, getQualificationStatus(team))"
+                @click="toggleRow(index)"
               ></i>
             </td>
             <td>{{ startIndex + index }}</td>
