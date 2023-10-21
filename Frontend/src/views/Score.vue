@@ -701,9 +701,27 @@ export default {
       // Loop through each metric and add the required data to the array
       const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
       const team = this.filteredTeams[index];
+      const team2 = this.filteredTeams.filter(
+        (team) => team.id === this.teamToScore
+      );
+
+      console.log(
+        "team2 - ",
+        team2.teamName,
+        "id2 - ",
+        team2.id,
+        " isQualifiedPromo2 - ",
+        team2.isQualifiedPromo,
+        " isQualifiedFinal2 - ",
+        team2.isQualifiedFinal,
+        " isQualifiedFinalSecondStage2 - ",
+        team2.isQualifiedFinalSecondStage
+      );
       console.log(
         "team - ",
         team.teamName,
+        "id - ",
+        team.id,
         " isQualifiedPromo - ",
         team.isQualifiedPromo,
         " isQualifiedFinal - ",
