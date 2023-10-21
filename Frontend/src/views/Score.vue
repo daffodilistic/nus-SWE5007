@@ -412,9 +412,8 @@ export default {
       downloadFileList: [],
       teamToScore: "",
       showMemberModal: false,
-
+      currentTeamID: "",
       userList: [],
-      currentTeamName: "",
     };
   },
   computed: {
@@ -580,13 +579,14 @@ export default {
             headers,
           }
         );
-        this.loadTeam();
+        this.showTeam(this.currentTeamID);
         this.showMemberModal = true; // Show the modal after fetching the users
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     },
-    async showTeam(teamId, teamName) {
+    async showTeam(teamId) {
+      this.currentTeamID = teamId;
       let token = "";
       if (
         Vue.$keycloak &&
@@ -611,7 +611,6 @@ export default {
           (record) =>
             !record.hasOwnProperty("gameTeam") && record.idcTeam === teamId
         );
-        this.currentTeamName = teamName;
         this.showMemberModal = true; // Show the modal after fetching the users
       } catch (error) {
         console.error("Error fetching users:", error);
