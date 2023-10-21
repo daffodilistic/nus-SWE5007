@@ -701,6 +701,16 @@ export default {
       // Loop through each metric and add the required data to the array
       const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
       const team = this.filteredTeams[index];
+      console.log(
+        "team - ",
+        team.teamName,
+        " isQualifiedPromo - ",
+        team.isQualifiedPromo,
+        " isQualifiedFinal - ",
+        team.isQualifiedFinal,
+        " isQualifiedFinalSecondStage - ",
+        team.isQualifiedFinalSecondStage
+      );
 
       const metricIdsArray = [];
       const metricScoreArray = [];
