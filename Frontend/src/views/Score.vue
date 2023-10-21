@@ -309,8 +309,6 @@
                         metricIndex === filteredMetricsForTeam(index).length - 3
                       "
                       :rowspan="filteredMetricsForTeam(index).length"
-                      &&
-                      !teamToScoreFinSec
                     >
                       <b-button
                         v-if="!teamToScoreFinSec"
@@ -318,6 +316,9 @@
                         @click="editMetric(index, 'reject')"
                         variant="outline-primary"
                         class="delete-button"
+                        v-b-tooltip.hover="
+                          'Team will not advance to next round'
+                        "
                       >
                         <b-icon icon="x-lg"></b-icon>
                       </b-button>
@@ -328,6 +329,7 @@
                         @click="editMetric(index, 'advance')"
                         variant="outline-primary"
                         class="delete-button"
+                        v-b-tooltip.hover="'Team will advance to next round'"
                       >
                         <b-icon icon="check-lg"></b-icon>
                       </b-button>
