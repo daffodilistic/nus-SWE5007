@@ -187,13 +187,13 @@
         >
           <tr
             :class="{ 'parent-row': true, 'active-row': activeRow === index }"
-            @click="toggleRow(index)"
+            @click="toggleRow(index, getQualificationStatus(team))"
           >
             <td>
               <i
                 :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'"
                 class="expand-icon"
-                @click="toggleRow(index)"
+                @click="toggleRow(index, getQualificationStatus(team))"
               ></i>
             </td>
             <td>{{ startIndex + index }}</td>
@@ -262,10 +262,6 @@
                       <span class="step-text">Step 3:</span> <br />
                       <span class="grey-font"> Update Qualification</span>
                     </th>
-                    <th>
-                      <span class="step-text">Step 4:</span> <br />
-                      <span class="grey-font"> Submit</span>
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -307,31 +303,6 @@
                       </b-button>
                       <div class="score">{{ calculatedScore }}</div>
                     </td>
-                    <td
-                      v-if="
-                        metricIndex === filteredMetricsForTeam(index).length - 3
-                      "
-                      :rowspan="filteredMetricsForTeam(index).length"
-                    >
-                      <div class="form-group select">
-                        <select
-                          v-model="qualification"
-                          id="category"
-                          class="editing-dropdown"
-                        >
-                          <option value="" disabled selected>
-                            Select Qualification Status
-                          </option>
-                          <option
-                            v-for="option in filteredQualificationOptions"
-                            :value="option.value"
-                            :key="option.value"
-                          >
-                            {{ option.text }}
-                          </option>
-                        </select>
-                      </div>
-                    </td>
 
                     <td
                       v-if="
@@ -340,15 +311,21 @@
                       :rowspan="filteredMetricsForTeam(index).length"
                     >
                       <b-button
-                        id="saveScore"
-                        @click="editMetric(index)"
+                        id="reject-button"
+                        @click="editMetric(index, 'reject')"
                         variant="outline-primary"
                         class="delete-button"
-                        v-b-tooltip.hover="
-                          'Click to submit score and qualification for this team'
-                        "
                       >
-                        <b-icon icon="save"></b-icon>
+                        <b-icon icon="x-lg"></b-icon>
+                      </b-button>
+                      &nbsp;
+                      <b-button
+                        id="advance-button"
+                        @click="editMetric(index, 'advance')"
+                        variant="outline-primary"
+                        class="delete-button"
+                      >
+                        <b-icon icon="check-lg"></b-icon>
                       </b-button>
                     </td>
                   </tr>
@@ -580,7 +557,6 @@ export default {
           }
         );
         this.showTeam(this.currentTeamID);
-        console.log("this.currentTeamID", this.currentTeamID);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -705,7 +681,7 @@ export default {
       }
     },
 
-    async editMetric(index) {
+    async editMetric(index, qualiStatus) {
       let token = "";
 
       if (
@@ -735,21 +711,34 @@ export default {
       'PRO', 'Promotional Round'
       'DIQ', 'Not Qualified'
        */
+
       let qualifiedPromo = false;
       let qualifiedFinal = false;
       let qualifiedFinalSec = false;
       let requestBody;
       let response;
 
-      if (this.qualification === "Promotional Round") {
-        qualifiedPromo = true;
-      } else if (this.qualification === "Final 1st Stage") {
-        qualifiedPromo = true;
-        qualifiedFinal = true;
-      } else if (this.qualification === "Final 2nd Stage") {
-        qualifiedPromo = true;
-        qualifiedFinal = true;
-        qualifiedFinalSec = true;
+      if (qualiStatus === "reject") {
+        console.log("qualiStatus===reject");
+        qualifiedPromo = team.isQualifiedPromo;
+        qualifiedFinal = team.isQualifiedFinal;
+        qualifiedFinalSec = team.isQualifiedFinalSecondStage;
+      } else {
+        console.log("qualiStatus===advance");
+
+        if (team.isQualifiedFinal) {
+          console.log("advance to Final 2nd Stage");
+          qualifiedPromo = true;
+          qualifiedFinal = true;
+          qualifiedFinalSec = true;
+        } else if (team.isQualifiedPromo) {
+          console.log("advance to Final 1st Stage");
+          qualifiedPromo = true;
+          qualifiedFinal = true;
+        } else {
+          console.log("advance to Promo Stage");
+          qualifiedPromo = true;
+        }
       }
 
       for (const metric of metricsForTeam) {
@@ -763,6 +752,7 @@ export default {
       };
       let CalScoreResponse = "";
       let updateTeamURL = "";
+
       try {
         requestBody = {
           id: this.teamToScore,
@@ -947,6 +937,7 @@ export default {
 
 .grey-font {
   color: grey;
+  font-weight: normal;
 }
 .green-score {
   color: green;
