@@ -5,7 +5,7 @@ export const ageGroupOptions = [
 
   export const competitionChoiceOptions = [
     { value: 'IDC', text: 'Innovation Design Challenge', id:'1'},
-    { value: 'GAC', text: 'Game Arena', id:'2' },
+    { value: 'GAC', text: 'Grand Arena', id:'2' },
   ];
 
   export const adminUploadTypeOptions = [
