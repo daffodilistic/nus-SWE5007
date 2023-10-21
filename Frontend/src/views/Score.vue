@@ -309,8 +309,11 @@
                         metricIndex === filteredMetricsForTeam(index).length - 3
                       "
                       :rowspan="filteredMetricsForTeam(index).length"
+                      &&
+                      !teamToScoreFinSec
                     >
                       <b-button
+                        v-if="!teamToScoreFinSec"
                         id="reject-button"
                         @click="editMetric(index, 'reject')"
                         variant="outline-primary"
@@ -320,6 +323,7 @@
                       </b-button>
                       &nbsp;
                       <b-button
+                        v-if="!teamToScoreFinSec"
                         id="advance-button"
                         @click="editMetric(index, 'advance')"
                         variant="outline-primary"
@@ -350,6 +354,7 @@ import axios from "axios";
 import { api } from "../api";
 import { competitionChoiceOptions, stageNameOptions } from "../dropdownOptions";
 import Vue from "vue";
+import Swal from "sweetalert2";
 import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 Vue.use(VueSweetalert2);
@@ -388,6 +393,9 @@ export default {
       showDownloadModal: false,
       downloadFileList: [],
       teamToScore: "",
+      teamToScorePro: "",
+      teamToScoreFinFirst: "",
+      teamToScoreFinSec: "",
       showMemberModal: false,
       currentTeamID: "",
       userList: [],
@@ -682,157 +690,149 @@ export default {
     },
 
     async editMetric(index, qualiStatus) {
-      let token = "";
+      const confirmation = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, Submit Score!",
+      });
+      if (confirmation.isConfirmed) {
+        let token = "";
 
-      if (
-        Vue.$keycloak &&
-        Vue.$keycloak.token &&
-        Vue.$keycloak.token.length > 0
-      ) {
-        token = Vue.$keycloak.token;
-      } else {
-        token = "mockedToken"; //for unit test
-      }
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
+        if (
+          Vue.$keycloak &&
+          Vue.$keycloak.token &&
+          Vue.$keycloak.token.length > 0
+        ) {
+          token = Vue.$keycloak.token;
+        } else {
+          token = "mockedToken"; //for unit test
+        }
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
 
-      // Loop through each metric and add the required data to the array
-      const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
-      const team = this.filteredTeams[index];
-      const team2 = this.filteredTeams.filter(
-        (team) => team.id === this.teamToScore
-      );
+        // Loop through each metric and add the required data to the array
+        const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
 
-      console.log(
-        "team2 - ",
-        team2.teamName,
-        "id2 - ",
-        team2.id,
-        " isQualifiedPromo2 - ",
-        team2.isQualifiedPromo,
-        " isQualifiedFinal2 - ",
-        team2.isQualifiedFinal,
-        " isQualifiedFinalSecondStage2 - ",
-        team2.isQualifiedFinalSecondStage
-      );
-      console.log(
-        "team - ",
-        team.teamName,
-        "id - ",
-        team.id,
-        " isQualifiedPromo - ",
-        team.isQualifiedPromo,
-        " isQualifiedFinal - ",
-        team.isQualifiedFinal,
-        " isQualifiedFinalSecondStage - ",
-        team.isQualifiedFinalSecondStage
-      );
+        console.log(
+          "this.teamToScore - ",
+          this.teamToScore,
+          "this.teamToScorePro - ",
+          this.teamToScorePro,
+          "this.teamToScoreFinFirst - ",
+          this.teamToScoreFinFirst,
+          " this.teamToScoreFinSec - ",
+          this.teamToScoreFinSec
+        );
 
-      const metricIdsArray = [];
-      const metricScoreArray = [];
+        const metricIdsArray = [];
+        const metricScoreArray = [];
 
-      /*
+        /*
       'FTS', 'Final 2nd Stage'
       'FFS', 'Final 1st Stage'
       'PRO', 'Promotional Round'
       'DIQ', 'Not Qualified'
        */
 
-      let qualifiedPromo = false;
-      let qualifiedFinal = false;
-      let qualifiedFinalSec = false;
-      let requestBody;
-      let response;
+        let qualifiedPromo = false;
+        let qualifiedFinal = false;
+        let qualifiedFinalSec = false;
+        let requestBody;
+        let response;
 
-      if (qualiStatus === "reject") {
-        console.log("qualiStatus===reject");
-        qualifiedPromo = team.isQualifiedPromo;
-        qualifiedFinal = team.isQualifiedFinal;
-        qualifiedFinalSec = team.isQualifiedFinalSecondStage;
-      } else {
-        console.log("qualiStatus===advance");
-
-        if (team.isQualifiedFinal) {
-          console.log("advance to Final 2nd Stage");
-          qualifiedPromo = true;
-          qualifiedFinal = true;
-          qualifiedFinalSec = true;
-        } else if (team.isQualifiedPromo) {
-          console.log("advance to Final 1st Stage");
-          qualifiedPromo = true;
-          qualifiedFinal = true;
+        if (qualiStatus === "reject") {
+          console.log("qualiStatus===reject");
+          qualifiedPromo = this.teamToScorePro;
+          qualifiedFinal = this.teamToScoreFinFirst;
         } else {
-          console.log("advance to Promo Stage");
-          qualifiedPromo = true;
+          console.log("qualiStatus===advance");
+
+          if (this.teamToScoreFinFirst) {
+            console.log("advance to Final 2nd Stage");
+            qualifiedPromo = true;
+            qualifiedFinal = true;
+            qualifiedFinalSec = true;
+          } else if (this.teamToScorePro) {
+            console.log("advance to Final 1st Stage");
+            qualifiedPromo = true;
+            qualifiedFinal = true;
+          } else {
+            console.log("advance to Promo Stage");
+            qualifiedPromo = true;
+          }
         }
-      }
 
-      for (const metric of metricsForTeam) {
-        metricIdsArray.push(metric.id);
-        metricScoreArray.push(metric.enteredScore);
-      }
+        for (const metric of metricsForTeam) {
+          metricIdsArray.push(metric.id);
+          metricScoreArray.push(metric.enteredScore);
+        }
 
-      this.metricRequestBody = {
-        metricIds: metricIdsArray,
-        metricScores: metricScoreArray,
-      };
-      let CalScoreResponse = "";
-      let updateTeamURL = "";
-
-      try {
-        requestBody = {
-          id: this.teamToScore,
-          isQualifiedPromo: qualifiedPromo,
-          isQualifiedFinal: qualifiedFinal,
-          isQualifiedFinalSecondStage: qualifiedFinalSec,
+        this.metricRequestBody = {
+          metricIds: metricIdsArray,
+          metricScores: metricScoreArray,
         };
-        CalScoreResponse = await axios.post(
-          `${api.CALCULATE_IDC_SCORE_BASE_URL}`,
-          this.metricRequestBody,
-          { headers }
-        );
-        updateTeamURL = api.UPDATE_IDC_TEAM_BASE_URL;
-        response = await axios.put(
-          `${api.QUALIFY_IDC_TEAM_BASE_URL}`,
-          requestBody,
-          { headers }
-        );
-        this.$swal({
-          title: "Success!",
-          text: "Team updated successfully!",
-          icon: "success",
-          timer: 2000, // Display the success message for 2 seconds
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+        let CalScoreResponse = "";
+        let updateTeamURL = "";
 
-      const presentationArray = [];
+        try {
+          requestBody = {
+            id: this.teamToScore,
+            isQualifiedPromo: qualifiedPromo,
+            isQualifiedFinal: qualifiedFinal,
+            isQualifiedFinalSecondStage: qualifiedFinalSec,
+          };
+          CalScoreResponse = await axios.post(
+            `${api.CALCULATE_IDC_SCORE_BASE_URL}`,
+            this.metricRequestBody,
+            { headers }
+          );
+          updateTeamURL = api.UPDATE_IDC_TEAM_BASE_URL;
+          response = await axios.put(
+            `${api.QUALIFY_IDC_TEAM_BASE_URL}`,
+            requestBody,
+            { headers }
+          );
+          this.$swal({
+            title: "Success!",
+            text: "Team updated successfully!",
+            icon: "success",
+            timer: 2000, // Display the success message for 2 seconds
+          });
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
 
-      const presentationObject = {
-        score: Math.round(CalScoreResponse.data.data),
-        stage: this.qualification,
-        venue: "some venue",
-      };
+        const presentationArray = [];
 
-      presentationArray.push(presentationObject);
-      const updateTeamRequestBody = {
-        id: this.teamToScore,
-        presentationRequestsList: presentationArray,
-      };
+        const presentationObject = {
+          score: Math.round(CalScoreResponse.data.data),
+          stage: this.qualification,
+          venue: "some venue",
+        };
 
-      try {
-        const updateTeamResponse = await axios.put(
-          `${updateTeamURL}`,
-          updateTeamRequestBody,
-          { headers }
-        );
-        this.teamToScore = "";
-        this.loadTeam();
-      } catch (error) {
-        console.error("Error updating team:", error);
+        presentationArray.push(presentationObject);
+        const updateTeamRequestBody = {
+          id: this.teamToScore,
+          presentationRequestsList: presentationArray,
+        };
+
+        try {
+          const updateTeamResponse = await axios.put(
+            `${updateTeamURL}`,
+            updateTeamRequestBody,
+            { headers }
+          );
+          this.teamToScore = "";
+          this.loadTeam();
+        } catch (error) {
+          console.error("Error updating team:", error);
+        }
       }
     },
     async previewScore(index) {
@@ -918,6 +918,9 @@ export default {
         const team = this.filteredTeamsByQualification[index];
 
         this.teamToScore = team.id;
+        this.teamToScorePro = team.isQualifiedPromo;
+        this.teamToScoreFinFirst = team.isQualifiedFinal;
+        this.teamToScoreFinSec = team.isQualifiedFinalSecondStage;
 
         let token = "";
         if (
