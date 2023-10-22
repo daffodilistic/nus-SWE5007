@@ -260,7 +260,12 @@
                     </th>
                     <th>
                       <span class="step-text">Step 3:</span> <br />
-                      <span class="grey-font"> Can Team Advance?</span>
+                      <span class="grey-font" v-if="!teamToScoreFinSec">
+                        Can Team Advance?</span
+                      >
+                      <span class="grey-font" v-if="teamToScoreFinSec">
+                        Submit Score</span
+                      >
                     </th>
                   </tr>
                 </thead>
@@ -314,10 +319,10 @@
                         id="reject-button"
                         @click="editMetric(index, 'reject')"
                         variant="outline-primary"
-                        class="delete-button"
                         v-b-tooltip.hover="
                           'Team will not advance to next round'
                         "
+                        v-if="!teamToScoreFinSec"
                       >
                         <img
                           src="../assets/cross.jpg"
@@ -331,11 +336,25 @@
                         id="advance-button"
                         @click="editMetric(index, 'advance')"
                         variant="outline-primary"
-                        class="delete-button"
                         v-b-tooltip.hover="'Team will advance to next round'"
+                        v-if="!teamToScoreFinSec"
                       >
                         <img
                           src="../assets/tick.jpg"
+                          alt="Versus"
+                          width="40px"
+                          height="40px"
+                        />
+                      </b-button>
+                      <b-button
+                        id="advance-button"
+                        @click="editMetric(index, 'reject')"
+                        variant="outline-primary"
+                        v-b-tooltip.hover="'Submit Team Score'"
+                        v-if="teamToScoreFinSec"
+                      >
+                        <img
+                          src="../assets/submit.jpg"
                           alt="Versus"
                           width="40px"
                           height="40px"
@@ -743,13 +762,6 @@ export default {
         const metricIdsArray = [];
         const metricScoreArray = [];
 
-        /*
-      'FTS', 'Final 2nd Stage'
-      'FFS', 'Final 1st Stage'
-      'PRO', 'Promotional Round'
-      'DIQ', 'Not Qualified'
-       */
-
         let qualifiedPromo = false;
         let qualifiedFinal = false;
         let qualifiedFinalSec = false;
@@ -760,6 +772,7 @@ export default {
           console.log("qualiStatus===reject");
           qualifiedPromo = this.teamToScorePro;
           qualifiedFinal = this.teamToScoreFinFirst;
+          qualifiedFinalSec = this.teamToScoreFinSec;
         } else {
           console.log("qualiStatus===advance");
 
