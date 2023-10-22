@@ -1205,7 +1205,9 @@ export default {
               groupId: grp.id,
               teamName: grp.gameTeamResponses[index].teamName,
             };
-            firstPlaceArray.push(details);
+            if (!firstPlaceArray.includes(details)) {
+              firstPlaceArray.push(details);
+            }
           }
           if (
             grp.gameTeamIdSecond === grp.gameTeamResponses[index].id &&
@@ -1216,7 +1218,10 @@ export default {
               groupId: grp.id,
               teamName: grp.gameTeamResponses[index].teamName,
             };
-            secondPlaceArray.push(details);
+
+            if (!secondPlaceArray.includes(details)) {
+              secondPlaceArray.push(details);
+            }
           }
         }
       }
