@@ -3,17 +3,21 @@ server:
 spring:
   cloud:
     gcp:
-#      credentials:
-#        encoded-key: asdasdf
-      project-id: shaped-splicer-397009
+      project-id: apt-terrain-401911
+      credentials:
+        encoded-key: ${GCP_CREDENTIALS_JSON}
       sql:
         enabled: false
       bucket:
-        id: idc-system-resources
+        id: idc-system-resources-prd
         dirName: participants
   sql:
     init:
       platform: postgres
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   datasource:
     url: jdbc:postgresql://10.21.176.3:5432/ric-database
     username: ${POSTGRESQL_USERNAME}

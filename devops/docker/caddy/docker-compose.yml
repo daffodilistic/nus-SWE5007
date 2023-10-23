@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  caddy:
+    image: caddy:2
+    environment:
+      - TZ=Asia/Singapore
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./volumes/caddy/config:/config
+      - ./volumes/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./volumes/caddy/data:/data
+      - ./app/public_html:/usr/share/caddy

@@ -1,253 +1,1073 @@
 <template>
- <b-tabs >
-        <b-tab v-for="option in filteredCompetitionChoices" :key="option.id" :title="option.text" @click="selectedCompetition = option.text; loadUser()">
   <div>
-    <br><br>
-    <div class="search-container">
-      <table>
+    <div>
+      <table class="instruction-table">
         <tr>
-          <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
-          <td><input type="text" v-model="searchQuery" placeholder="Search user Name" class="search-box"></td>
+          <u>Instructions :</u>
+        </tr>
+        <tr>
+          1. General Tab - contain users NOT assigned to any team. You can only
+          create new user
+          <b-icon icon="person-plus"></b-icon>
+          here.
+        </tr>
+        <tr>
+          2. Innovation Design Challenge (IDC) Tab - contain users assigned to
+          IDC team.
+        </tr>
+        <tr>
+          3. Game Arena (GA) Tab - contain users assigned to GA team.
         </tr>
       </table>
     </div>
-    <div v-if="users && users.length > 0">
-    <p>Showing {{ startIndex }} to {{ endIndex }} of {{ totalRecords }} records</p>
-    <div class="pagination">
-      <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-        <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-        <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-      </button>
-    </div>
-
-    <div class="add-button">
-      <b-button id="addNewuser" variant="outline-primary" @click="addNewUser"><b-icon icon="person-plus" v-b-tooltip.hover="'Click to create new user'"></b-icon>
-      </b-button>
-    </div><br>
-    <table class="main-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>S/No</th>
-          <th>User Name</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Email</th>
-          <th>Phone Number</th>
-          <th>Country</th>
-          <th>State</th>
-          <th>Birthday</th>
-          <th>School Name</th>
-          <th>Experience<br>Year(s)</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody v-for="(user, index) in paginatedUsers" :key="index">
-        <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
-          <td>
-
-          </td>
-          <td>{{ startIndex + index }}</td>
-          <td v-if="!user.editing">
-            {{ user.userName }}
-          </td>
-          <td v-else>
-            <input
-              type="text"
-              v-model="user.editingUserName"
-              class="form-control editing-textbox"
-            />
-          </td>
-          <td v-if="!user.editing">
-            {{ user.firstName }}
-          </td>
-          <td v-else>
-            <input
-              type="text"
-              v-model="user.editingFirstName"
-              class="form-control editing-textbox"
-            />
-          </td>
-          <td v-if="!user.editing">
-            {{ user.lastName }}
-          </td>
-          <td v-else>
-            <input
-              type="text"
-              v-model="user.editingLastName"
-              class="form-control editing-textbox"
-            />
-          </td>
-          <td v-if="!user.editing">
-            {{ user.email }}
-          </td>
-          <td v-else>
-            <input
-              type="text"
-              v-model="user.editingEmail"
-              class="form-control editing-textbox"
-            />
-          </td>
-
-          <td v-if="!user.editing">
-            {{ user.phoneNumber }}
-          </td>
-          <td v-else>
-            <input
-              type="text"
-              v-model="user.editingPhoneNumber"
-              class="form-control editing-textbox"
-            />
-          </td>
-
-
-          <td v-if="!user.editing">
-            {{ user.country }}
-          </td>
-          <td v-else>
-            <div class="form-group select">
-              <select v-model="selectedCountry" id="country" class="editing-dropdown">
-                <option value="" disabled selected>Select Country</option>
-                <option v-for="option in countriesOptions" :value="option.id" :key="option.id">{{ option.name }}</option>
-              </select>
-            </div>
-          </td>
-
-          <td v-if="!user.editing">
-            {{ user.state }}
-          </td>
-          <td v-else>
-            <div class="form-group select">
-              <select v-model="selectedState" id="state" class="editing-dropdown">
-                <option value="" disabled selected>Select State</option>
-                <option v-for="option in filteredStates" :value="option.id" :key="option.id">{{ option.name }}</option>
-              </select>
-            </div>
-          </td>
-          <td v-if="!user.editing">
-            {{ user.dateOfBirth }}
-          </td>
-          <td v-else>
-            <input
-              type="date"
-              v-model="user.editingDateOfBirth"
-              class="form-control editing-textbox"
-            />
-          </td>
-
-          <td v-if="!user.editing">
-            {{ user.schoolName }}
-          </td>
-          <td v-else>
-            <input
-              type="text"
-              v-model="user.editingSchoolName"
-              class="form-control editing-textbox"
-            />
-          </td>
-
-          <td v-if="!user.editing">
-            {{ user.yearsOfExp }}
-          </td>
-          <td v-else>
-            <input
-              type="number"
-              step="1"
-              min="0"
-              max="10"
-              v-model="user.editingYearsOfExp"
-              class="form-control editing-textbox"
-            />
-          </td>
-
-          <td>
-            <!-- Edit Icon -->
-            <b-button id="edit-button" @click="editingUser(startIndex + index -1)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to edit user particulars'">
-              <span v-if="!user.editing"><b-icon icon="pencil"></b-icon></span>
-              <span v-else><b-icon icon="save"></b-icon></span>
-            </b-button>
-            <!-- Delete Icon -->
-            <b-button
-            id="deleteUser"
-            class="delete-button"
-            variant="outline-primary"
-            @click="deleteUser(startIndex + index -1)" v-b-tooltip.hover="'Click to delete user'"
+    <b-tabs>
+      <b-tab
+        v-for="option in filteredCompetitionChoices"
+        :key="option.id"
+        :title="option.text"
+        @click="
+          selectedCompetition = option.text;
+          loadUser();
+        "
+      >
+        <div v-if="selectedCompetition === 'General'">
+          <b-card no-body class="mb-2">
+            <b-card-header header-tag="header" class="p-2" role="tab">
+              <b-button
+                block
+                v-b-toggle.first-accordion
+                variant="info"
+                class="accordion-button"
+                @click="setUserType('judge')"
+              >
+                &nbsp;&nbsp;<img
+                  src="../assets/judge.png"
+                  alt="Versus"
+                  width="35px"
+                  height="30px"
+                />&nbsp; Judges
+              </b-button>
+            </b-card-header>
+            <b-collapse
+              id="first-accordion"
+              accordion="my-accordion"
+              role="tabpanel"
             >
-              <b-icon icon="trash"></b-icon>
-            </b-button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="pagination">
-    <button @click="gotoPage(currentPage - 1)" :disabled="currentPage === 1" class="page-button">
-      <i class="fas fa-chevron-left icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Previous" icon -->
-    </button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button @click="gotoPage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-button">
-      <i class="fas fa-chevron-right icon" style='color: rgb(65, 127, 202)'></i> <!-- Font Awesome "Next" icon -->
-    </button>
-  </div>
-  </div>
-  <div v-else>
-      <!-- Show a loading message or spinner while the data is being fetched -->
-      <div class="loader-container">
-        <i class="fas fa-spinner fa-spin"></i>
-      </div>
-    </div>
-  </div>
-    </b-tab>
-    </b-tabs>
-</template>
+              <div class="search-container">
+                <table>
+                  <tr>
+                    <td>
+                      <p class="h3 mb-2">
+                        <b-icon
+                          icon="search"
+                          style="color: rgb(65, 127, 202)"
+                        ></b-icon>
+                      </p>
+                    </td>
 
+                    <td>
+                      <input
+                        type="text"
+                        v-model="searchQuery"
+                        placeholder="Search user Name"
+                        class="search-box"
+                      />
+                    </td>
+                    <td>
+                      &nbsp;&nbsp;<b-button
+                        id="addNewuser"
+                        variant="outline-primary"
+                        @click="addNewUser('judge')"
+                        ><b-icon
+                          icon="person-plus"
+                          v-b-tooltip.hover="'Click to create new user'"
+                        ></b-icon>
+                      </b-button>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div v-if="users && users.length > 0">
+                <p>
+                  Showing {{ startIndex }} to {{ endIndex }} of
+                  {{ totalRecords }} records
+                </p>
+                <div class="pagination">
+                  <button
+                    @click="gotoPage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-left icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Previous" icon -->
+                  </button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button
+                    @click="gotoPage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-right icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Next" icon -->
+                  </button>
+                </div>
+
+                <table class="main-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>S/No</th>
+                      <th>User Name</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                      <th>Phone Number</th>
+                      <th>Country</th>
+                      <th>State</th>
+                      <th>Birthday</th>
+                      <th>School Name</th>
+                      <th>Experience<br />Year(s)</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody v-for="(user, index) in paginatedUsers" :key="index">
+                    <tr
+                      :class="{
+                        'parent-row': true,
+                        'active-row': activeRow === index,
+                      }"
+                      @click="toggleRow(index)"
+                    >
+                      <td></td>
+                      <td>{{ startIndex + index }}</td>
+                      <td v-if="!user.editing">
+                        {{ user.userName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingUserName"
+                          class="form-control editing-textbox"
+                          :class="{
+                            'is-invalid': !isUserNameAvailable(
+                              user.editingUserName
+                            ),
+                          }"
+                        />
+                        <div
+                          v-if="!isUserNameAvailable(user.editingUserName)"
+                          class="invalid-feedback"
+                        >
+                          Username is not available.
+                        </div>
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.firstName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingFirstName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.lastName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingLastName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.email }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingEmail"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.phoneNumber }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingPhoneNumber"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.country }}
+                      </td>
+                      <td v-else>
+                        <div class="form-group select">
+                          <select
+                            v-model="selectedCountry"
+                            id="country"
+                            class="editing-dropdown"
+                          >
+                            <option value="" disabled selected>
+                              Select Country
+                            </option>
+                            <option
+                              v-for="option in countriesOptions"
+                              :value="option.id"
+                              :key="option.id"
+                            >
+                              {{ option.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.state }}
+                      </td>
+                      <td v-else>
+                        <div class="form-group select">
+                          <select
+                            v-model="selectedState"
+                            id="state"
+                            class="editing-dropdown"
+                          >
+                            <option value="" disabled selected>
+                              Select State
+                            </option>
+                            <option
+                              v-for="option in filteredStates"
+                              :value="option.id"
+                              :key="option.id"
+                            >
+                              {{ option.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.dateOfBirth }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="date"
+                          v-model="user.editingDateOfBirth"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.schoolName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingSchoolName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.yearsOfExp }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="number"
+                          step="1"
+                          min="0"
+                          max="10"
+                          v-model="user.editingYearsOfExp"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td>
+                        <!-- Edit Icon -->
+                        <b-button
+                          id="edit-button"
+                          @click="editingUser(startIndex + index - 1, 'judge')"
+                          variant="outline-primary"
+                          class="delete-button"
+                          v-b-tooltip.hover="'Click to edit user particulars'"
+                        >
+                          <span v-if="!user.editing"
+                            ><b-icon icon="pencil"></b-icon
+                          ></span>
+                          <span v-else><b-icon icon="save"></b-icon></span>
+                        </b-button>
+                        <!-- Delete Icon -->
+                        <b-button
+                          id="deleteUser"
+                          class="delete-button"
+                          variant="outline-primary"
+                          @click="deleteUser(startIndex + index - 1)"
+                          v-b-tooltip.hover="'Click to delete user'"
+                        >
+                          <b-icon icon="trash"></b-icon>
+                        </b-button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="pagination">
+                  <button
+                    @click="gotoPage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-left icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Previous" icon -->
+                  </button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button
+                    @click="gotoPage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-right icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Next" icon -->
+                  </button>
+                </div>
+              </div>
+
+              <div v-else>
+                <!-- Show a loading message or spinner while the data is being fetched -->
+                <div class="loader-container">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+              </div>
+            </b-collapse>
+          </b-card>
+        </div>
+
+        <div>
+          <b-card no-body class="mb-2">
+            <b-card-header header-tag="header" class="p-2" role="tab">
+              <b-button
+                block
+                v-b-toggle.second-accordion
+                variant="info"
+                class="accordion-button"
+                @click="setUserType('teacher')"
+                >&nbsp;&nbsp;<img
+                  src="../assets/teacher.jpg"
+                  alt="Versus"
+                  width="35px"
+                  height="30px"
+                />&nbsp; Teachers
+              </b-button>
+            </b-card-header>
+            <b-collapse
+              id="second-accordion"
+              accordion="my-accordion"
+              role="tabpanel"
+            >
+              <div class="search-container">
+                <table>
+                  <tr>
+                    <td>
+                      <p class="h3 mb-2">
+                        <b-icon
+                          icon="search"
+                          style="color: rgb(65, 127, 202)"
+                        ></b-icon>
+                      </p>
+                    </td>
+
+                    <td>
+                      <input
+                        type="text"
+                        v-model="searchQuery"
+                        placeholder="Search user Name"
+                        class="search-box"
+                      />
+                    </td>
+                    <td v-if="selectedCompetition === 'General'">
+                      &nbsp;&nbsp;<b-button
+                        id="addNewuser"
+                        variant="outline-primary"
+                        @click="addNewUser('teacher')"
+                        ><b-icon
+                          icon="person-plus"
+                          v-b-tooltip.hover="'Click to create new user'"
+                        ></b-icon>
+                      </b-button>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div v-if="users && users.length > 0">
+                <p>
+                  Showing {{ startIndex }} to {{ endIndex }} of
+                  {{ totalRecords }} records
+                </p>
+                <div class="pagination">
+                  <button
+                    @click="gotoPage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-left icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Previous" icon -->
+                  </button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button
+                    @click="gotoPage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-right icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Next" icon -->
+                  </button>
+                </div>
+
+                <table class="main-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>S/No</th>
+                      <th>User Name</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                      <th>Phone Number</th>
+                      <th>Country</th>
+                      <th>State</th>
+                      <th>Birthday</th>
+                      <th>School Name</th>
+                      <th>Experience<br />Year(s)</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody v-for="(user, index) in paginatedUsers" :key="index">
+                    <tr
+                      :class="{
+                        'parent-row': true,
+                        'active-row': activeRow === index,
+                      }"
+                      @click="toggleRow(index)"
+                    >
+                      <td></td>
+                      <td>{{ startIndex + index }}</td>
+                      <td v-if="!user.editing">
+                        {{ user.userName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingUserName"
+                          class="form-control editing-textbox"
+                          :class="{
+                            'is-invalid': !isUserNameAvailable(
+                              user.editingUserName
+                            ),
+                          }"
+                        />
+                        <div
+                          v-if="!isUserNameAvailable(user.editingUserName)"
+                          class="invalid-feedback"
+                        >
+                          Username is not available.
+                        </div>
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.firstName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingFirstName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.lastName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingLastName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.email }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingEmail"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.phoneNumber }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingPhoneNumber"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.country }}
+                      </td>
+                      <td v-else>
+                        <div class="form-group select">
+                          <select
+                            v-model="selectedCountry"
+                            id="country"
+                            class="editing-dropdown"
+                          >
+                            <option value="" disabled selected>
+                              Select Country
+                            </option>
+                            <option
+                              v-for="option in countriesOptions"
+                              :value="option.id"
+                              :key="option.id"
+                            >
+                              {{ option.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.state }}
+                      </td>
+                      <td v-else>
+                        <div class="form-group select">
+                          <select
+                            v-model="selectedState"
+                            id="state"
+                            class="editing-dropdown"
+                          >
+                            <option value="" disabled selected>
+                              Select State
+                            </option>
+                            <option
+                              v-for="option in filteredStates"
+                              :value="option.id"
+                              :key="option.id"
+                            >
+                              {{ option.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.dateOfBirth }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="date"
+                          v-model="user.editingDateOfBirth"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.schoolName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingSchoolName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.yearsOfExp }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="number"
+                          step="1"
+                          min="0"
+                          max="10"
+                          v-model="user.editingYearsOfExp"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td>
+                        <!-- Edit Icon -->
+                        <b-button
+                          id="edit-button"
+                          @click="
+                            editingUser(startIndex + index - 1, 'teacher')
+                          "
+                          variant="outline-primary"
+                          class="delete-button"
+                          v-b-tooltip.hover="'Click to edit user particulars'"
+                        >
+                          <span v-if="!user.editing"
+                            ><b-icon icon="pencil"></b-icon
+                          ></span>
+                          <span v-else><b-icon icon="save"></b-icon></span>
+                        </b-button>
+                        <!-- Delete Icon -->
+                        <b-button
+                          id="deleteUser"
+                          class="delete-button"
+                          variant="outline-primary"
+                          @click="deleteUser(startIndex + index - 1)"
+                          v-b-tooltip.hover="'Click to delete user'"
+                        >
+                          <b-icon icon="trash"></b-icon>
+                        </b-button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="pagination">
+                  <button
+                    @click="gotoPage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-left icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Previous" icon -->
+                  </button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button
+                    @click="gotoPage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-right icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Next" icon -->
+                  </button>
+                </div>
+              </div>
+
+              <div v-else>
+                <!-- Show a loading message or spinner while the data is being fetched -->
+                <div class="loader-container">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+              </div>
+            </b-collapse>
+          </b-card>
+        </div>
+
+        <div>
+          <b-card no-body class="mb-2">
+            <b-card-header header-tag="header" class="p-2" role="tab">
+              <b-button
+                block
+                v-b-toggle.third-accordion
+                variant="info"
+                class="accordion-button"
+                @click="setUserType('participant')"
+                >&nbsp;&nbsp;<img
+                  src="../assets/student.png"
+                  alt="Versus"
+                  width="35px"
+                  height="30px"
+                />&nbsp; Students
+              </b-button>
+            </b-card-header>
+            <b-collapse
+              id="third-accordion"
+              accordion="my-accordion"
+              role="tabpanel"
+            >
+              <div class="search-container">
+                <table>
+                  <tr>
+                    <td>
+                      <p class="h3 mb-2">
+                        <b-icon
+                          icon="search"
+                          style="color: rgb(65, 127, 202)"
+                        ></b-icon>
+                      </p>
+                    </td>
+
+                    <td>
+                      <input
+                        type="text"
+                        v-model="searchQuery"
+                        placeholder="Search user Name"
+                        class="search-box"
+                      />
+                    </td>
+                    <td v-if="selectedCompetition === 'General'">
+                      &nbsp;&nbsp;<b-button
+                        id="addNewuser"
+                        variant="outline-primary"
+                        @click="addNewUser('participant')"
+                        ><b-icon
+                          icon="person-plus"
+                          v-b-tooltip.hover="'Click to create new user'"
+                        ></b-icon>
+                      </b-button>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div v-if="users && users.length > 0">
+                <p>
+                  Showing {{ startIndex }} to {{ endIndex }} of
+                  {{ totalRecords }} records
+                </p>
+                <div class="pagination">
+                  <button
+                    @click="gotoPage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-left icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Previous" icon -->
+                  </button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button
+                    @click="gotoPage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-right icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Next" icon -->
+                  </button>
+                </div>
+
+                <table class="main-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>S/No</th>
+                      <th>User Name</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                      <th>Phone Number</th>
+                      <th>Country</th>
+                      <th>State</th>
+                      <th>Birthday</th>
+                      <th>School Name</th>
+                      <th>Experience<br />Year(s)</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody v-for="(user, index) in paginatedUsers" :key="index">
+                    <tr
+                      :class="{
+                        'parent-row': true,
+                        'active-row': activeRow === index,
+                      }"
+                      @click="toggleRow(index)"
+                    >
+                      <td></td>
+                      <td>{{ startIndex + index }}</td>
+                      <td v-if="!user.editing">
+                        {{ user.userName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingUserName"
+                          class="form-control editing-textbox"
+                          :class="{
+                            'is-invalid': !isUserNameAvailable(
+                              user.editingUserName
+                            ),
+                          }"
+                        />
+                        <div
+                          v-if="!isUserNameAvailable(user.editingUserName)"
+                          class="invalid-feedback"
+                        >
+                          Username is not available.
+                        </div>
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.firstName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingFirstName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.lastName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingLastName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.email }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingEmail"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.phoneNumber }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingPhoneNumber"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.country }}
+                      </td>
+                      <td v-else>
+                        <div class="form-group select">
+                          <select
+                            v-model="selectedCountry"
+                            id="country"
+                            class="editing-dropdown"
+                          >
+                            <option value="" disabled selected>
+                              Select Country
+                            </option>
+                            <option
+                              v-for="option in countriesOptions"
+                              :value="option.id"
+                              :key="option.id"
+                            >
+                              {{ option.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.state }}
+                      </td>
+                      <td v-else>
+                        <div class="form-group select">
+                          <select
+                            v-model="selectedState"
+                            id="state"
+                            class="editing-dropdown"
+                          >
+                            <option value="" disabled selected>
+                              Select State
+                            </option>
+                            <option
+                              v-for="option in filteredStates"
+                              :value="option.id"
+                              :key="option.id"
+                            >
+                              {{ option.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+                      <td v-if="!user.editing">
+                        {{ user.dateOfBirth }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="date"
+                          v-model="user.editingDateOfBirth"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.schoolName }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="text"
+                          v-model="user.editingSchoolName"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td v-if="!user.editing">
+                        {{ user.yearsOfExp }}
+                      </td>
+                      <td v-else>
+                        <input
+                          type="number"
+                          step="1"
+                          min="0"
+                          max="10"
+                          v-model="user.editingYearsOfExp"
+                          class="form-control editing-textbox"
+                        />
+                      </td>
+
+                      <td>
+                        <!-- Edit Icon -->
+                        <b-button
+                          id="edit-button"
+                          @click="
+                            editingUser(startIndex + index - 1, 'participant')
+                          "
+                          variant="outline-primary"
+                          class="delete-button"
+                          v-b-tooltip.hover="'Click to edit user particulars'"
+                        >
+                          <span v-if="!user.editing"
+                            ><b-icon icon="pencil"></b-icon
+                          ></span>
+                          <span v-else><b-icon icon="save"></b-icon></span>
+                        </b-button>
+                        <!-- Delete Icon -->
+                        <b-button
+                          id="deleteUser"
+                          class="delete-button"
+                          variant="outline-primary"
+                          @click="deleteUser(startIndex + index - 1)"
+                          v-b-tooltip.hover="'Click to delete user'"
+                        >
+                          <b-icon icon="trash"></b-icon>
+                        </b-button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="pagination">
+                  <button
+                    @click="gotoPage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-left icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Previous" icon -->
+                  </button>
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button
+                    @click="gotoPage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                    class="page-button"
+                  >
+                    <i
+                      class="fas fa-chevron-right icon"
+                      style="color: rgb(65, 127, 202)"
+                    ></i>
+                    <!-- Font Awesome "Next" icon -->
+                  </button>
+                </div>
+              </div>
+
+              <div v-else>
+                <!-- Show a loading message or spinner while the data is being fetched -->
+                <div class="loader-container">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+              </div>
+            </b-collapse>
+          </b-card>
+        </div>
+      </b-tab>
+    </b-tabs>
+  </div>
+</template>
 
 <script>
 import axios from "axios";
-import { GET_ALL_USER_INFO_BASE_URL,UPDATE_USER_INFO_BASE_URL,CREATE_USER_INFO_BASE_URL,DELETE_USER_INFO_BASE_URL} from '@/api';
-import { competitionChoiceOptions,countriesOptions,statesOptions } from "../dropdownOptions";
-import Swal from 'sweetalert2';
-import Vue from 'vue'
+import { api } from "../api";
+import {
+  competitionChoiceOptions,
+  countriesOptions,
+  statesOptions,
+} from "../dropdownOptions";
+import Swal from "sweetalert2";
+import Vue from "vue";
 
 export default {
   head() {
     return {
       link: [
         {
-          rel: 'stylesheet',
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
-          integrity: 'sha512-...',
-          crossorigin: 'anonymous',
-          referrerpolicy: 'no-referrer',
+          rel: "stylesheet",
+          href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+          integrity: "sha512-...",
+          crossorigin: "anonymous",
+          referrerpolicy: "no-referrer",
         },
       ],
-    }
+    };
   },
 
   data() {
     return {
-      userName:'',
-      firstName:'',
-      lastName:'',
-      country:'',
-      state:'',
-      selectedCountry: '', // Holds the selected country ID
-      selectedState: '',   // Holds the selected state ID
-      email:'',
-      phoneNumber:'',
-      yearsOfExp:'',
-      schoolName:'',
-      dateOfBirth:'',
-      searchQuery: '',
-      users:[],
+      userName: "",
+      firstName: "",
+      lastName: "",
+      country: "",
+      state: "",
+      selectedCountry: "", // Holds the selected country ID
+      selectedState: "", // Holds the selected state ID
+      email: "",
+      phoneNumber: "",
+      yearsOfExp: "",
+      schoolName: "",
+      dateOfBirth: "",
+      searchQuery: "",
+      users: [],
+      teachers: [],
+      judges: [],
       activeRow: null,
       itemsPerPage: 10, // Number of users per page
       currentPage: 1, // Current page
       editingStatus: null, // Control the visibility of the modal
       userList: [],
-      selectedCompetition: "Innovation Design Challenge",
+      selectedCompetition: "General",
+      userType: "",
     };
   },
   computed: {
@@ -259,33 +1079,54 @@ export default {
     },
 
     filteredStates() {
-    return this.selectedCountry
-      ? statesOptions.filter(state => state.countryId === this.selectedCountry)
-      : [];
-  },
+      return this.selectedCountry
+        ? statesOptions.filter(
+            (state) => state.countryId === this.selectedCountry
+          )
+        : [];
+    },
 
     filteredUsers() {
       // If the users data is not available yet, return an empty array
-      if (!this.users || this.users.length === 0) {
+
+      let userList = "";
+
+      if (this.userType === "participant") {
+        userList = this.users;
+      } else if (this.userType === "teacher") {
+        userList = this.teachers;
+      } else if (this.userType === "judge") {
+        userList = this.judges;
+      }
+
+      console.log("userList", userList);
+
+      if (!userList || userList.length === 0) {
         return [];
       }
 
       // If the search query is empty, show all users
-      if (this.searchQuery.trim() === '') {
+      if (this.searchQuery.trim() === "") {
         // Sort the users by "Stage Name" in ascending order (A to Z)
-        return this.users.slice().sort((a, b) => {
-          const stageA = a.firstName || '';
-          const stageB = b.firstName || '';
+        return userList.slice().sort((a, b) => {
+          const stageA = a.firstName || "";
+          const stageB = b.firstName || "";
           return stageA.localeCompare(stageB);
         });
       }
 
       // Otherwise, filter users based on the search query
       const query = this.searchQuery.trim().toLowerCase();
-      return this.users.filter((user) => user.firstName.toLowerCase().includes(query));
+      return userList.filter((user) =>
+        user.firstName.toLowerCase().includes(query)
+      );
     },
     filteredCompetitionChoices() {
-      return competitionChoiceOptions;
+      return [
+        // Add the "General" option to the existing competitionChoiceOptions
+        { value: "GEN", text: "General", id: "3" },
+        ...competitionChoiceOptions,
+      ];
     },
     totalPages() {
       return Math.ceil(this.filteredUsers.length / this.itemsPerPage);
@@ -308,56 +1149,111 @@ export default {
   },
   async mounted() {
     let token = "";
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+    if (
+      Vue.$keycloak &&
+      Vue.$keycloak.token &&
+      Vue.$keycloak.token.length > 0
+    ) {
+      token = Vue.$keycloak.token;
+    } else {
+      token = "mockedToken"; //for unit test
+    }
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     };
     try {
-      this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
-      this.users = this.usersData.data.data;
-
+      this.usersData = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
+        headers,
+      });
+      this.users = this.usersData.data.data.filter(
+        (record) =>
+          !record.hasOwnProperty("idcTeam") &&
+          !record.hasOwnProperty("gameTeam")
+      );
     } catch (error) {
       // Handle any errors that might occur during the request
       console.error("Error fetching users:", error);
     }
   },
   methods: {
+    setUserType(userType) {
+      console.log("setUserType", userType);
+      this.userType = userType;
+    },
+    isUserNameAvailable(username) {
+      // Check if the username exists in any user's firstname property in the users array
 
+      return !this.users.some(
+        (user) =>
+          user.userName &&
+          username &&
+          user.userName.toLowerCase() === username.toLowerCase()
+      );
+    },
     async toggleRow(index) {
-    if (this.activeRow === index) {
-      this.activeRow = null; // Collapse the row if it's already expanded
-    } else {
-      this.activeRow = index;
-    }
-  },
-     async loadUser() {
+      if (this.activeRow === index) {
+        this.activeRow = null; // Collapse the row if it's already expanded
+      } else {
+        this.activeRow = index;
+      }
+    },
+    async loadUser() {
       let token = "";
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       };
       try {
         if (this.selectedCompetition === "Game Arena") {
-          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+          this.usersData = await axios.get(
+            `${api.GET_ALL_USER_INFO_BASE_URL}`,
+            {
+              headers,
+            }
+          );
+          this.users = this.usersData.data.data.filter((record) =>
+            record.hasOwnProperty("gameTeam")
+          );
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
-          this.usersData = await axios.get(`${GET_ALL_USER_INFO_BASE_URL}`, { headers });
+          this.usersData = await axios.get(
+            `${api.GET_ALL_USER_INFO_BASE_URL}`,
+            {
+              headers,
+            }
+          );
+          this.users = this.usersData.data.data.filter((record) =>
+            record.hasOwnProperty("idcTeam")
+          );
+        } else {
+          this.usersData = await axios.get(
+            `${api.GET_ALL_USER_INFO_BASE_URL}`,
+            {
+              headers,
+            }
+          );
+          this.users = this.usersData.data.data.filter(
+            (record) =>
+              !record.hasOwnProperty("idcTeam") &&
+              !record.hasOwnProperty("gameTeam")
+          );
         }
-        this.users = this.usersData.data.data;
+        console.log("this.users", this.users);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
-    async addNewUser() {
+
+    async addNewUser(userType) {
       // Create a new user object and add it to the beginning of the users array
       const newUser = {
         userName: "",
@@ -369,7 +1265,7 @@ export default {
         state: "",
         dateOfBirth: "",
         schoolName: "",
-        yearsOfExp:0,
+        yearsOfExp: 0,
         editing: true, // Set editing to true to enable editing mode for the new user
         editingUserName: "",
         editingFirstName: "",
@@ -380,180 +1276,210 @@ export default {
         selectedState: "",
         editingDateOfBirth: "",
         editingSchoolName: "",
-        editingYearsOfExp:0,
+        editingYearsOfExp: 0,
       };
-
-      this.users.unshift(newUser);
+      if (userType === "participant") {
+        this.users.unshift(newUser);
+      } else if (userType === "teacher") {
+        this.teachers.unshift(newUser);
+      } else if (userType === "judge") {
+        this.judges.unshift(newUser);
+      }
 
       // Update the currentPage to 1 to ensure the newly added user appears on the first page
       this.currentPage = 1;
     },
 
-      gotoPage(page) {
-        if (page >= 1 && page <= this.totalPages) {
-          this.currentPage = page;
-        }
-      },
+    gotoPage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+      }
+    },
 
-      // Method to toggle editing mode for a user
-      async editingUser(index) {
-        const user = this.filteredUsers[index];
+    // Method to toggle editing mode for a user
+    async editingUser(index, userType) {
+      let url = "";
+      let url2 = "";
+      let user = "";
 
-        const selectedCountryObject = countriesOptions.find(country => country.id === this.selectedCountry);
-        let selectedCountryName = ''
+      if (userType === "participant") {
+        user = this.filteredUsers[index];
+        url = api.UPDATE_USER_INFO_BASE_URL;
+        url2 = api.CREATE_USER_INFO_BASE_URL;
+      } else if (userType === "teacher") {
+        user = this.filteredUsers[index];
+        url2 = api.CREATE_TEACHER_INFO_BASE_URL;
+      } else if (userType === "judge") {
+        user = this.filteredUsers[index];
+        url2 = api.CREATE_JUDGE_INFO_BASE_URL;
+      }
+      console.log("url2-", url2, " for ", userType);
 
-        const selectedStateObject = statesOptions.find(state => state.id === this.selectedState);
-        let selectedStateName = ''
+      const selectedCountryObject = countriesOptions.find(
+        (country) => country.id === this.selectedCountry
+      );
+      let selectedCountryName = "";
 
-        if (selectedCountryObject) {
-          selectedCountryName = selectedCountryObject.name;
-          console.log('Selected Country Name:', selectedCountryName);
-        } else {
-          console.log('Selected country not found in options.');
-        }
+      const selectedStateObject = statesOptions.find(
+        (state) => state.id === this.selectedState
+      );
+      let selectedStateName = "";
 
-        if (selectedStateObject) {
-          selectedStateName = selectedStateObject.name;
+      if (selectedCountryObject) {
+        selectedCountryName = selectedCountryObject.name;
+        console.log("Selected Country Name:", selectedCountryName);
+      } else {
+        console.log("Selected country not found in options.");
+      }
 
-        } else {
-          console.log('Selected State not found in options.');
-        }
-        if (user.editing) {
-          // Save the changes
-          user.userName = user.editingUserName;
-          user.firstName = user.editingFirstName;
-          user.lastName = user.editingLastName;
-          user.phoneNumber = user.editingPhoneNumber;
-          user.email = user.editingEmail;
-          user.country = this.selectedCountry;
-          user.state = this.selectedState;
-          user.schoolName = user.editingSchoolName;
-          user.yearsOfExp = user.editingYearsOfExp;
-          user.dateOfBirth = user.editingDateOfBirth;
+      if (selectedStateObject) {
+        selectedStateName = selectedStateObject.name;
+      } else {
+        console.log("Selected State not found in options.");
+      }
+      if (user.editing) {
+        // Save the changes
+        user.userName = user.editingUserName;
+        user.firstName = user.editingFirstName;
+        user.lastName = user.editingLastName;
+        user.phoneNumber = user.editingPhoneNumber;
+        user.email = user.editingEmail;
+        user.country = this.selectedCountry;
+        user.state = this.selectedState;
+        user.schoolName = user.editingSchoolName;
+        user.yearsOfExp = user.editingYearsOfExp;
+        user.dateOfBirth = user.editingDateOfBirth;
 
-          user.editing = false;
-          let token = "";
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
-          const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          };
-          try {
-          let url = '';
-          let url2 = '';
-            if (this.selectedCompetition === "Game Arena") {
-              url = UPDATE_USER_INFO_BASE_URL;
-              url2 = CREATE_USER_INFO_BASE_URL;
-            } else if (this.selectedCompetition === "Innovation Design Challenge") {
-             url = UPDATE_USER_INFO_BASE_URL;
-             url2 = CREATE_USER_INFO_BASE_URL;
-            }
-            // If the user has an ID, update the existing record using a PUT request
-            if (user.id) {
-              const requestBody = {
-                id: user.id,
-                userName: user.userName,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                country: selectedCountryName,
-                state: selectedStateName,
-                schoolName: user.schoolName,
-                yearsOfExp: user.yearsOfExp,
-                dateOfBirth: user.dateOfBirth
-              };
-              const response = await axios.put(`${url}`, requestBody, { headers });
-            }
-            // If the user doesn't have an ID, create a new record using a POST request
-            else {
-              const requestBody = {
-                userName: user.userName,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                country: selectedCountryName,
-                state: selectedStateName,
-                schoolName: user.schoolName,
-                yearsOfExp: user.yearsOfExp,
-                dateOfBirth: user.dateOfBirth
-              };
-
-              const response = await axios.post(`${url2}`, requestBody, { headers });
-
-              // Add the newly created user to the beginning of the users array
-              this.users.unshift(response.data.data);
-              url ='';
-            }
-            this.loadUser();
-            // Optional: Perform any additional actions, such as updating the UI.
-          } catch (error) {
-            // Handle errors, if any
-            console.error('Error saving user:', error);
-          }
-        } else {
-          // Enter editing mode
-          user.editingUserName = user.userName;
-          user.editingFirstName = user.firstName;
-          user.editingLastName = user.lastName;
-          user.editingPhoneNumber = user.phoneNumber;
-          user.editingEmail = user.email;
-          this.selectedCountry = selectedCountryName;
-          this.selectedState = selectedStateName;
-          user.editingSchoolName = user.schoolName;
-          user.editingYearsOfExp = user.yearsOfExp;
-          user.editingDateOfBirth = user.dateOfBirth;
-          user.editing = true;
-        }
-      },
-      // Method to delete a user
-      async deleteUser(index) {
-        const user = this.filteredUsers[index];
+        user.editing = false;
         let token = "";
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+        if (
+          Vue.$keycloak &&
+          Vue.$keycloak.token &&
+          Vue.$keycloak.token.length > 0
+        ) {
+          token = Vue.$keycloak.token;
+        } else {
+          token = "mockedToken"; //for unit test
+        }
         const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        try {
+          // If the user has an ID, update the existing record using a PUT request
+          if (user.id) {
+            const requestBody = {
+              id: user.id,
+              userName: user.userName,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              phoneNumber: user.phoneNumber,
+              country: selectedCountryName,
+              state: selectedStateName,
+              schoolName: user.schoolName,
+              yearsOfExp: user.yearsOfExp,
+              dateOfBirth: user.dateOfBirth,
+            };
+            const response = await axios.put(`${url}`, requestBody, {
+              headers,
+            });
+          }
+          // If the user doesn't have an ID, create a new record using a POST request
+          else {
+            const requestBody = {
+              userName: user.userName,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              phoneNumber: user.phoneNumber,
+              country: selectedCountryName,
+              state: selectedStateName,
+              schoolName: user.schoolName,
+              yearsOfExp: user.yearsOfExp,
+              dateOfBirth: user.dateOfBirth,
+            };
+
+            const response = await axios.post(`${url2}`, requestBody, {
+              headers,
+            });
+            if (userType === "participant") {
+              this.users.unshift(response.data.data);
+            } else if (userType === "teacher") {
+              this.teachers.unshift(response.data.data);
+            } else if (userType === "judge") {
+              this.judges.unshift(response.data.data);
+            }
+          }
+          this.loadUser();
+        } catch (error) {
+          console.error("Error saving user:", error);
+        }
+      } else {
+        // Enter editing mode
+        user.editingUserName = user.userName;
+        user.editingFirstName = user.firstName;
+        user.editingLastName = user.lastName;
+        user.editingPhoneNumber = user.phoneNumber;
+        user.editingEmail = user.email;
+        this.selectedCountry = selectedCountryName;
+        this.selectedState = selectedStateName;
+        user.editingSchoolName = user.schoolName;
+        user.editingYearsOfExp = user.yearsOfExp;
+        user.editingDateOfBirth = user.dateOfBirth;
+        user.editing = true;
+      }
+    },
+    // Method to delete a user
+    async deleteUser(index) {
+      const user = this.filteredUsers[index];
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      const confirmation = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+      });
+
+      if (confirmation.isConfirmed) {
+        const requestBody = {
+          id: user.id,
         };
 
-        const confirmation = await Swal.fire({
-          title: 'Are you sure?',
-          text: 'You won\'t be able to revert this!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, delete it!'
-        });
-
-        if (confirmation.isConfirmed) {
-          const requestBody = {
-            id: user.id,
-          };
-
         try {
-            const response = await axios.delete(`${DELETE_USER_INFO_BASE_URL}`, {
-          data: requestBody,
-          headers: headers
-        });
+          const response = await axios.delete(
+            `${api.DELETE_USER_INFO_BASE_URL}`,
+            {
+              data: requestBody,
+              headers: headers,
+            }
+          );
 
           // Show a success message
           Swal.fire({
-            title: 'Deleted!',
-            text: 'The user has been deleted.',
-            icon: 'success'
+            title: "Deleted!",
+            text: "The user has been deleted.",
+            icon: "success",
           });
 
-          this.loadUser()
+          this.loadUser();
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -566,7 +1492,6 @@ export default {
 <style scoped>
 /* Main Table Styles */
 .main-table {
-
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -578,7 +1503,7 @@ export default {
 
 .main-table th,
 .main-table td {
-padding: 8px;
+  padding: 8px;
   text-align: center;
   font-size: 14px;
   background-color: #f6f6f6;
@@ -588,7 +1513,6 @@ padding: 8px;
   font-weight: bold;
 }
 
-
 /* Hover effect for clickable rows */
 .main-table tbody tr:hover {
   background-color: #f2f2f2;
@@ -596,14 +1520,13 @@ padding: 8px;
 }
 
 .active-row {
-  background-color: rgb(218, 234, 253)/* Light blue for active parent row */
+  background-color: rgb(218, 234, 253); /* Light blue for active parent row */
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px; /* Add some top margin for spacing */
 }
 
 .page-button {
@@ -621,7 +1544,7 @@ padding: 8px;
   display: flex;
   justify-content: flex-end; /* Aligns the search box to the right */
   margin-bottom: 20px;
-  margin-right:65px;
+  margin-right: 5px;
 }
 
 /* Search Box Styles */
@@ -704,11 +1627,27 @@ input.form-control.editing-textbox {
 
 /* Optionally, add styles for the dropdown arrow icon */
 .editing-dropdown .dropdown-toggle::after {
-  font-family: 'Font Awesome'; /* Assuming you're using Font Awesome for icons */
-  content: '\f107'; /* Replace with the correct icon code */
+  font-family: "Font Awesome"; /* Assuming you're using Font Awesome for icons */
+  content: "\f107"; /* Replace with the correct icon code */
   margin-left: 5px; /* Add some spacing between the text and the icon */
   color: #555; /* Set the color of the icon */
 }
 
+.accordion-button {
+  color: #100101;
+}
 
+.accordion-button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
+}
+
+.instruction-table {
+  text-align: left;
+  font-size: 14px;
+  color: #120b51;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 </style>

@@ -5,32 +5,38 @@ export const ageGroupOptions = [
 
   export const competitionChoiceOptions = [
     { value: 'IDC', text: 'Innovation Design Challenge', id:'1'},
-    { value: 'GA', text: 'Game Arena', id:'2' },
+    { value: 'GAC', text: 'Grand Arena', id:'2' },
   ];
 
   export const adminUploadTypeOptions = [
-    { value: 'Game Manual', text: 'Game Manual', id:'1'},
-    { value: 'Time Table', text: 'Time Table', id:'2' },
+    { value: 'GM', text: 'Game Manual', id:'1'},
+    { value: 'TT', text: 'Time Table', id:'2' },
   ];
 
   export const qualificationOptions = [
-    { value: 'FTS', text: 'Final 2nd Stage', competitionId:'1'},
-    { value: 'FFS', text: 'Final 1st Stage', competitionId:'1'},
-    { value: 'PRE', text: 'Preliminary Round', competitionId:'1'},
-    { value: 'PRO', text: 'Promotional Round', competitionId:'1'},
-    { value: 'DIQ', text: 'Not Qualified', competitionId:'1'},
+    { value: 'FTS', text: 'Final 2nd Stage', competitionId:'1',seq:'4'},
+    { value: 'FFS', text: 'Final 1st Stage', competitionId:'1',seq:'3'},
+    { value: 'PRE', text: 'Preliminary Round', competitionId:'1',seq:'2'},
+    { value: 'PRO', text: 'Promotional Round', competitionId:'1',seq:'1'},
+    { value: 'DIQ', text: 'Not Qualified', competitionId:'1',seq:'0'},
     { value: 'ELR', text: 'Elimination Round', competitionId:'2'},
     { value: 'QLR', text: 'Qualification Round', competitionId:'2'},
-    { value: 'DIQ', text: 'Not Qualified', competitionId:'2'},
+
   ];
 
   export const stageNameOptions = [
     { value: 'Final 2nd Stage', text: 'Final 2nd Stage', competitionId:'1'},
     { value: 'Final 1st Stage', text: 'Final 1st Stage', competitionId:'1'},
     { value: 'Promotional Round', text: 'Promotional Round', competitionId:'1'},
+    { value: 'Preliminary Round', text: 'Preliminary Round', competitionId:'1'},
     { value: 'Qualification Round', text: 'Qualification Round', competitionId:'2'},
     { value: 'Eimination Round', text: 'Eimination Round', competitionId:'2'},
-    { value: 'Not Qualified', text: 'Not Qualified', competitionId:'1'},
+  ];
+
+  export const tcGameOptions = [
+    { value: 'Sprinting', text: 'Sprinting', competitionId:'3'},
+    { value: 'Mountaineering', text: 'Mountaineering', competitionId:'3'},
+    { value: 'Sumo', text: 'Sumo', competitionId:'3'},
   ];
 
   export const countriesOptions = [

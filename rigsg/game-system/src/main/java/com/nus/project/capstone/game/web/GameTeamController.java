@@ -4,6 +4,7 @@ import com.nus.project.capstone.model.entity.base.GeneralMessageEntity;
 import com.nus.project.capstone.model.entity.base.UserResponse;
 import com.nus.project.capstone.model.entity.game.GameTeamRequests;
 import com.nus.project.capstone.model.entity.game.GameTeamResponse;
+import com.nus.project.capstone.model.entity.idc.IdcTeamRequests;
 import com.nus.project.capstone.model.persistence.base.UserJpaEntities;
 import com.nus.project.capstone.model.persistence.base.UserRepository;
 import com.nus.project.capstone.model.persistence.game.GameTeamJpaEntities;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.nus.project.capstone.game.web.Tools.genericFailureMessage;
 
 @Slf4j
 @RestController
@@ -50,11 +53,25 @@ public class GameTeamController {
         val i = o.map(gameTeamJpa -> {
             val gameTeamResponse = GameTeamResponse.toGameTeamResponse(gameTeamJpa);
             gameTeamResponse.setUserResponses(gameTeamJpa.getUsers() == null ? null :
-                    gameTeamJpa.getUsers().stream().map(UserResponse::toUserResponse).collect(Collectors.toList()));
+                    gameTeamJpa.getUsers().stream().map(user -> UserResponse.toUserResponse(user, null)).collect(Collectors.toList()));
             return gameTeamResponse;
         }).orElse(null);
 
         return ResponseEntity.ok(GeneralMessageEntity.builder().data(i).build());
+    }
+
+    @PutMapping("/assign-user")
+    public ResponseEntity<GeneralMessageEntity> assignUser(@RequestBody GameTeamRequests gameTeamRequests) {
+        if (gameTeamRequests.getTeamName() == null &&
+                gameTeamRequests.getAgeGroup() == null &&
+                gameTeamRequests.getQualificationRoundScore() == null &&
+                gameTeamRequests.getQualificationRoundPoint() == null &&
+                gameTeamRequests.getQualificationRoundNumMatchesPlayed() == null &&
+                gameTeamRequests.getIsQualifiedForElimination() == null) {
+            return updateTeam(gameTeamRequests);
+        } else {
+            return genericFailureMessage();
+        }
     }
 
     @PutMapping("/update-team")

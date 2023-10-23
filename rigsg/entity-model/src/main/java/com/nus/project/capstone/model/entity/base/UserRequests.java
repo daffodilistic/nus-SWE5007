@@ -24,6 +24,8 @@ public class UserRequests {
     private String schoolName;
     private Integer yearsOfExp;
     private String userName; // for keycloak use only
+    private Boolean isRegistered;
+    private String userType;
 
     public static UserRequests toUserRequests(UserJpaEntities u) {
         return UserRequests.builder()
@@ -37,6 +39,8 @@ public class UserRequests {
                 .phoneNumber(u.getPhoneNumber())
                 .schoolName(u.getSchoolName())
                 .yearsOfExp(u.getYearsOfExp())
+                .isRegistered(u.getIsRegistered())
+                .userType(u.getUserType())
                 .build();
     }
 }

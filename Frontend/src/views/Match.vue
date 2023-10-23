@@ -1,25 +1,140 @@
 <template>
   <div class="match">
-    <div class="team" :class="{ 'winner': match.homeScore > match.awayScore }">
-      {{ match.homeTeam }}
-      <span v-if="showTrophy && match.homeScore > match.awayScore" class="trophy">🏆</span>
-      <span v-else-if="showStar && match.homeScore > match.awayScore" class="star">⭐</span>
+    <div class="team" :class="{ winner: match.hostScore > match.oppoScore }">
+      <span
+        v-if="showTrophy && match.hostScore > match.oppoScore"
+        class="trophy"
+        >🏆<br
+      /></span>
+      <span
+        v-else-if="showStar && match.hostScore > match.oppoScore"
+        class="star"
+        >⭐<br
+      /></span>
+      <span
+        v-else="showBlank && match.hostScore < match.oppoScore"
+        class="blank"
+      >
+        <br
+      /></span>
+      {{ match.hostTeamName }}
     </div>
-    <div class="score">&nbsp;&nbsp;&nbsp;&nbsp;{{ match.homeScore }} - {{ match.awayScore }}&nbsp;&nbsp;&nbsp;&nbsp;</div>
-    <div class="team" :class="{ 'winner': match.awayScore > match.homeScore }">
-      {{ match.awayTeam }}
-      <span v-if="showTrophy && match.awayScore > match.homeScore" class="trophy">🏆</span>
-      <span v-else-if="showStar && match.awayScore > match.homeScore" class="star">⭐</span>
+    <div class="score">
+      <template v-if="match.gameStatus !== 'done'">
+        <input
+          type="number"
+          v-model="match.enteredHostScore"
+          :min="0"
+          :disabled="match.gameStatus !== 'ongoing'"
+          class="narrow-input"
+        />
+        &nbsp;-&nbsp;
+        <input
+          type="number"
+          v-model="match.enteredOppoScore"
+          :min="0"
+          :disabled="match.gameStatus !== 'ongoing'"
+          class="narrow-input"
+        />
+      </template>
+      <template v-else-if="match.gameStatus === 'done'">
+        {{ match.hostScore }} - {{ match.oppoScore }}
+      </template>
+    </div>
+    <div class="team" :class="{ winner: match.oppoScore > match.hostScore }">
+      <span
+        v-if="showTrophy && match.oppoScore > match.hostScore"
+        class="trophy"
+        >🏆<br
+      /></span>
+      <span
+        v-else-if="showStar && match.oppoScore > match.hostScore"
+        class="star"
+        >⭐<br
+      /></span>
+      <span
+        v-else="showBlank && match.oppoScore < match.hostScore"
+        class="blank"
+      >
+        <br
+      /></span>
+      {{ match.oppoTeamName }}
+    </div>
+
+    <div>
+      <template v-if="gameStatusTextMap[match.gameStatus] === 'Not Started'"
+        ><br />
+        <b-button
+          @click="startGame(match.id, 'na')"
+          variant="outline-primary"
+          class="delete-button"
+          v-b-tooltip.hover="'Click to start game for this matchup'"
+        >
+          <b-icon icon="play-circle"></b-icon>
+        </b-button>
+      </template>
+
+      <template v-if="match.gameStatus == 'ongoing'"
+        ><br />
+        <b-button
+          @click="submitScore(match.hostTeamId, match.oppoTeamId, match, 'na')"
+          variant="outline-primary"
+          class="delete-button"
+          v-b-tooltip.hover="'Click to submit score for this matchup'"
+        >
+          <b-icon icon="save"></b-icon>
+        </b-button>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
+import Round from "./Round.vue";
+import ScoreGA from "./ScoreGA.vue";
+import eventBus from "../utils/eventBus.js";
+import { delay } from "../utils/utils.js";
+
 export default {
   props: {
-    match: Object, // Contains match data (homeTeam, awayTeam, homeScore, awayScore)
+    match: Object, // Contains match data (homeTeam, awayTeam, hostScore, oppoScore)
     showStar: Boolean, // Indicates whether to show a star
     showTrophy: Boolean, // Indicates whether to show a trophy
+    showBlank: Boolean,
+  },
+  components: {
+    Round,
+    ScoreGA,
+  },
+  data() {
+    return {};
+  },
+  computed: {
+    gameStatusTextMap() {
+      // Define a mapping of age group values to their corresponding text
+      const gameStatusMap = {
+        pending: "Not Started",
+        ongoing: "In-Progress",
+        done: "Completed",
+        // Add more entries as needed for other age groups
+      };
+      return gameStatusMap;
+    },
+  },
+  methods: {
+    async submitScore(hostTeamId, oppoTeamId, matchObj, index) {
+      eventBus.$emit("submit-score", hostTeamId, oppoTeamId, matchObj, index);
+    },
+
+    async startGame(gameId, index) {
+      eventBus.$emit("start-game", gameId, index);
+      await delay(1000);
+      eventBus.$emit("load-elimination-data");
+    },
+
+    async checkAdvanceRound(gameId, index) {
+      eventBus.$emit("check-advance");
+    },
   },
 };
 </script>
@@ -40,7 +155,7 @@ export default {
   flex: 1;
   text-align: center;
   font-weight: bold;
-
+  width: 120px;
 }
 
 /* Style for the winning team */
@@ -49,8 +164,14 @@ export default {
 }
 
 /* Style for the trophy and star icons */
-.trophy, .star {
+.star,
+.blank {
   font-size: 20px;
+  margin-left: 4px;
+}
+
+.trophy {
+  font-size: 30px;
   margin-left: 4px;
 }
 
@@ -67,9 +188,22 @@ export default {
   color: white; /* Text color for the score */
   padding: 4px 8px; /* Adjust padding for spacing */
   border-radius: 4px; /* Add rounded corners */
-  font-size: 20px;
+  font-size: 30px;
 
   /* Use Google Fonts for the Sports World font */
-  font-family: 'Sports World', sans-serif;
+  font-family: "Tourney", sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.narrow-input {
+  width: 50px;
+}
+
+.host-score-td {
+  font-size: 20px;
+  color: rgba(0, 0, 255, 0.744);
+  font-weight: bold;
+  font-family: "Tourney", sans-serif;
 }
 </style>

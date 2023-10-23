@@ -12,5 +12,7 @@ CREATE TABLE users
     school_name         varchar(50) NULL,
     years_of_exp        BIGINT NULL,
     idc_team_id         uuid REFERENCES idc_team (idc_team_id),
-    game_team_id        uuid REFERENCES game_team (game_team_id)
+    game_team_id        uuid REFERENCES game_team (game_team_id),
+    is_registered       BOOL DEFAULT FALSE,
+    user_type           varchar(10) NULL,
 );

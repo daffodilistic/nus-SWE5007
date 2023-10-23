@@ -64,7 +64,7 @@ public class IdcTeamController {
         val i = o.map(idcTeamJpa -> {
             val idcTeamResponse = IdcTeamResponse.toIdcTeamResponse(idcTeamJpa);
             idcTeamResponse.setUserResponses(idcTeamJpa.getUsers() == null ? null :
-                    idcTeamJpa.getUsers().stream().map(UserResponse::toUserResponse).collect(Collectors.toList()));
+                    idcTeamJpa.getUsers().stream().map(user -> UserResponse.toUserResponse(user, null)).collect(Collectors.toList()));
             return idcTeamResponse;
         }).orElse(null);
 
@@ -219,7 +219,14 @@ public class IdcTeamController {
 
     @GetMapping("/view-all-participants-files")
     public ResponseEntity<GeneralMessageEntity> getAllFiles() {
-        List<String> fileNames = fileService.getAllDownloadableFilesFromParticipants();
+        List<String> fileNames = fileService.getAllDownloadableFiles(true);
+        return ResponseEntity.ok(GeneralMessageEntity.builder()
+                .data(fileNames).build());
+    }
+
+    @GetMapping("/view-all-admin-files")
+    public ResponseEntity<GeneralMessageEntity> getAllFiles2() {
+        List<String> fileNames = fileService.getAllDownloadableFiles(false);
         return ResponseEntity.ok(GeneralMessageEntity.builder()
                 .data(fileNames).build());
     }
@@ -240,4 +247,10 @@ public class IdcTeamController {
             return genericFailureMessage();
         }
     }
+
+    @PostMapping(value = "/upload-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<GeneralMessageEntity> uploadFile(@RequestParam("files") MultipartFile[] files) {
+        return fileService.uploadFileToGCP(files[0], "admin");
+    }
+
 }

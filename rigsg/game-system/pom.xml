@@ -32,5 +32,9 @@
 
     <dependencyManagement>
     </dependencyManagement>
+	
+    <build>
+		<finalName>game-system</finalName>
+	</build>
 
 </project>

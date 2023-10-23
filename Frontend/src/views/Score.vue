@@ -1,195 +1,407 @@
 <template>
-
   <div>
-      <!-- show download START-->
-       <b-modal
-          v-model="showDownloadModal"
-          modal-class="custom-modal"
-          title="Download File"
-          hide-footer
-        >
-            <!-- List of users to be displayed inside the modal -->
-            <table class="modal-table">
-                  <thead>
-                    <tr>
-                      <th>Filename</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <template v-if="downloadFileList.length === 0">
-                      <tr>
-                        <td colspan="5"><br><br>No records available.</td>
-                      </tr>
-                      <tr><br><br></tr>
-                    </template>
-                    <template v-else>
-                       <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
-                        <td>{{ file }} </td>
-                        <td> <b-button id = "downloadFile" @click="downloadFile(file)" variant="outline-primary" class="delete-button">
-                <b-icon icon="cloud-download"></b-icon>
-              </b-button></td>
-                      </tr>
-                      <tr><br><br></tr>
-                    </template>
-                  </tbody>
-                </table>
-        </b-modal>
-        <!-- show download Modal END-->
+    <!-- show download START-->
+    <b-modal
+      v-model="showDownloadModal"
+      modal-class="custom-modal"
+      title="Download File"
+      hide-footer
+    >
+      <!-- List of users to be displayed inside the modal -->
+      <table class="modal-table">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-if="downloadFileList.length === 0">
+            <tr>
+              <td colspan="5"><br /><br />No records available.</td>
+            </tr>
+            <tr>
+              <br /><br />
+            </tr>
+          </template>
+          <template v-else>
+            <tr v-for="(file, fileIndex) in downloadFileList" :key="fileIndex">
+              <td>{{ file }}</td>
+              <td>
+                <b-button
+                  id="downloadFile"
+                  @click="downloadFile(file)"
+                  variant="outline-primary"
+                  class="delete-button"
+                >
+                  <b-icon icon="cloud-download"></b-icon>
+                </b-button>
+              </td>
+            </tr>
+            <tr>
+              <br /><br />
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </b-modal>
+    <!-- show download Modal END-->
+    <!-- Show Member Modal START-->
+    <b-modal
+      v-model="showMemberModal"
+      modal-class="modal"
+      hide-footer
+      id="showUserModal"
+      title="Mark Attendance"
+    >
+      <!-- List of users to be displayed inside the modal -->
+      <table class="modal-table">
+        <thead>
+          <tr>
+            <th>S/No</th>
+            <th>User Name</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Attendance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, userIndex) in userList" :key="user.id">
+            <td>{{ userIndex + 1 }}</td>
+            <td>{{ user.userName }}</td>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+
+            <td>
+              <b-button
+                id="edit-button"
+                @click="markAttendance(user.id, user.isRegistered)"
+                variant="outline-primary"
+                class="delete-button"
+                v-b-tooltip.hover="
+                  'Click to update attendance for this participant!'
+                "
+              >
+                <span v-if="user.isRegistered === true"
+                  ><b-icon icon="check-lg"></b-icon
+                ></span>
+                <span v-else><b-icon icon="x-lg"></b-icon></span>
+              </b-button>
+            </td>
+          </tr>
+          <tr></tr>
+        </tbody>
+      </table>
+    </b-modal>
+    <!-- Show Member Modal END-->
     <div class="search-container">
       <table>
         <tr>
-          <td><p class="h3 mb-2"><b-icon icon="filter" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
           <td>
-            <select name="game-type" class="filter-dropdown" v-model="selectedQualification">
+            <p class="h3 mb-2">
+              <b-icon icon="filter" style="color: rgb(65, 127, 202)"></b-icon>
+            </p>
+          </td>
+          &nbsp;
+          <td>
+            <select
+              name="game-type"
+              class="filter-dropdown"
+              v-model="selectedQualification"
+            >
               <option value="" disabled selected>Select Stage Name</option>
               <!-- Use v-for to loop through competitionChoiceOptions -->
-              <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
+              <option
+                v-for="option in filteredQualificationOptions"
+                :value="option.value"
+                :key="option.value"
+              >
+                {{ option.text }}
+              </option>
             </select>
           </td>
           <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-          <td><p class="h3 mb-2"><b-icon icon="search" style='color: rgb(65, 127, 202)'></b-icon></p></td>&nbsp;
-          <td><input type="text" v-model="searchQuery" placeholder="Search Team Name" class="search-box"></td>
+          <td>
+            <p class="h3 mb-2">
+              <b-icon icon="search" style="color: rgb(65, 127, 202)"></b-icon>
+            </p>
+          </td>
+          &nbsp;
+          <td>
+            <input
+              type="text"
+              v-model="searchQuery"
+              placeholder="Search Team Name"
+              class="search-box"
+            />
+          </td>
         </tr>
       </table>
     </div>
-    <div v-if="teams && teams.length > 0">
-    <p>Showing {{ totalRecords }} records</p>
-
-    <table class="main-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>S/No</th>
-          <th>Team Name</th>
-          <th>Age Group</th>
-          <th>Teacher Name</th>
-          <th>Score</th>
-          <th>Qualification Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-
-      <tbody v-for="(team, index) in filteredTeamsByQualification" :key="index">
-        <tr :class="{'parent-row': true, 'active-row': activeRow === index}" @click="toggleRow(index)">
-          <td>
-            <i :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'" class="expand-icon" @click="toggleRow(index)"></i>
-          </td>
-          <td>{{ startIndex + index }}</td>
-          <td>{{ team.teamName }}</td>
-          <td>{{ ageGroupTextMap[team.ageGroup] }} </td>
-          <td>{{ team.teacherName }}</td>
-          <td v-if="team.presentationResponses.length === 0">
-            Not Scored
-          </td>
-          <td v-else v-for="(response, index) in team.presentationResponses" :key="index">
-            <span v-if="response.stage === getQualificationStatus(team)"
-                  :class="{'green-score': response.score > 50, 'red-score': response.score <= 50}">
-              {{ response.score }}
-            </span>
-          </td>
-          <td>
-            {{getQualificationStatus(team) }}
-          </td>
-          <td>
-          <b-button id="viewDownload" @click="viewDownload(team.teamName)" variant="outline-primary" v-b-tooltip.hover="'Click to view team submission'">
-            <b-icon icon="folder2-open"></b-icon>
-          </b-button>
-           </td>
-        </tr>
-    <!-- Child rows for metrics -->
-    <tr v-if="activeRow === index " class="child-row">
-          <td :colspan="10"> <!-- Use colspan to span all columns in the row -->
-            <table class="metrics-table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Metric Name</th>
-                  <th>Metric Weightage</th>
-                  <th>
-                    <span class="step-text">Step 1:</span> <br> <span class="grey-font">Enter Score <br>(out of 100)</span>
-                  </th>
-                  <th>
-                    <span class="step-text">Step 2:</span> <br> <span class="grey-font"> Preview Score</span>
-                  </th>
-                  <th>
-                    <span class="step-text">Step 3:</span> <br> <span class="grey-font"> Update Qualification</span>
-                  </th>
-                  <th>
-                    <span class="step-text">Step 4:</span> <br> <span class="grey-font"> Submit</span>
-                  </th>
-
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(metric, metricIndex) in filteredMetricsForTeam(index)" :key="metricIndex" class="child-row">
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                  <td>{{ metric.metricName }}</td>
-                  <td>{{ metric.metricWeight * 100 +"%" }}</td>
-                  <td><input type="number" v-model="metric.enteredScore" class="form-control" :min="0"></td>
-                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
-                      :rowspan="filteredMetricsForTeam(index).length"
-                      class="score-cell">
-                       <b-button id = "previewScore" @click="previewScore(index)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to preview score'">
-                      <b-icon icon="calculator"></b-icon>
-                    </b-button>
-                    <div class="score">{{  calculatedScore }}</div>
-                  </td>
-                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
-                      :rowspan="filteredMetricsForTeam(index).length">
-                  <div class="form-group select">
-                    <select v-model="qualification" id="category" class="editing-dropdown">
-                      <option value="" disabled selected>Select Qualification Status</option>
-                      <option v-for="option in filteredQualificationOptions" :value="option.value" :key="option.value">{{ option.text }}</option>
-                    </select>
-                  </div>
-                  </td>
-
-                  <td v-if="metricIndex === filteredMetricsForTeam(index).length - 3"
-                      :rowspan="filteredMetricsForTeam(index).length">
-
-                    <b-button id="saveScore" @click="editMetric(index)" variant="outline-primary" class="delete-button" v-b-tooltip.hover="'Click to submit score and qualification for this team'">
-                      <b-icon icon="save"></b-icon>
-                    </b-button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      </tbody>
+    <table class="instruction-table">
+      <tr>
+        <u>Instructions :</u>
+      </tr>
+      <tr>
+        1. Select the stage to be scored using the 'Select Stage Name' dropdown
+        box.
+      </tr>
+      <tr>
+        2. Click on
+        <b-icon icon="card-checklist"></b-icon>
+        to mark team attendance.
+      </tr>
+      <tr>
+        3. Click on
+        <b-icon icon="folder2-open"></b-icon>
+        to view team submission.
+      </tr>
+      <tr>
+        4. Click on
+        <i :class="'fas fa-plus'" class="expand-icon"></i>
+        to view scoring matrics of the team & follow the steps.
+      </tr>
+      <tr>
+        5. Repeat steps 1 to 3 for all teams.
+      </tr>
     </table>
-  </div>
-  <div v-else>
+    <div v-if="teams && teams.length > 0">
+      <p>Showing {{ totalRecords }} records</p>
+
+      <table class="main-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>S/No</th>
+            <th>Team Name</th>
+            <th>Age Group</th>
+            <th>Score</th>
+            <th>Qualification Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody
+          v-for="(team, index) in filteredTeamsByQualification"
+          :key="index"
+        >
+          <tr
+            :class="{ 'parent-row': true, 'active-row': activeRow === index }"
+            @click="toggleRow(index)"
+          >
+            <td>
+              <i
+                :class="activeRow === index ? 'fas fa-minus' : 'fas fa-plus'"
+                class="expand-icon"
+                @click="toggleRow(index)"
+              ></i>
+            </td>
+            <td>{{ startIndex + index }}</td>
+            <td>{{ team.teamName }}</td>
+            <td>{{ ageGroupTextMap[team.ageGroup] }}</td>
+            <td v-if="team.presentationResponses.length === 0">Not Scored</td>
+            <td
+              v-else
+              v-for="(response, index) in team.presentationResponses"
+              :key="index"
+            >
+              <span
+                v-if="response.stage === getQualificationStatus(team)"
+                :class="{
+                  'green-score': response.score > 50,
+                  'red-score': response.score <= 50,
+                }"
+              >
+                {{ response.score }}
+              </span>
+            </td>
+            <td>
+              {{ getQualificationStatus(team) }}
+            </td>
+
+            <td>
+              <b-button
+                id="viewDownload"
+                @click="showTeam(team.id)"
+                variant="outline-primary"
+                v-b-tooltip.hover="'Click to view team members'"
+              >
+                <b-icon icon="card-checklist"></b-icon> </b-button
+              >&nbsp;
+              <b-button
+                id="viewDownload"
+                @click="viewDownload(team.teamName)"
+                variant="outline-primary"
+                v-b-tooltip.hover="'Click to view team submission'"
+              >
+                <b-icon icon="folder2-open"></b-icon>
+              </b-button>
+            </td>
+          </tr>
+          <!-- Child rows for metrics -->
+          <tr v-if="activeRow === index" class="child-row">
+            <td :colspan="10">
+              <!-- Use colspan to span all columns in the row -->
+              <table class="metrics-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Metric Name</th>
+                    <th>Metric Weightage</th>
+                    <th>
+                      <span class="step-text">Step 1:</span> <br />
+                      <span class="grey-font"
+                        >Enter Score <br />(out of 100)</span
+                      >
+                    </th>
+                    <th>
+                      <span class="step-text">Step 2:</span> <br />
+                      <span class="grey-font"> Preview Score</span>
+                    </th>
+                    <th>
+                      <span class="step-text">Step 3:</span> <br />
+                      <span class="grey-font" v-if="!teamToScoreFinSec">
+                        Can Team Advance?</span
+                      >
+                      <span class="grey-font" v-if="teamToScoreFinSec">
+                        Submit Score</span
+                      >
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(metric, metricIndex) in filteredMetricsForTeam(
+                      index
+                    )"
+                    :key="metricIndex"
+                    class="child-row"
+                  >
+                    <td>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </td>
+                    <td>{{ metric.metricName }}</td>
+                    <td>{{ metric.metricWeight * 100 + "%" }}</td>
+                    <td>
+                      <input
+                        type="number"
+                        v-model="metric.enteredScore"
+                        class="form-control"
+                        :min="0"
+                      />
+                    </td>
+                    <td
+                      v-if="
+                        metricIndex === filteredMetricsForTeam(index).length - 3
+                      "
+                      :rowspan="filteredMetricsForTeam(index).length"
+                      class="score-cell"
+                    >
+                      <b-button
+                        id="previewScore"
+                        @click="previewScore(index)"
+                        variant="outline-primary"
+                        class="delete-button"
+                        v-b-tooltip.hover="'Click to preview score'"
+                      >
+                        <b-icon icon="calculator"></b-icon>
+                      </b-button>
+                      <div class="score">{{ calculatedScore }}</div>
+                    </td>
+
+                    <td
+                      v-if="
+                        metricIndex === filteredMetricsForTeam(index).length - 3
+                      "
+                      :rowspan="filteredMetricsForTeam(index).length"
+                    >
+                      <b-button
+                        id="reject-button"
+                        @click="editMetric(index, 'reject')"
+                        variant="outline-primary"
+                        v-b-tooltip.hover="
+                          'Team will not advance to next round'
+                        "
+                        v-if="!teamToScoreFinSec"
+                      >
+                        <img
+                          src="../assets/cross.jpg"
+                          alt="Versus"
+                          width="40px"
+                          height="40px"
+                        />
+                      </b-button>
+                      &nbsp;
+                      <b-button
+                        id="advance-button"
+                        @click="editMetric(index, 'advance')"
+                        variant="outline-primary"
+                        v-b-tooltip.hover="'Team will advance to next round'"
+                        v-if="!teamToScoreFinSec"
+                      >
+                        <img
+                          src="../assets/tick.jpg"
+                          alt="Versus"
+                          width="40px"
+                          height="40px"
+                        />
+                      </b-button>
+                      <b-button
+                        id="advance-button"
+                        @click="editMetric(index, 'reject')"
+                        variant="outline-primary"
+                        v-b-tooltip.hover="'Submit Team Score'"
+                        v-if="teamToScoreFinSec"
+                      >
+                        <img
+                          src="../assets/submit.jpg"
+                          alt="Versus"
+                          width="40px"
+                          height="40px"
+                        />
+                      </b-button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div v-else>
       <!-- Show a loading message or spinner while the data is being fetched -->
       <div class="loader-container">
         <i class="fas fa-spinner fa-spin"></i>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
 import axios from "axios";
-import { CALCULATE_IDC_SCORE_BASE_URL,UPDATE_IDC_TEAM_BASE_URL, QUALIFY_IDC_TEAM_BASE_URL,GET_ALL_IDC_METRIC_BASE_URL, GET_ALL_IDC_TEAM_BASE_URL,VIEW_ALL_FILES_BASE_URL } from '@/api';
-import { competitionChoiceOptions,stageNameOptions } from "../dropdownOptions";
-import Vue from 'vue'
+import { api } from "../api";
+import { competitionChoiceOptions, stageNameOptions } from "../dropdownOptions";
+import Vue from "vue";
+import Swal from "sweetalert2";
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+Vue.use(VueSweetalert2);
 
 export default {
-  name: 'Page1',
+  name: "Page1",
   head() {
     return {
       link: [
         {
-          rel: 'stylesheet',
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
-          integrity: 'sha512-...',
-          crossorigin: 'anonymous',
-          referrerpolicy: 'no-referrer',
+          rel: "stylesheet",
+          href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+          integrity: "sha512-...",
+          crossorigin: "anonymous",
+          referrerpolicy: "no-referrer",
         },
       ],
-    }
+    };
   },
 
   data() {
@@ -198,10 +410,10 @@ export default {
       qualification: "",
       metricRequestBody: [],
       totalRecords: 0,
-      selectedQualification: '',
-      searchQuery: '',
-      teams:[],
-      presentations:[],
+      selectedQualification: "",
+      searchQuery: "",
+      teams: [],
+      presentations: [],
       activeRow: null,
       itemsPerPage: 10, // Number of teams per page
       currentPage: 1, // Current page
@@ -209,35 +421,49 @@ export default {
       metrics: [],
       showDownloadModal: false,
       downloadFileList: [],
-
+      teamToScore: "",
+      teamToScorePro: "",
+      teamToScoreFinFirst: "",
+      teamToScoreFinSec: "",
+      showMemberModal: false,
+      currentTeamID: "",
+      userList: [],
     };
   },
   computed: {
-
+    totalRecordsModal() {
+      return this.userList.length;
+    },
+    paginatedModalUserList() {
+      const startIndex = (this.currentPageModal - 1) * this.itemsPerPageModal;
+      const endIndex = startIndex + this.itemsPerPageModal;
+      return this.userList.slice(startIndex, endIndex);
+    },
     stageNameOptions() {
       return stageNameOptions;
     },
     filteredQualificationOptions() {
-
-      return this.stageNameOptions.filter(option => option.competitionId === '1');
-
+      return this.stageNameOptions.filter(
+        (option) => option.competitionId === "1"
+      );
     },
     filteredCompetitionChoices() {
       return competitionChoiceOptions;
     },
 
     ageGroupTextMap() {
-    // Define a mapping of age group values to their corresponding text
-    const ageGroupMap = {
-      'OC': 'Open Category: 8-15 years old',
-      'JC': 'Junior Category: 8-12 years old',
-      // Add more entries as needed for other age groups
-    };
-    return ageGroupMap;
-  },
+      // Define a mapping of age group values to their corresponding text
+      const ageGroupMap = {
+        OC: "Open Category: 8-15 years old",
+        JC: "Junior Category: 8-12 years old",
+        // Add more entries as needed for other age groups
+      };
+      return ageGroupMap;
+    },
     filteredTeamsByQualification() {
       if (!this.selectedQualification) {
         // If no qualification is selected, return only not qualified teams.
+
         return this.filteredTeams.filter((team) => {
           let result = false;
           result = !team.isQualifiedPromo;
@@ -250,7 +476,10 @@ export default {
         let result = false;
         switch (this.selectedQualification) {
           case "Promotional Round":
-            result = team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage;
+            result =
+              team.isQualifiedPromo &&
+              !team.isQualifiedFinal &&
+              !team.isQualifiedFinalSecondStage;
             break;
           case "Final 1st Stage":
             result = team.isQualifiedFinal && !team.isQualifiedFinalSecondStage;
@@ -269,20 +498,22 @@ export default {
     },
 
     filteredTeams() {
-    // If the teams data is not available yet, return an empty array
-    if (!this.teams || this.teams.length === 0) {
-      return [];
-    }
+      // If the teams data is not available yet, return an empty array
+      if (!this.teams || this.teams.length === 0) {
+        return [];
+      }
 
-    // If the search query is empty, show all teams
-    if (this.searchQuery.trim() === '') {
-      return this.teams;
-    }
+      // If the search query is empty, show all teams
+      if (this.searchQuery.trim() === "") {
+        return this.teams;
+      }
 
-    // Otherwise, filter teams based on the search query
-    const query = this.searchQuery.trim().toLowerCase();
-    return this.teams.filter((team) => team.teamName.toLowerCase().includes(query));
-  },
+      // Otherwise, filter teams based on the search query
+      const query = this.searchQuery.trim().toLowerCase();
+      return this.teams.filter((team) =>
+        team.teamName.toLowerCase().includes(query)
+      );
+    },
     startIndex() {
       return (this.currentPage - 1) * this.itemsPerPage + 1;
     },
@@ -292,63 +523,150 @@ export default {
     },
   },
   async mounted() {
-     let token='';
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+    let token = "";
+    if (
+      Vue.$keycloak &&
+      Vue.$keycloak.token &&
+      Vue.$keycloak.token.length > 0
+    ) {
+      token = Vue.$keycloak.token;
+    } else {
+      token = "mockedToken"; //for unit test
+    }
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     };
     try {
-      this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
+      this.teamsData = await axios.get(`${api.GET_ALL_IDC_TEAM_BASE_URL}`, {
+        headers,
+      });
       const allTeams = this.teamsData.data.data;
 
       // Filter out teams that do not have any of the specified qualifications
       //this.teams = allTeams.filter((team) => team.isQualifiedPromo && !team.isQualifiedFinal && !team.isQualifiedFinalSecondStage);
-      this.teams = allTeams
-      this.presentations = teams.presentationResponses
+      this.teams = allTeams;
+      this.presentations = teams.presentationResponses;
       this.totalRecords = this.teams.length;
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   },
   methods: {
-    async viewDownload(teamName) {
-       let token='';
-       if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+    async markAttendance(userId, userRegStatus) {
+      console.log("userId", userId, "userRegStatus", userRegStatus);
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      let isRegistered = "false";
+      if (userRegStatus) {
+        //true
+        isRegistered = "false";
+      } else {
+        isRegistered = "true";
+      }
+
+      const requestBody = {
+        id: userId,
+        isRegistered: isRegistered,
+      };
+
+      console.log("requestBody", requestBody);
+
+      try {
+        const response = await axios.post(
+          `${api.MARK_ATTENDANCE_BASE_URL}`,
+          requestBody,
+          {
+            headers,
+          }
+        );
+        this.showTeam(this.currentTeamID);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    async showTeam(teamId) {
+      this.currentTeamID = teamId;
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${VIEW_ALL_FILES_BASE_URL}`, { headers });
+        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
+          headers,
+        });
+
+        const allUsers = response.data.data;
+        this.userList = allUsers.filter(
+          (record) =>
+            !record.hasOwnProperty("gameTeam") && record.idcTeam === teamId
+        );
+        this.showMemberModal = true; // Show the modal after fetching the users
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
+    async viewDownload(teamName) {
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      try {
+        const response = await axios.get(`${api.VIEW_ALL_FILES_BASE_URL}`, {
+          headers,
+        });
         const originalArray = response.data.data;
         const prefix = teamName;
 
         // Remove the "participants/" prefix from each item
         const interimArray = originalArray.map((item) => {
           // Use string manipulation to remove the prefix
-          return item.replace('participants/', '');
+          return item.replace("participants/", "");
         });
 
         this.downloadFileList = interimArray.filter((item) => {
-        const parts = item.split('-');
-        if (parts.length > 1) {
-          // Check if the first part of the filename matches the prefix
-          return parts[0] === prefix;
-        }
-        return false;
-      });
+          const parts = item.split("-");
+          if (parts.length > 1) {
+            // Check if the first part of the filename matches the prefix
+            return parts[0] === prefix;
+          }
+          return false;
+        });
         this.showDownloadModal = true; // Show the modal after fetching the users
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Error fetching users:", error);
       }
     },
@@ -371,94 +689,153 @@ export default {
     },
 
     async loadTeam() {
-       let token='';
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+      let token = "";
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       };
       try {
+        this.teamsData = await axios.get(`${api.GET_ALL_IDC_TEAM_BASE_URL}`, {
+          headers,
+        });
 
-            this.teamsData = await axios.get(`${GET_ALL_IDC_TEAM_BASE_URL}`, { headers });
+        this.teams = this.teamsData.data.data;
 
-           this.teams = this.teamsData.data.data;
-            console.log('this.teams',this.teams);
-            //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
+        //this.teams = allTeams.filter((team) => team.isQualifiedPromo || team.isQualifiedFinal || team.isQualifiedFinalSecondStage);
 
-          this.totalRecords = this.teams.length;
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
+        this.totalRecords = this.teams.length;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     },
 
-    async editMetric(index) {
-       let token='';
+    async editMetric(index, qualiStatus) {
+      const confirmation = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, Submit Score!",
+      });
+      if (confirmation.isConfirmed) {
+        let token = "";
 
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
+        if (
+          Vue.$keycloak &&
+          Vue.$keycloak.token &&
+          Vue.$keycloak.token.length > 0
+        ) {
+          token = Vue.$keycloak.token;
+        } else {
+          token = "mockedToken"; //for unit test
+        }
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+
+        // Loop through each metric and add the required data to the array
+        const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
+
+        console.log(
+          "this.teamToScore - ",
+          this.teamToScore,
+          "this.teamToScorePro - ",
+          this.teamToScorePro,
+          "this.teamToScoreFinFirst - ",
+          this.teamToScoreFinFirst,
+          " this.teamToScoreFinSec - ",
+          this.teamToScoreFinSec
+        );
+
+        const metricIdsArray = [];
+        const metricScoreArray = [];
+
+        let qualifiedPromo = false;
+        let qualifiedFinal = false;
+        let qualifiedFinalSec = false;
+        let requestBody;
+        let response;
+
+        if (qualiStatus === "reject") {
+          console.log("qualiStatus===reject");
+          qualifiedPromo = this.teamToScorePro;
+          qualifiedFinal = this.teamToScoreFinFirst;
+          qualifiedFinalSec = this.teamToScoreFinSec;
+        } else {
+          console.log("qualiStatus===advance");
+
+          if (this.teamToScoreFinFirst) {
+            console.log("advance to Final 2nd Stage");
+            qualifiedPromo = true;
+            qualifiedFinal = true;
+            qualifiedFinalSec = true;
+          } else if (this.teamToScorePro) {
+            console.log("advance to Final 1st Stage");
+            qualifiedPromo = true;
+            qualifiedFinal = true;
           } else {
-            token = "mockedToken";//for unit test
+            console.log("advance to Promo Stage");
+            qualifiedPromo = true;
           }
-       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
+        }
 
-      // Loop through each metric and add the required data to the array
-      const metricsForTeam = this.filteredMetricsForTeam(this.activeRow);
-      const team = this.filteredTeams[index];
-      const metricIdsArray = [];
-      const metricScoreArray = [];
+        if (this.teamToScoreFinSec) {
+          this.qualification = "Final 2nd Stage";
+        } else if (this.teamToScoreFinFirst) {
+          this.qualification = "Final 1st Stage";
+        } else if (this.teamToScorePro) {
+          this.qualification = "Promotional Round";
+        } else {
+          this.qualification = "Preliminary Round";
+        }
+        for (const metric of metricsForTeam) {
+          metricIdsArray.push(metric.id);
+          metricScoreArray.push(metric.enteredScore);
+        }
 
-      /*
-      'FTS', 'Final 2nd Stage'
-      'FFS', 'Final 1st Stage'
-      'PRO', 'Promotional Round'
-      'DIQ', 'Not Qualified'
-       */
-      let qualifiedPromo = false;
-      let qualifiedFinal = false ;
-      let qualifiedFinalSec = false ;
-      let requestBody;
-      let response;
+        this.metricRequestBody = {
+          metricIds: metricIdsArray,
+          metricScores: metricScoreArray,
+        };
+        let CalScoreResponse = "";
+        let updateTeamURL = "";
 
-      if (this.qualification==='Promotional Round'){
-        qualifiedPromo = true;
-      }else if(this.qualification==='Final 1st Stage'){
-        qualifiedPromo = true;
-        qualifiedFinal = true;
-      }else if(this.qualification==='Final 2nd Stage'){
-        qualifiedPromo = true;
-        qualifiedFinal = true;
-        qualifiedFinalSec = true;
-      }
-
-      for (const metric of metricsForTeam) {
-        metricIdsArray.push(metric.id);
-        metricScoreArray.push(metric.enteredScore)
-      }
-
-      this.metricRequestBody = {
-        metricIds: metricIdsArray,
-        metricScores: metricScoreArray
-      };
-      let CalScoreResponse = '';
-      let updateTeamURL='';
-      try {
-
-            requestBody = {
-              id: team.id,
-              isQualifiedPromo : qualifiedPromo,
-              isQualifiedFinal : qualifiedFinal,
-              isQualifiedFinalSecondStage : qualifiedFinalSec
-            };
-            CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
-            updateTeamURL = UPDATE_IDC_TEAM_BASE_URL
-            response = await axios.put(`${QUALIFY_IDC_TEAM_BASE_URL}`, requestBody, { headers });
+        try {
+          requestBody = {
+            id: this.teamToScore,
+            isQualifiedPromo: qualifiedPromo,
+            isQualifiedFinal: qualifiedFinal,
+            isQualifiedFinalSecondStage: qualifiedFinalSec,
+          };
+          CalScoreResponse = await axios.post(
+            `${api.CALCULATE_IDC_SCORE_BASE_URL}`,
+            this.metricRequestBody,
+            { headers }
+          );
+          updateTeamURL = api.UPDATE_IDC_TEAM_BASE_URL;
+          response = await axios.put(
+            `${api.QUALIFY_IDC_TEAM_BASE_URL}`,
+            requestBody,
+            { headers }
+          );
+          this.$swal({
+            title: "Success!",
+            text: "Team updated successfully!",
+            icon: "success",
+            timer: 2000, // Display the success message for 2 seconds
+          });
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -468,35 +845,43 @@ export default {
         const presentationObject = {
           score: Math.round(CalScoreResponse.data.data),
           stage: this.qualification,
-          venue: 'some venue'
+          venue: "some venue",
         };
 
-        presentationArray.push(presentationObject)
+        presentationArray.push(presentationObject);
         const updateTeamRequestBody = {
-          id: team.id,
-          presentationRequestsList: presentationArray
+          id: this.teamToScore,
+          presentationRequestsList: presentationArray,
         };
 
         try {
-
-          const updateTeamResponse = await axios.put(`${updateTeamURL}`,updateTeamRequestBody, { headers });
-
+          const updateTeamResponse = await axios.put(
+            `${updateTeamURL}`,
+            updateTeamRequestBody,
+            { headers }
+          );
+          this.teamToScore = "";
           this.loadTeam();
         } catch (error) {
           console.error("Error updating team:", error);
         }
+      }
     },
-     async previewScore(index) {
-       let token='';
+    async previewScore(index) {
+      let token = "";
 
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
-       const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+      if (
+        Vue.$keycloak &&
+        Vue.$keycloak.token &&
+        Vue.$keycloak.token.length > 0
+      ) {
+        token = Vue.$keycloak.token;
+      } else {
+        token = "mockedToken"; //for unit test
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       };
 
       // Loop through each metric and add the required data to the array
@@ -506,23 +891,26 @@ export default {
       const metricScoreArray = [];
       for (const metric of metricsForTeam) {
         metricIdsArray.push(metric.id);
-        metricScoreArray.push(metric.enteredScore)
+        metricScoreArray.push(metric.enteredScore);
       }
 
       this.metricRequestBody = {
         metricIds: metricIdsArray,
-        metricScores: metricScoreArray
+        metricScores: metricScoreArray,
       };
 
-      let CalScoreResponse = '';
+      let CalScoreResponse = "";
       try {
-            CalScoreResponse = await axios.post(`${CALCULATE_IDC_SCORE_BASE_URL}`,this.metricRequestBody, { headers });
+        CalScoreResponse = await axios.post(
+          `${api.CALCULATE_IDC_SCORE_BASE_URL}`,
+          this.metricRequestBody,
+          { headers }
+        );
 
-          this.calculatedScore = Math.round(CalScoreResponse.data.data);
-
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
+        this.calculatedScore = Math.round(CalScoreResponse.data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     },
 
     updateSelectedQualification(qualification) {
@@ -531,52 +919,69 @@ export default {
     },
     filteredMetricsForTeam(teamIndex) {
       const team = this.filteredTeamsByQualification[teamIndex];
-      const qualification = team.isQualifiedFinalSecondStage ? "Final 2nd Stage" :
-                         team.isQualifiedFinal ? "Final 1st Stage" :
-                         team.isQualifiedPromo ? "Promotional Round" :
-                        !team.isQualifiedPromo ? "Preliminary Round" :
-                         null;
+      const qualification = team.isQualifiedFinalSecondStage
+        ? "Final 2nd Stage"
+        : team.isQualifiedFinal
+        ? "Final 1st Stage"
+        : team.isQualifiedPromo
+        ? "Promotional Round"
+        : !team.isQualifiedPromo
+        ? "Preliminary Round"
+        : null;
 
       if (!qualification) {
         // If the team doesn't have any of the specified qualifications, return an empty array
         return [];
       }
 
-    // Filter the metrics based on the team's qualification status
-    return this.metrics.filter((metric) => metric.stageName === qualification);
-  },
+      // Filter the metrics based on the team's qualification status
+      return this.metrics.filter(
+        (metric) => metric.stageName === qualification
+      );
+    },
 
-  async toggleRow(index) {
+    async toggleRow(index) {
+      if (this.activeRow === index) {
+        this.activeRow = null; // Collapse the row if it's already expanded
+      } else {
+        this.calculatedScore = null;
+        this.activeRow = index;
 
-  if (this.activeRow === index) {
-    this.activeRow = null; // Collapse the row if it's already expanded
-  } else {
-    this.calculatedScore = null
-    this.activeRow = index;
+        const team = this.filteredTeamsByQualification[index];
 
-    const team = this.filteredTeamsByQualification[index];
+        this.teamToScore = team.id;
+        this.teamToScorePro = team.isQualifiedPromo;
+        this.teamToScoreFinFirst = team.isQualifiedFinal;
+        this.teamToScoreFinSec = team.isQualifiedFinalSecondStage;
 
-     let token='';
-          if (Vue.$keycloak && Vue.$keycloak.token && Vue.$keycloak.token.length > 0) {
-            token = Vue.$keycloak.token;
-          } else {
-            token = "mockedToken";//for unit test
-          }
+        let token = "";
+        if (
+          Vue.$keycloak &&
+          Vue.$keycloak.token &&
+          Vue.$keycloak.token.length > 0
+        ) {
+          token = Vue.$keycloak.token;
+        } else {
+          token = "mockedToken"; //for unit test
+        }
 
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-    try {
-
-      this.metricData = await axios.get(`${GET_ALL_IDC_METRIC_BASE_URL}`, { headers });
-      this.metrics = this.metricData.data.data;
-
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }
-},
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        try {
+          this.metricData = await axios.get(
+            `${api.GET_ALL_IDC_METRIC_BASE_URL}`,
+            {
+              headers,
+            }
+          );
+          this.metrics = this.metricData.data.data;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    },
   },
   watch: {
     // Watch for changes in the filteredTeamsByQualification computed property
@@ -589,13 +994,13 @@ export default {
 </script>
 
 <style scoped>
-
 .step-text {
   color: black; /* Change the color to your desired color */
 }
 
 .grey-font {
   color: grey;
+  font-weight: normal;
 }
 .green-score {
   color: green;
@@ -652,7 +1057,7 @@ export default {
 }
 
 .active-row {
-  background-color: rgb(218, 234, 253)/* Light blue for active parent row */
+  background-color: rgb(218, 234, 253); /* Light blue for active parent row */
 }
 
 .child-row {
@@ -681,7 +1086,7 @@ export default {
   display: flex;
   justify-content: flex-end; /* Aligns the search box to the right */
   margin-bottom: 20px;
-  margin-right:65px;
+  margin-right: 65px;
 }
 
 /* Search Box Styles */
@@ -795,17 +1200,16 @@ input.form-control.editing-textbox {
 }
 
 .score-cell {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
+}
 
-  }
-
-  .score {
-    padding: 20px;
-    font-weight: bold;
-    font-size: 70px;
-    color: #11059c;
-  }
+.score {
+  padding: 20px;
+  font-weight: bold;
+  font-size: 70px;
+  color: #11059c;
+}
 
 .editing-dropdown {
   font-size: 14px; /* Adjust the font size as needed */
@@ -819,9 +1223,26 @@ input.form-control.editing-textbox {
 
 /* Optionally, add styles for the dropdown arrow icon */
 .editing-dropdown .dropdown-toggle::after {
-  font-family: 'Font Awesome'; /* Assuming you're using Font Awesome for icons */
-  content: '\f107'; /* Replace with the correct icon code */
+  font-family: "Font Awesome"; /* Assuming you're using Font Awesome for icons */
+  content: "\f107"; /* Replace with the correct icon code */
   margin-left: 5px; /* Add some spacing between the text and the icon */
   color: #555; /* Set the color of the icon */
+}
+
+.instruction-table {
+  text-align: left;
+  font-size: 14px;
+  color: #120b51;
+  margin-left: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  height: 100%; /* Fill the height of the modal */
 }
 </style>
