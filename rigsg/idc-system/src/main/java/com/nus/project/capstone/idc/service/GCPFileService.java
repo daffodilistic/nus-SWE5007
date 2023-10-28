@@ -55,7 +55,7 @@ public class GCPFileService {
     @Autowired
     public GCPFileService(
             @Value("${spring.cloud.gcp.project-id}") String gcpProjectId,
-            @Value("${spring.cloud.gcp.credentials.encoded-key}") Optional<String> gcpCredential,
+            @Value("${spring.cloud.gcp.credentials.encoded-key:#{null}}") Optional<String> gcpCredential,
             @Value("${spring.cloud.gcp.bucket.credential:#{null}}") Optional<String> gcpBucketCredential,
             @Value("${spring.cloud.gcp.bucket.id}") String gcpBucketId,
             @Value("${spring.cloud.gcp.bucket.dirName}") String gcpDirectoryName) {

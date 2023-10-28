@@ -5,13 +5,13 @@ spring:
     gcp:
       credentials:
         location: classpath:prod-sql-credential.json
-      project-id: shaped-splicer-397009
+      project-id: apt-terrain-401911
       sql:
         database-name: ric-database
-        instance-connection-name: shaped-splicer-397009:asia-southeast1:prd-ric-database
+        instance-connection-name: apt-terrain-401911:asia-southeast1:prd-ric-database
       bucket:
         credential: classpath:dev-bucket-credential.json
-        id: idc-system-resources
+        id: idc-system-resources-prd
         dirName: participants
   servlet:
     multipart:
