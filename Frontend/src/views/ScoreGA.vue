@@ -1192,10 +1192,24 @@ export default {
     async startElimination() {
       let firstPlaceArray = [];
       let secondPlaceArray = [];
+      console.log("startElim this.groups ", this.groups);
       //loop through all game group, to get its 1st and 2nd place teams.
       for (let index = 0; index < this.groups.length; index++) {
         const grp = this.groups[index];
+        console.log("startElim grp ", grp, " at index ", index);
         for (let index = 0; index < grp.gameTeamResponses.length; index++) {
+          console.log(" grp.gameTeamIdFirst  ", grp.gameTeamIdFirst);
+          console.log(
+            " grp.gameTeamResponses[index].id ",
+            grp.gameTeamResponses[index].id
+          );
+          console.log(
+            "  grp.gameTeamResponses[index].isQualifiedForElimination  ",
+            grp.gameTeamResponses[index].isQualifiedForElimination
+          );
+
+          console.log(" grp.gameTeamIdSecond  ", grp.gameTeamIdSecond);
+
           if (
             grp.gameTeamIdFirst === grp.gameTeamResponses[index].id &&
             grp.gameTeamResponses[index].isQualifiedForElimination
@@ -1205,9 +1219,9 @@ export default {
               groupId: grp.id,
               teamName: grp.gameTeamResponses[index].teamName,
             };
-            if (!firstPlaceArray.includes(details)) {
-              firstPlaceArray.push(details);
-            }
+
+            firstPlaceArray.push(details);
+            console.log("startElim firstPlaceArray ", firstPlaceArray);
           }
           if (
             grp.gameTeamIdSecond === grp.gameTeamResponses[index].id &&
@@ -1219,9 +1233,8 @@ export default {
               teamName: grp.gameTeamResponses[index].teamName,
             };
 
-            if (!secondPlaceArray.includes(details)) {
-              secondPlaceArray.push(details);
-            }
+            secondPlaceArray.push(details);
+            console.log("startElim secondPlaceArray ", secondPlaceArray);
           }
         }
       }
@@ -1238,11 +1251,13 @@ export default {
             stage: "Elim-01",
           };
 
-          const response = await axios.post(
-            `${api.CREATE_GAME_BASE_URL}`,
-            requestBody,
-            { headers }
-          );
+          console.log("create elim game", requestBody);
+
+          //const response = await axios.post(
+          //`${api.CREATE_GAME_BASE_URL}`,
+          //requestBody,
+          //{ headers }
+          //);
           Swal.fire({
             title: "Success!",
             text: "Elimination Round Started!",
