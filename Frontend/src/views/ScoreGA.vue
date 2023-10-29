@@ -1253,11 +1253,11 @@ export default {
 
           console.log("create elim game", requestBody);
 
-          //const response = await axios.post(
-          //`${api.CREATE_GAME_BASE_URL}`,
-          //requestBody,
-          //{ headers }
-          //);
+          const response = await axios.post(
+            `${api.CREATE_GAME_BASE_URL}`,
+            requestBody,
+            { headers }
+          );
           Swal.fire({
             title: "Success!",
             text: "Elimination Round Started!",
