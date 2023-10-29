@@ -170,7 +170,7 @@
                 <th></th>
                 <th>S/No</th>
                 <th>Group Name</th>
-                <th v-if="selectedCompetition === 'Game Arena'">
+                <th v-if="selectedCompetition === 'Grand Arena'">
                   Match Date/time
                 </th>
                 <th>Actions</th>
@@ -478,7 +478,7 @@ export default {
         try {
           let url = "";
           let url2 = "";
-          if (this.selectedCompetition === "Game Arena") {
+          if (this.selectedCompetition === "Grand Arena") {
             url = api.UPDATE_GAME_GROUP_BASE_URL;
             url2 = api.CREATE_GAME_GROUP_BASE_URL;
           } else if (
@@ -568,7 +568,7 @@ export default {
       };
       let response = "";
       try {
-        if (this.selectedCompetition === "Game Arena") {
+        if (this.selectedCompetition === "Grand Arena") {
           response = await axios.get(`${api.GET_ALL_GAME_TEAM_BASE_URL}`, {
             headers,
           });
@@ -615,7 +615,7 @@ export default {
 
           let response;
 
-          if (this.selectedCompetition === "Game Arena") {
+          if (this.selectedCompetition === "Grand Arena") {
             let groupFilteredObj = this.groups.filter(
               (team) => team.id === group.id
             );
@@ -673,7 +673,7 @@ export default {
         };
 
         try {
-          if (this.selectedCompetition === "Game Arena") {
+          if (this.selectedCompetition === "Grand Arena") {
             const response2 = await axios.put(
               `${api.ADD_TEAM_IDC_GROUP_BASE_URL}`,
               requestBody2,
@@ -749,7 +749,7 @@ export default {
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-        if (this.selectedCompetition === "Game Arena") {
+        if (this.selectedCompetition === "Grand Arena") {
           const requestBody = {
             id: this.currentGroupId,
             gameTeamIds: this.selectedTeams,
