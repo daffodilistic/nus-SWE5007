@@ -539,7 +539,7 @@ export default {
         Authorization: `Bearer ${Vue.$keycloak.token}`,
       };
       try {
-        if (this.selectedCompetition === "Game Arena") {
+        if (this.selectedCompetition === "Grand Arena") {
           this.groupsData = await axios.get(
             `${api.GET_ALL_GAME_GROUP_BASE_URL}`,
             {
