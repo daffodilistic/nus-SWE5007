@@ -16,7 +16,7 @@
           IDC team.
         </tr>
         <tr>
-          3. Game Arena (GA) Tab - contain users assigned to GA team.
+          3. Grand Arena (GA) Tab - contain users assigned to GA team.
         </tr>
       </table>
     </div>
@@ -1214,7 +1214,7 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        if (this.selectedCompetition === "Game Arena") {
+        if (this.selectedCompetition === "Grand Arena") {
           this.usersData = await axios.get(
             `${api.GET_ALL_USER_INFO_BASE_URL}`,
             {

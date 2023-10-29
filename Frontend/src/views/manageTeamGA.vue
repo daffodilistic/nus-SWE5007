@@ -867,7 +867,7 @@ export default {
         };
 
         try {
-          if (this.selectedCompetition === "Game Arena") {
+          if (this.selectedCompetition === "Grand Arena") {
             const response2 = await axios.put(``, requestBody2, { headers });
             const response = await axios.delete(``, {
               data: requestBody,

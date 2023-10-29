@@ -305,7 +305,7 @@ export default {
         };
       } else if (
         this.competitionChoice === "GAC" ||
-        this.competitionChoice === "Game Arena"
+        this.competitionChoice === "Grand Arena"
       ) {
         teamData = {
           teamName: this.teamName,
@@ -335,7 +335,7 @@ export default {
           };
         } else if (
           this.competitionChoice === "GAC" ||
-          this.competitionChoice === "Game Arena"
+          this.competitionChoice === "Grand Arena"
         ) {
           RegisterTeamData = {
             id: createTeamResponse.data.data,
