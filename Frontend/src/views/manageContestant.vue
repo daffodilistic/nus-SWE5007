@@ -1234,7 +1234,7 @@ export default {
           );
           this.teachers = this.usersData.data.data.filter(
             (user) =>
-              user.userType === "teacher" && record.hasOwnProperty("gameTeam")
+              user.userType === "teacher" && user.hasOwnProperty("gameTeam")
           );
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
           this.usersData = await axios.get(
@@ -1248,7 +1248,7 @@ export default {
           );
           this.teachers = this.usersData.data.data.filter(
             (user) =>
-              user.userType === "teacher" && record.hasOwnProperty("idcTeam")
+              user.userType === "teacher" && user.hasOwnProperty("idcTeam")
           );
         } else {
           this.usersData = await axios.get(
