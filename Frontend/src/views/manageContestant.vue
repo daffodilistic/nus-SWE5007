@@ -1166,6 +1166,7 @@ export default {
       this.usersData = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
         headers,
       });
+      console.log(this.usersData )
       this.users = this.usersData.data.data.filter(
         (record) =>
           !record.hasOwnProperty("idcTeam") &&
