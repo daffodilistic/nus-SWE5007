@@ -1232,6 +1232,10 @@ export default {
           this.users = this.usersData.data.data.filter((record) =>
             record.hasOwnProperty("gameTeam")
           );
+          this.teachers = this.usersData.data.data.filter(
+            (user) =>
+              user.userType === "teacher" && record.hasOwnProperty("gameTeam")
+          );
         } else if (this.selectedCompetition === "Innovation Design Challenge") {
           this.usersData = await axios.get(
             `${api.GET_ALL_USER_INFO_BASE_URL}`,
@@ -1241,6 +1245,10 @@ export default {
           );
           this.users = this.usersData.data.data.filter((record) =>
             record.hasOwnProperty("idcTeam")
+          );
+          this.teachers = this.usersData.data.data.filter(
+            (user) =>
+              user.userType === "teacher" && record.hasOwnProperty("idcTeam")
           );
         } else {
           this.usersData = await axios.get(
@@ -1253,6 +1261,16 @@ export default {
             (record) =>
               !record.hasOwnProperty("idcTeam") &&
               !record.hasOwnProperty("gameTeam")
+          );
+
+          this.teachers = this.usersData.data.data.filter(
+            (user) =>
+              user.userType === "teacher" &&
+              !record.hasOwnProperty("idcTeam") &&
+              !record.hasOwnProperty("gameTeam")
+          );
+          this.judges = this.usersData.data.data.filter(
+            (user) => user.userType === "judge"
           );
         }
         console.log("this.users", this.users);
