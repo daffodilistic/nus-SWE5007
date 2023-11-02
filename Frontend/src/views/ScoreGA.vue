@@ -343,11 +343,6 @@
                     variant="outline-primary"
                     class="delete-button"
                     v-b-tooltip.hover="'Click to qualify top 2 teams'"
-                    v-bind:disabled="
-                      group.gameTeamResponses.filter(
-                        (team) => team.isQualifiedForElimination
-                      ).length >= 2
-                    "
                   >
                     <b-icon icon="star"></b-icon>
                   </b-button>
@@ -1076,29 +1071,29 @@ export default {
           id: group.id,
         };
         try {
-          // If the group has an ID, update the existing record using a PUT request
-          // const response = await axios.post(
-          //`${api.CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`,
-          //requestBody,
-          //{ headers }
-          // );
-
-          //if (
-          //((response.data.data = "Group "),
-          //group.id,
-          //" is ready for qualification")
-          // ) {
+          //If the group has an ID, update the existing record using a PUT request
           const response = await axios.post(
-            `${api.QUALIFY_GAME_TEAM_BASE_URL}`,
+            `${api.CHECK_GAME_QUALIFICATION_STATUS_BASE_URL}`,
             requestBody,
             { headers }
           );
-          Swal.fire({
-            title: "Success!",
-            text: "Top 2 teams of the group are now qualified for elimination round !",
-            icon: "success",
-          });
-          //}
+
+          if (
+            ((response.data.data = "Group "),
+            group.id,
+            " is ready for qualification")
+          ) {
+            const response = await axios.post(
+              `${api.QUALIFY_GAME_TEAM_BASE_URL}`,
+              requestBody,
+              { headers }
+            );
+            Swal.fire({
+              title: "Success!",
+              text: "Top 2 teams of the group are now qualified for elimination round !",
+              icon: "success",
+            });
+          }
           await delay(1000);
           this.loadGroup();
         } catch (error) {
