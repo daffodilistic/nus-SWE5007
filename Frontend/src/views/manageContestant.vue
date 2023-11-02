@@ -1266,8 +1266,8 @@ export default {
           this.teachers = this.usersData.data.data.filter(
             (user) =>
               user.userType === "teacher" &&
-              !record.hasOwnProperty("idcTeam") &&
-              !record.hasOwnProperty("gameTeam")
+              !user.hasOwnProperty("idcTeam") &&
+              !user.hasOwnProperty("gameTeam")
           );
           this.judges = this.usersData.data.data.filter(
             (user) => user.userType === "judge"
