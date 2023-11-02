@@ -1169,6 +1169,7 @@ export default {
       console.log(this.usersData);
       this.users = this.usersData.data.data.filter(
         (record) =>
+          record.userType === "participants" &&
           !record.hasOwnProperty("idcTeam") &&
           !record.hasOwnProperty("gameTeam")
       );
