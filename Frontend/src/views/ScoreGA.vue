@@ -343,6 +343,11 @@
                     variant="outline-primary"
                     class="delete-button"
                     v-b-tooltip.hover="'Click to qualify top 2 teams'"
+                    v-bind:disabled="
+                      group.gameTeamResponses.filter(
+                        (team) => team.isQualifiedForElimination
+                      ).length >= 2
+                    "
                   >
                     <b-icon icon="star"></b-icon>
                   </b-button>
