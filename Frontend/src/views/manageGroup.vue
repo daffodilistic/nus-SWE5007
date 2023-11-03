@@ -193,8 +193,15 @@
                   ></i>
                 </td>
                 <td>{{ startIndex + index }}</td>
-                <td v-if="!group.editing">
+                <td
+                  v-if="!group.editing && selectedCompetition !== 'Grand Arena'"
+                >
                   {{ group.groupName }}
+                </td>
+                <td
+                  v-if="!group.editing && selectedCompetition === 'Grand Arena'"
+                >
+                  {{ group.id }}
                 </td>
                 <td v-else>
                   <input
