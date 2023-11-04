@@ -170,9 +170,6 @@
                 <th></th>
                 <th>S/No</th>
                 <th>Group Name</th>
-                <th v-if="selectedCompetition === 'Grand Arena'">
-                  Match Date/time
-                </th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -194,7 +191,10 @@
                 </td>
                 <td>{{ startIndex + index }}</td>
                 <td
-                  v-if="!group.editing && selectedCompetition !== 'Grand Arena'"
+                  v-if="
+                    !group.editing &&
+                    selectedCompetition === 'Innovation Design Challenge'
+                  "
                 >
                   {{ group.groupName }}
                 </td>
