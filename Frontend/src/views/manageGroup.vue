@@ -190,17 +190,7 @@
                   ></i>
                 </td>
                 <td>{{ startIndex + index }}</td>
-                <td
-                  v-if="
-                    !group.editing &&
-                    selectedCompetition === 'Innovation Design Challenge'
-                  "
-                >
-                  {{ group.groupName }}
-                </td>
-                <td
-                  v-if="!group.editing && selectedCompetition === 'Grand Arena'"
-                >
+                <td v-if="!group.editing">
                   {{ group.id }}
                 </td>
                 <td v-else>
