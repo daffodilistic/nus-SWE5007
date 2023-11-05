@@ -385,13 +385,13 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
-          headers,
-        });
-        const team = response.data.data;
-        const filteredUser = team.filter(
-          (record) => record.firstName === userName
-        );
+        //const response = await axios.get(`${api.GET_ALL_USER_INFO_BASE_URL}`, {
+        //headers,
+        //});
+        //const team = response.data.data;
+        // const filteredUser = team.filter(
+        //(record) => record.firstName === userName
+        //);
         //this.idcTeamId = filteredUser[0].idcTeam;
         this.idcTeamId = "90af660f-1ebb-4696-a1c7-86f0b9bee659";
         const requestBody = {
