@@ -17,16 +17,23 @@ keycloak.ric-robotics.xyz {
 	}
 }
 
+# Web frontend
 register.ric-robotics.xyz {
 	handle {
-		reverse_proxy 10.148.0.47:8880 {
+		reverse_proxy 10.148.0.474:8880 https://10.99.2.200:80 {
+			lb_policy random
+			lb_retries 1
+			lb_try_duration 5s
+			health_uri /
+			health_interval 10s
+			health_timeout 10s
 			# header_up Host {host} # redundant
 			header_up X-Real-IP {remote}
 			# header_up X-Forwarded-For {remote}  # redundant
 			# header_up X-Forwarded-Port {server_port} # redundant
 			header_down -Server
-			header_down -X-Powered-By
 			header_down -X-Asp*
+			header_down -X-Powered-By
 		}
 		header X-Powered-By "Coffee"
 	}
@@ -36,13 +43,25 @@ register.ric-robotics.xyz {
 	}
 }
 
+# Demo site for testing/debugging purposes
 ric-robotics.xyz {
 	handle {
-		reverse_proxy 10.148.0.47:9990 {
-			# header_up Host {host} # redundant
+		reverse_proxy 10.148.0.47:9990 apt-terrain-401911.as.r.appspot.com {
+			lb_policy random
+			lb_retries 1
+			lb_try_duration 10s
+			health_uri /
+			health_interval 10s
+			health_timeout 10s
+			# required if upstream host header must match TLS SNI value
+			header_up Host {upstream_hostport} 
+			# redundant - already forwarded by default
+			# header_up Host {host} 
 			header_up X-Real-IP {remote}
-			# header_up X-Forwarded-For {remote}  # redundant
-			# header_up X-Forwarded-Port {server_port} # redundant
+			# redundant - already forwarded by default
+			# header_up X-Forwarded-For {remote}
+			# redundant - already forwarded by default
+			# header_up X-Forwarded-Port {server_port}
 			header_down -Server
 			header_down -X-Powered-By
 			header_down -X-Asp*
@@ -55,6 +74,7 @@ ric-robotics.xyz {
 	}
 }
 
+# Game service
 game.ric-robotics.xyz {
 	handle {
 		reverse_proxy 10.148.0.47:9991 {
@@ -74,6 +94,7 @@ game.ric-robotics.xyz {
 	}
 }
 
+# IDC site
 idc.ric-robotics.xyz {
 	handle {
 		reverse_proxy 10.148.0.47:9992 {
@@ -93,6 +114,7 @@ idc.ric-robotics.xyz {
 	}
 }
 
+# Info site
 info.ric-robotics.xyz {
 	handle {
 		reverse_proxy 10.148.0.47:9993 {
