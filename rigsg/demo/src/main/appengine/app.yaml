@@ -1,10 +1,6 @@
-runtime: java
-env: flex
-#entrypoint: java -Xmx128m -jar demo.jar
 service: default
-runtime_config:
-    operating_system: "ubuntu22"
-    runtime_version: "17"
-automatic_scaling:
-  min_num_instances: 1
-  max_num_instances: 1
+runtime: java17
+
+instance_class: b2
+manual_scaling:
+  instances: 1
