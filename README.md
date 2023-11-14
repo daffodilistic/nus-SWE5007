@@ -56,8 +56,18 @@ The following Github Secrets are required:
 - `POSTGRESQL_USERNAME`: The username for the Postgres database
 - `POSTGRESQL_PASSWORD`: The password for the Postgres database
 - `GCP_CREDENTIALS_JSON`: Base64 encoded version of the JSON credentials file
+- 
 ### Google App Engine setup
 1. App Engine Admin API needs to be enabled in the Google Cloud Console, under
 the menu option "APIs and services".
 2. Ensure that the correct default service account used for App Engine is set 
 in App Engine -> Settings.
+3. If using a custom service account key, ensure that the following roles are
+assigned to it (replace admin roles with deployer/viewer/editor if required):
+   - App Engine Admin
+   - Cloud Build Service Account
+   - Cloud SQL Client
+   - Storage Admin
+4. If you want the custom service account key to use the App Engine default
+service account, add the custom service account key as a principal to the
+App Engine default service account
